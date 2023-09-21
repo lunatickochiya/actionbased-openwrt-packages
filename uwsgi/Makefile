@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=uwsgi
 PKG_VERSION:=2.0.21
-PKG_RELEASE:=10
+PKG_RELEASE:=
 
 PYPI_NAME:=uWSGI
 PYPI_SOURCE_NAME:=uwsgi

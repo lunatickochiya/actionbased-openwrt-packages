@@ -5,7 +5,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=webd
 PKG_VERSION:=20230604
-PKG_RELEASE:=2
+PKG_RELEASE:=
 
 include $(INCLUDE_DIR)/package.mk
 
