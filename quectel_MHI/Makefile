@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=pcie_mhi
 PKG_VERSION:=3.2
-PKG_RELEASE:=1
+PKG_RELEASE:=
 
 include $(INCLUDE_DIR)/kernel.mk
 include $(INCLUDE_DIR)/package.mk
