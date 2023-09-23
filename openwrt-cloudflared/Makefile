@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=openwrt-cloudflared
 PKG_VERSION:=2023.8.2
-PKG_RELEASE:=
+PKG_RELEASE:=3
 
 PKG_LICENSE:=MPLv2
 PKG_LICENSE_FILES:=LICENSE
