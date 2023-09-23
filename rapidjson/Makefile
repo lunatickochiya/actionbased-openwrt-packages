@@ -5,12 +5,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=rapidjson
-PKG_RELEASE:=3
+PKG_RELEASE:=4
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/Tencent/rapidjson.git
 PKG_SOURCE_DATE:=2023-08-07
-PKG_SOURCE_VERSION:=null
+PKG_SOURCE_VERSION:=b4a6da3e634c2327eeeb1287a48bc9b6e1e1858c
 PKG_MIRROR_HASH:=skip
 
 PKG_LICENSE:=BSD 3-Clause
