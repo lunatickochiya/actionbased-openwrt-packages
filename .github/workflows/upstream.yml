@@ -190,7 +190,7 @@ jobs:
         git_clone https://github.com/peter-tank/luci-app-dnscrypt-proxy2
         git_clone https://github.com/NateLol/luci-app-oled
         git_clone https://github.com/4IceG/luci-app-3ginfo op3ginfo  && mv -n op3ginfo/{3ginfo,luci-app-3ginfo} ./;rm -rf op3ginfo
-        git_clone https://github.com/sundaqiang/openwrt-packages sundaqiang && mv -n openwrt-packages/luci-* ./; rm -rf sundaqiang
+        git_clone https://github.com/sundaqiang/openwrt-packages sundaqiang && mv -n sundaqiang/luci-* ./; rm -rf sundaqiang
         git_clone https://github.com/vernesong/OpenClash && mv -n OpenClash/luci-app-openclash ./; rm -rf OpenClash
         git_clone https://github.com/pymumu/luci-app-smartdns
         git_clone https://github.com/CHN-beta/rkp-ipid
