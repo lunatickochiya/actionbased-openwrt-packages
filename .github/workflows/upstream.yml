@@ -13,7 +13,7 @@ on:
       - '.gitignore'
       - '.github/diy/**'
   schedule:
-    - cron: 0 */8 * * *
+    - cron: 0 */12 * * *
   workflow_dispatch:
     inputs:
       ssh:
@@ -105,6 +105,7 @@ jobs:
         (
         git_clone https://github.com/pexcn/openwrt-chinadns-ng chinadns-ng
         git_clone https://github.com/xiaorouji/openwrt-passwall && mvdir openwrt-passwall
+        git_clone https://github.com/xiaorouji/openwrt-passwall -b luci-smartdns-dev && mvdir openwrt-passwall-smartdns-dev
         git_clone https://github.com/fw876/helloworld && rm -rf helloworld/v2raya && mvdir helloworld
         git_clone https://github.com/Lienol/openwrt-package liep
         git clone https://github.com/AutoCONFIG/minieap-openwrt -b default
@@ -255,7 +256,7 @@ jobs:
         net/sub-web net/dnsproxy net/haproxy net/v2raya net/cdnspeedtest net/keepalived net/microsocks \
         net/go-nats net/go-wol net/simple-torrent net/bitsrunlogin-go net/transfer net/sing-box net/cloudreve net/daed \
         net/subconverter net/ngrokc net/oscam net/njitclient net/scutclient net/gost net/gowebdav net/qBittorrent-Enhanced-Edition \
-        net/brook \
+        net/brook net/trojan-go net/trojan-plus net/v2ray-core\
         admin/btop libs/jpcre2 libs/wxbase libs/rapidjson libs/libcron libs/quickjspp libs/toml11 libs/libtorrent-rasterbar \
         libs/libdouble-conversion libs/qt6base libs/cxxopts libs/jpcre2 libs/alac \
         utils/qt6tools utils/cpulimit utils/filebrowser utils/cups utils/cups-bjnp utils/joker net/udp2raw net/msd_lite \
