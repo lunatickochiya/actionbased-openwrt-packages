@@ -363,6 +363,18 @@ jobs:
         ) &
 
         (
+        for pkg in $(ls -d */); do
+          if [[ "$(grep "PKG_VERSION" $pkg/Makefile)" && ! "$(grep "PKG_RELEASE" $pkg/Makefile)" ]]; then
+            sed -i "s/\(PKG_VERSION:=.*\)/\1\nPKG_RELEASE:=/" $pkg/Makefile || true
+          fi
+          if [ "$(grep "PKG_RELEASE" $pkg/Makefile)" ]; then
+            sed -i "s/PKG_RELEASE:=.*/PKG_RELEASE:=$(git rev-list --count master $pkg)/" $pkg/Makefile || true
+          fi
+        done
+        touch /tmp/ok2
+        ) &
+
+        (
         rm -rf luci-app-partexp/po/zh_Hans
         bash .github/diy/create_acl_for_luci.sh -a >/dev/null 2>&1 || true
         bash .github/diy/convert_translation.sh -a >/dev/null 2>&1 || true
@@ -377,6 +389,7 @@ jobs:
         sed -i 's/+vsftpd$/+vsftpd-alt/' luci-app-vsftpd/Makefile
         sed -i 's/ +uhttpd-mod-ubus//' luci-app-packet-capture/Makefile
         sed -i '/boot()/,+2d' ddns-scripts/files/etc/init.d/ddns
+        sed -i "/DISTRIB_DESCRIPTION/c\DISTRIB_DESCRIPTION=\"%D %C by Kiddin'\"" base-files/files/etc/openwrt_release
         sed -i "s/PKG_VERSION:=2/PKG_VERSION:=3/" mwan3/Makefile
         sed -i "s/default n/default y/" dockerd/Config.in
         sed -i "/+uhttpd/d" ariang/Makefile
@@ -422,6 +435,11 @@ jobs:
         Emoji=("🎉" "🤞" "✨" "🎁" "🎈" "🎄" "🎨" "💋" "🍓" "🍕" "🍉" "💐" "🌴" "🚀" "🛸" "🗽" "⛅" "🌈" "🔥" "⛄" "🐶" "🏅" "🦄" "🐤")
         git add .
         git commit -m "${Emoji[$[$RANDOM % ${#Emoji[@]}]]} Sync $(date +%Y-%m-%d" "%H:%M:%S)"
+        for pkg in $(git diff-tree --no-commit-id --name-only HEAD); do
+          if [ "$(grep "PKG_RELEASE" $pkg/Makefile)" ]; then
+            sed -i "s/PKG_RELEASE:=.*/PKG_RELEASE:=$(git rev-list --count master $pkg)/" $pkg/Makefile || true
+          fi
+        done
         git reset --soft HEAD^
         git add .
         git commit -m "${Emoji[$[$RANDOM % ${#Emoji[@]}]]} Sync $(date +%Y-%m-%d" "%H:%M:%S)"
