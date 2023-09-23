@@ -16,15 +16,6 @@ diff --git a/luci-app-passwall-smartdns-dev/Makefile b/luci-app-passwall-smartdn
 index ed9770f070..1fea4ee29b 100644
 --- a/luci-app-passwall-smartdns-dev/Makefile
 +++ b/luci-app-passwall-smartdns-dev/Makefile
-@@ -5,7 +5,7 @@
-
- include $(TOPDIR)/rules.mk
-
--PKG_NAME:=luci-app-passwall
-+PKG_NAME:=luci-app-passwall-smartdns-dev
-
- PKG_CONFIG_DEPENDS:= \
- 	CONFIG_PACKAGE_$(PKG_NAME)_Iptables_Transparent_Proxy \
 @@ -35,6 +35,7 @@ PKG_CONFIG_DEPENDS:= \
  LUCI_TITLE:=LuCI support for PassWall
  LUCI_PKGARCH:=all
@@ -292,16 +283,6 @@ index cc39c00a21..079c9723b3 100755
 
 --- a/luci-app-passwall-smartdns-dev/root/usr/share/passwall/0_default_config
 +++ b/luci-app-passwall-smartdns-dev/root/usr/share/passwall/0_default_config
-@@ -7,7 +7,8 @@ config global
- 	option tcp_node_socks_port '1070'
- 	option dns_mode 'dns2tcp'
- 	option remote_dns '1.1.1.1'
--	option filter_proxy_ipv6 '0'
-+	option filter_proxy_ipv6 '1'
-+	option chinadns_ng '1'
- 	option when_chnroute_default_dns 'direct'
- 	option tcp_proxy_mode 'chnroute'
- 	option udp_proxy_mode 'chnroute'
 @@ -45,12 +46,12 @@ config global_other
  	option nodes_ping 'auto_ping tcping'
  
