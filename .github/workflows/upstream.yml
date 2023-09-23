@@ -232,7 +232,7 @@ jobs:
         svn export https://github.com/xiaorouji/openwrt-passwall/branches/luci-smartdns-dev/luci-app-passwall luci-app-passwall-smartdns-dev; sed -i 's/luci-app-passwall/luci-app-passwall-smartdns-dev/g' luci-app-passwall-smartdns-dev/Makefile
         ) &
         (
-        git_sparse_clone master "https://github.com/coolsnowwolf/packages" "leanpkg" net/miniupnpd net/mwan3 multimedia/UnblockNeteaseMusic-Go \
+        git_sparse_clone master "https://github.com/coolsnowwolf/packages" "leanpkg" net/miniupnpd net/mwan3 multimedia/UnblockNeteaseMusic-Go utils/bandwidthd \
         multimedia/UnblockNeteaseMusic net/amule net/softethervpn5 net/antileech net/baidupcs-web net/frp multimedia/gmediarender net/go-aliyundrive-webdav \
         net/qBittorrent-static net/phtunnel \
         net/uugamebooster net/verysync net/vlmcsd net/dnsforwarder net/nps net/tcpping net/netatalk net/pgyvpn
@@ -257,7 +257,7 @@ jobs:
         net/sub-web net/dnsproxy net/haproxy net/v2raya net/cdnspeedtest net/keepalived net/microsocks \
         net/go-nats net/go-wol net/simple-torrent net/bitsrunlogin-go net/transfer net/sing-box net/cloudreve net/daed \
         net/subconverter net/ngrokc net/oscam net/njitclient net/scutclient net/gost net/gowebdav net/qBittorrent-Enhanced-Edition \
-        net/brook net/trojan-go net/trojan-plus net/v2ray-core \
+        net/brook net/trojan-go net/trojan-plus net/v2ray-core lang/lua-maxminddb net/pdnsd-alt \
         admin/btop libs/jpcre2 libs/wxbase libs/rapidjson libs/libcron libs/quickjspp libs/toml11 libs/libtorrent-rasterbar \
         libs/libdouble-conversion libs/qt6base libs/cxxopts libs/jpcre2 libs/alac \
         utils/qt6tools utils/cpulimit utils/filebrowser utils/cups utils/cups-bjnp utils/joker net/udp2raw net/msd_lite \
