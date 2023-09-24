@@ -414,6 +414,9 @@ jobs:
         mkdir -p luci-app-passwall/root/www/luci-static/passwall
         cp -rf luci-app-bypass/root/www/luci-static/bypass/* luci-app-passwall/root/www/luci-static/passwall/
         cp -rf luci-app-bypass/root/usr/share/bypass/GeoLite2-Country.mmdb luci-app-passwall/root/usr/share/passwall/
+        mkdir -p luci-app-passwall-smartdns-dev/root/www/luci-static/passwall
+        cp -rf luci-app-bypass/root/www/luci-static/bypass/* luci-app-passwall-smartdns-dev/root/www/luci-static/passwall/
+        cp -rf luci-app-bypass/root/usr/share/bypass/GeoLite2-Country.mmdb luci-app-passwall-smartdns-dev/root/usr/share/passwall/
         rm -rf dns2tcp/patches/001-build-with-gcc-O3-optimizations.patch
         echo "#page>div[data-v-08ce2a3e]:first-child{display:none}
         button.btn_styles.color1[data-v-82a27618]:last-child{display:none}" >>luci-app-quickstart/htdocs/luci-static/quickstart/style.css
