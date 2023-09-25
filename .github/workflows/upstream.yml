@@ -106,7 +106,7 @@ jobs:
         git_clone https://github.com/pexcn/openwrt-chinadns-ng chinadns-ng
         git_clone https://github.com/xiaorouji/openwrt-passwall && mvdir openwrt-passwall
         git clone https://github.com/xiaorouji/openwrt-passwall -b luci-smartdns-dev openwrt-passwall-smartdns-dev && mvdir openwrt-passwall-smartdns-dev
-        git_clone https://github.com/fw876/helloworld && rm -rf helloworld/v2raya && mvdir helloworld
+        git_clone https://github.com/fw876/helloworld && rm -rf helloworld/v2raya helloworld/v2ray-core && mvdir helloworld
         git_clone https://github.com/Lienol/openwrt-package liep
         git clone https://github.com/AutoCONFIG/minieap-openwrt -b default
         git_clone https://github.com/rufengsuixing/luci-app-autoipsetadder
@@ -230,6 +230,8 @@ jobs:
         svn export https://github.com/openwrt/luci/branches/openwrt-22.03/applications/luci-app-wireguard
         svn export https://github.com/lucikap/Brukamen/trunk/luci-app-ua2f
         svn export https://github.com/HiGarfield/lede-17.01.4-Mod-a/trunk/package/extra/luci-app-openvpn-server
+        svn export https://github.com/coolsnowwolf/lede/trunk/package/network/services/noddos
+        svn export https://github.com/coolsnowwolf/lede/trunk/package/network/services/e2guardian
         svn export https://github.com/xiaorouji/openwrt-passwall/branches/luci-smartdns-dev/luci-app-passwall luci-app-passwall-smartdns-dev; sed -i 's/luci-app-passwall/luci-app-passwall-smartdns-dev/g' luci-app-passwall-smartdns-dev/Makefile
         ) &
         (
