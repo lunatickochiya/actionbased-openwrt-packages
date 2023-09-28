@@ -157,13 +157,13 @@ jobs:
         git_clone https://github.com/ophub/luci-app-amlogic amlogic && mv -n amlogic/luci-app-amlogic ./;rm -rf amlogic
         git_clone https://github.com/mingxiaoyu/luci-app-cloudflarespeedtest cloudflarespeedtest && mv -n cloudflarespeedtest/applications/* ./;rm -rf cloudflarespeedtest
         git_clone https://github.com/xiaorouji/openwrt-passwall2 passwall2 && mv -n passwall2/luci-app-passwall2 ./;rm -rf passwall2
-        git clone --depth 1 -b main https://github.com/xiaorouji/openwrt-passwall passwall && mv -n passwall/luci-app-passwall ./;rm -rf passwall
+        git_clone https://github.com/xiaorouji/openwrt-passwall-packages && mvdir openwrt-passwall-packages
         git clone --depth 1 https://github.com/kiddin9/openwrt-packages && mv -n openwrt-packages/luci-app-bypass openwrt-packages/luci-app-fileassistant ./ ; rm -rf openwrt-packages
         git_clone https://github.com/messense/aliyundrive-fuse aliyundrive && mv -n aliyundrive/openwrt/* ./;rm -rf aliyundrive
         git_clone https://github.com/linkease/nas-packages && mv -n nas-packages/{network/services/*,multimedia/*} ./; rm -rf nas-packages
         git_clone https://github.com/linkease/nas-packages-luci && mv -n nas-packages-luci/luci/* ./; rm -rf nas-packages-luci
         git_clone https://github.com/linkease/istore && mv -n istore/luci/* ./; rm -rf istore
-        git_clone https://github.com/AlexZhuo/luci-app-bandwidthd
+        #git_clone https://github.com/AlexZhuo/luci-app-bandwidthd
         ) &
         (
         git_clone https://github.com/KyleRicardo/MentoHUST-OpenWrt-ipk
@@ -205,7 +205,10 @@ jobs:
         git_clone https://github.com/ykxVK8yL5L/luci-app-synology synology && mv -n synology/luci-app-synology ./ && rm -rf synology
         git_clone https://github.com/htynkn/openwrt-switch-lan-play && mv -n openwrt-switch-lan-play/package/* ./ && rm -rf openwrt-switch-lan-play
         ) &
-        git_clone https://github.com/linkease/openwrt-app-actions &
+        (
+        git_clone https://github.com/linkease/openwrt-app-actions
+        git_clone https://github.com/xiaorouji/openwrt-passwall-packages && mvdir openwrt-passwall-packages
+        ) &
         (
         git_clone https://github.com/honwen/luci-app-shadowsocks-rust
         git_clone https://github.com/Hyy2001X/AutoBuild-Packages && rm -rf AutoBuild-Packages/luci-app-adguardhome && mvdir AutoBuild-Packages
@@ -256,7 +259,7 @@ jobs:
         (
         git_sparse_clone openwrt-23.05 "https://github.com/immortalwrt/packages" "immpkgs" net/mwol net/n2n net/dae \
         net/sub-web net/dnsproxy net/haproxy net/v2raya net/cdnspeedtest net/keepalived net/microsocks \
-        net/go-nats net/go-wol net/simple-torrent net/bitsrunlogin-go net/transfer net/sing-box net/cloudreve net/daed \
+        net/go-nats net/go-wol net/simple-torrent net/bitsrunlogin-go net/transfer net/cloudreve net/daed \
         net/subconverter net/ngrokc net/oscam net/njitclient net/scutclient net/gost net/gowebdav net/qBittorrent-Enhanced-Edition \
         net/brook net/trojan-go net/trojan-plus net/v2ray-core lang/lua-maxminddb net/pdnsd-alt \
         admin/btop libs/jpcre2 libs/wxbase libs/rapidjson libs/libcron libs/quickjspp libs/toml11 libs/libtorrent-rasterbar \
