@@ -8,7 +8,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=trojan-plus
 PKG_VERSION:=10.0.3
-PKG_RELEASE:=7
+PKG_RELEASE:=8
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/peter-tank/trojan-plus.git
@@ -20,8 +20,10 @@ PKG_BUILD_PARALLEL:=1
 PKG_BUILD_DEPENDS:=openssl
 
 PKG_LICENSE:=GPL-3.0
-PKG_LICENSE_FILE:=LICENSE
+PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Trojan-Plus-Group
+
+PKG_BUILD_FLAGS:=gc-sections lto
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
@@ -29,15 +31,9 @@ include $(INCLUDE_DIR)/cmake.mk
 TARGET_CXXFLAGS += -Wall -Wextra
 TARGET_CXXFLAGS += $(FPIC)
 
-# LTO
-TARGET_CXXFLAGS += -flto
-TARGET_LDFLAGS += -flto
-
 # CXX standard
 TARGET_CXXFLAGS += -std=c++11
 TARGET_CXXFLAGS := $(filter-out -O%,$(TARGET_CXXFLAGS)) -O3
-TARGET_CXXFLAGS += -ffunction-sections -fdata-sections
-TARGET_LDFLAGS += -Wl,--gc-sections
 
 CMAKE_OPTIONS += \
 	-DENABLE_MYSQL=OFF \
@@ -52,13 +48,14 @@ CMAKE_OPTIONS += \
 	-DBoost_NO_BOOST_CMAKE=ON
 
 define Package/trojan-plus
-	SECTION:=net
-	CATEGORY:=Network
-	TITLE:=An unidentifiable mechanism that helps you bypass GFW. It's compatible with original trojan with experimental features.
-	URL:=https://github.com/Trojan-Plus-Group/trojan-plus
-	DEPENDS:= \
-		+libpthread +libstdcpp +libopenssl \
-		+boost +boost-system +boost-program_options
+  SECTION:=net
+  CATEGORY:=Network
+  SUBMENU:=Web Servers/Proxies
+  TITLE:=An unidentifiable mechanism that helps you bypass GFW. It's compatible with original trojan with experimental features.
+  URL:=https://github.com/Trojan-Plus-Group/trojan-plus
+  DEPENDS:= \
+    +libpthread +libstdcpp +libopenssl \
+    +boost +boost-system +boost-program_options
 endef
 
 define Package/trojan-plus/install
@@ -67,3 +64,4 @@ define Package/trojan-plus/install
 endef
 
 $(eval $(call BuildPackage,trojan-plus))
+
