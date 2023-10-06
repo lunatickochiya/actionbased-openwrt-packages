@@ -224,6 +224,7 @@ jobs:
         git_clone https://github.com/izilzty/luci-app-chinadns-ng
         git_clone https://github.com/Diciya/luci-app-broadbandacc
         git_clone https://github.com/wiwizcom/WiFiPortal && mvdir WiFiPortal
+        git_clone https://github.com/gSpotx2f/luci-app-internet-detector
         ) &
         (
         svn export https://github.com/Ysurac/openmptcprouter-feeds/trunk/luci-app-iperf
@@ -281,7 +282,7 @@ jobs:
         ) &
         git_sparse_clone master "https://github.com/coolsnowwolf/luci" "leluci" applications libs/luci-lib-fs
         mv -f applications luciapp
-        rm -rf luciapp/{luci-app-qbittorrent,luci-app-cpufreq}
+        rm -rf luciapp/{luci-app-qbittorrent,luci-app-cpufreq,luci-app-zerotier}
         git_sparse_clone openwrt-23.05 "https://github.com/immortalwrt/luci" "immluci" applications protocols/luci-proto-minieap
         mv -n applications/* luciapp/; rm -rf applications
 
