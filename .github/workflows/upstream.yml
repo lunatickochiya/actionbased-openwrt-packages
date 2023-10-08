@@ -182,7 +182,6 @@ jobs:
         git_clone https://github.com/4IceG/luci-app-modemband modemb  && mv -n modemb/* ./;rm -rf modemb
         git_clone https://github.com/ZeaKyX/speedtest-web
         git_clone https://github.com/ZeaKyX/luci-app-speedtest-web
-        git_clone https://github.com/Zxilly/UA2F
         git_clone https://github.com/jhonathanc/ps3netsrv-openwrt && mv -n ps3netsrv-openwrt/* ./;rm -rf ps3netsrv-openwrt
         ) &
         (
@@ -261,7 +260,7 @@ jobs:
         git_sparse_clone openwrt-23.05 "https://github.com/immortalwrt/packages" "immpkgs" net/mwol net/n2n net/dae \
         net/sub-web net/dnsproxy net/haproxy net/v2raya net/cdnspeedtest net/keepalived net/microsocks \
         net/go-nats net/go-wol net/simple-torrent net/bitsrunlogin-go net/transfer net/cloudreve net/daed \
-        net/subconverter net/ngrokc net/oscam net/njitclient net/scutclient net/gost net/gowebdav net/qBittorrent-Enhanced-Edition \
+        net/subconverter net/ngrokc net/oscam net/njitclient net/scutclient net/gost net/ua2f net/gowebdav net/qBittorrent-Enhanced-Edition \
         net/brook net/trojan-go net/trojan-plus net/v2ray-core lang/lua-maxminddb net/pdnsd-alt \
         admin/btop libs/jpcre2 libs/wxbase libs/rapidjson libs/libcron libs/quickjspp libs/toml11 libs/libtorrent-rasterbar \
         libs/libdouble-conversion libs/qt6base libs/cxxopts libs/jpcre2 libs/alac \

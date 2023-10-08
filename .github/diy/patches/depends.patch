@@ -2,37 +2,37 @@
 +++ b/luci-app-aria2/Makefile
 @@ -7,7 +7,7 @@
  include $(TOPDIR)/rules.mk
- 
+
  LUCI_TITLE:=LuCI Support for Aria2
 -LUCI_DEPENDS:=+aria2
 +LUCI_DEPENDS:=+aria2 +ariang
  LUCI_PKGARCH:=all
- 
+
  PKG_MAINTAINER:=Xingwang Liao <kuoruan@gmail.com>
 
 --- a/luci-app-samba4/Makefile
 +++ b//luci-app-samba4/Makefile
 @@ -3,7 +3,7 @@
  include $(TOPDIR)/rules.mk
- 
+
  LUCI_TITLE:=Network Shares - Samba 4 SMB/CIFS fileserver
 -LUCI_DEPENDS:=+samba4-server
 +LUCI_DEPENDS:=+samba4-server +autoshare-samba
- 
+
  include ../../luci.mk
- 
+
 
 --- a/luci-app-ksmbd/Makefile
 +++ b/luci-app-ksmbd/Makefile
 @@ -3,7 +3,7 @@
  include $(TOPDIR)/rules.mk
- 
+
  LUCI_TITLE:=Network Shares - Ksmbd the SMB kernel fileserver
 -LUCI_DEPENDS:=+ksmbd-server
 +LUCI_DEPENDS:=+ksmbd-server +autoshare-ksmbd
- 
+
  include ../../luci.mk
- 
+
 --- a/firewall/Makefile
 +++ b/firewall/Makefile
 @@ -28,9 +28,8 @@ define Package/firewall
@@ -44,7 +44,7 @@
    PROVIDES:=uci-firewall
 -  CONFLICTS:=firewall4
  endef
- 
+
  define Package/firewall/description
 
 --- a/firewall4/Makefile
@@ -95,7 +95,7 @@
 --- a/msmtp/Makefile
 +++ b/msmtp/Makefile
 @@ -46,7 +46,7 @@ endef
- 
+
  define Package/msmtp
  $(call Package/msmtp/Default)
 -  DEPENDS+= +libgnutls +ca-bundle
@@ -103,7 +103,7 @@
    TITLE+= (with SSL support)
    VARIANT:=ssl
    DEFAULT_VARIANT:=1
- 
+
  define Package/luci-app-homeassistant/conffiles
  /etc/config/homeassistant
 
@@ -111,13 +111,13 @@
 +++ b/luci-app-unblockneteasemusic/Makefile
 @@ -5,7 +5,7 @@
  include $(TOPDIR)/rules.mk
- 
+
  LUCI_TITLE:=LuCI support for UnblockNeteaseMusic (JavaScript)
 -LUCI_DEPENDS:=+dnsmasq-full +firewall4 +node \
 +LUCI_DEPENDS:=+dnsmasq-full +UnblockNeteaseMusic +node \
  	@(PACKAGE_libustream-mbedtls||PACKAGE_libustream-openssl||PACKAGE_libustream-wolfssl)
  LUCI_PKGARCH:=all
- 
+
 
 --- a/k3screenctrl/Makefile
 +++ b/k3screenctrl/Makefile
@@ -144,7 +144,7 @@
    MENU:=1
 @@ -95,13 +96,13 @@ define Build/Prepare
  	$(Build/Prepare/Default)
- 
+
  	# Verify dependencies are the vendored version
 -	$(call EnsureVendoredVersion,../containerd/Makefile,containerd.installer)
 -	$(call EnsureVendoredVersion,../runc/Makefile,runc.installer)
@@ -152,7 +152,7 @@
 +	$(call EnsureVendoredVersion,../../packages/utils/containerd/Makefile,containerd.installer)
 +	$(call EnsureVendoredVersion,../../packages/utils/runc/Makefile,runc.installer)
 +	$(call EnsureVendoredVersion,../../packages/utils/tini/Makefile,tini.installer)
- 
+
  	# Verify CLI is the same version
  	( \
 -		CLI_MAKEFILE="../docker/Makefile"; \
@@ -170,19 +170,19 @@
 -  DEPENDS:=ip6tables +kmod-nf-nat6 +kmod-ipt-fullconenat +ip6tables-mod-nat
 +  DEPENDS:=+ip6tables +kmod-nf-nat6 +kmod-ipt-fullconenat +ip6tables-mod-nat
  endef
- 
+
  define KernelPackage/ipt-fullconenat
 
 --- a/luci-app-easymesh/Makefile
 +++ b/luci-app-easymesh/Makefile
 @@ -5,7 +5,7 @@
  include $(TOPDIR)/rules.mk
- 
+
  LUCI_TITLE:=LuCI Support for easymesh
 -LUCI_DEPENDS:=+kmod-cfg80211 +batctl-default +kmod-batman-adv +wpad-openssl +dawn
 +LUCI_DEPENDS:=+kmod-cfg80211 +batctl-default +kmod-batman-adv +wpad-wolfssl +dawn
  LUCI_PKGARCH:=all
- 
+
  PKG_NAME:=luci-app-easymesh
 
 --- a/phtunnel/Makefile
@@ -190,10 +190,10 @@
 @@ -36,7 +36,6 @@ PKG_SOURCE:=phtunnel
  PKG_SOURCE_URL:=https://mirrors.oray.com/orayos/packages/$(PKG_NAME)/$(PKG_ARCH_PHT)/$(PKG_VERSION)/bin
  PKG_HASH:=skip
- 
+
 -PKG_FLAGS:=nonshared
  PKG_MAINTAINER:=Oray <developer@oray.com>
- 
+
  include $(INCLUDE_DIR)/package.mk
 
 --- a/pgyvpn/Makefile
@@ -201,23 +201,23 @@
 @@ -36,7 +36,6 @@ PKG_SOURCE:=pgyvpnsvr
  PKG_SOURCE_URL:=https://mirrors.oray.com/orayos/packages/$(PKG_NAME)/$(PKG_ARCH_PGYYPN)/$(PKG_VERSION)/bin
  PKG_HASH:=skip
- 
+
 -PKG_FLAGS:=nonshared
  PKG_MAINTAINER:=Oray <developer@oray.com>
- 
+
  include $(INCLUDE_DIR)/package.mk
 
 --- a/luci-app-upnp/Makefile
 +++ b/luci-app-upnp/Makefile
 @@ -7,7 +7,7 @@
  include $(TOPDIR)/rules.mk
- 
+
  LUCI_TITLE:=Universal Plug & Play configuration module
 -LUCI_DEPENDS:=+miniupnpd +rpcd-mod-ucode
 +LUCI_DEPENDS:=+rpcd-mod-ucode
- 
+
  include ../../luci.mk
- 
+
 
 --- a/luci-app-openclash/Makefile
 +++ b/luci-app-openclash/Makefile
@@ -241,4 +241,15 @@
    TITLE:=wifidog-wiwiz
    URL:=http://www.wiwiz.com
    MENU:=1
- 
+
+--- a/luci-app-rclone/Makefile
++++ b/luci-app-rclone/Makefile
+@@ -15,7 +15,7 @@ PKG_CONFIG_DEPENDS:= \
+
+ LUCI_TITLE:=LuCI support for Rclone
+ LUCI_PKGARCH:=all
+-LUCI_DEPENDS:=+rclone-config \
++LUCI_DEPENDS:=+rclone-config +fuse-overlayfs \
+ 	+PACKAGE_$(PKG_NAME)_INCLUDE_rclone-webui:rclone-webui-react \
+ 	+PACKAGE_$(PKG_NAME)_INCLUDE_rclone-ng:rclone-ng
+
