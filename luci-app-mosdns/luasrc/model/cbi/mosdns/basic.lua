@@ -47,6 +47,10 @@ o:depends("configfile", "/etc/mosdns/config.yaml")
 o = s:taboption("basic", Flag, "redirect", translate("DNS Forward"), translate("Forward Dnsmasq Domain Name resolution requests to MosDNS"))
 o.default = true
 
+o = s:taboption("basic", Flag, "prefer_ipv4", translate("Remote DNS prefer IPv4"), translate("IPv4 is preferred for remote DNS resolution of dual-stack addresses, and is not affected when the destination is IPv6 only"))
+o:depends( "configfile", "/etc/mosdns/config.yaml")
+o.default = true
+
 o = s:taboption("basic", Flag, "custom_local_dns", translate("Custom China DNS"), translate("Follow WAN interface DNS if not enabled"))
 o:depends( "configfile", "/etc/mosdns/config.yaml")
 o.default = false
@@ -101,11 +105,6 @@ o.datatype = "and(uinteger,min(1),max(3))"
 o.default = "2"
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
-o = s:taboption("advanced", Value, "max_conns", translate("Maximum Connections"), translate("Set the Maximum connections for DoH and pipeline's TCP/DoT, Except for the HTTP/3 protocol"))
-o.datatype = "and(uinteger,min(1))"
-o.default = "2"
-o:depends("configfile", "/etc/mosdns/config.yaml")
-
 o = s:taboption("advanced", Value, "idle_timeout", translate("Idle Timeout"), translate("DoH/TCP/DoT Connection Multiplexing idle timeout (default 30 seconds)"))
 o.datatype = "and(uinteger,min(1))"
 o.default = "30"
@@ -121,10 +120,14 @@ o.rmempty = false
 o.default = false
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
-o = s:taboption("advanced", Flag, "enable_ecs_remote", translate("Enable EDNS client subnet"), translate("Add the EDNS Client Subnet option (ECS) to Remote DNS") .. '<br />' .. translate("MosDNS will auto identify the IP address subnet segment of your remote connection (0/24)") .. '<br />' .. translate("If your remote access network changes, May need restart MosDNS to update the ECS request address"))
+o = s:taboption("advanced", Flag, "enable_ecs_remote", translate("Enable EDNS client subnet"))
 o.rmempty = false
 o.default = false
 o:depends("configfile", "/etc/mosdns/config.yaml")
+
+o = s:taboption("advanced", Value, "remote_ecs_ip", translate("IP Address"), translate("Please provide the IP address you use when accessing foreign websites. This IP subnet (0/24) will be used as the ECS address for Remote DNS requests") .. '<br />' .. translate("This feature is typically used when using a self-built DNS server as an Remote DNS upstream (requires support from the upstream server)"))
+o.datatype = "ipaddr"
+o:depends("enable_ecs_remote", "1")
 
 o = s:taboption("advanced", Flag, "dns_leak", translate("Prevent DNS Leaks"), translate("Enable this option fallback policy forces forwarding to remote DNS"))
 o.rmempty = false

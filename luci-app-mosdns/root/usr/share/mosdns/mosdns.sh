@@ -56,21 +56,20 @@ adlist_update() {
     [ "$(uci -q get mosdns.config.adblock)" != 1 ] && exit 0
     ad_source=$(uci -q get mosdns.config.ad_source)
     AD_TMPDIR=$(mktemp -d) || exit 1
-    google_status=$(curl -I -4 -m 3 -o /dev/null -s -w %{http_code} http://www.google.com/generate_204)
     mirror=""
     : > /etc/mosdns/rule/.ad_source
     has_update=0
     for url in $ad_source;
     do
         if [ "$url" != "geosite.dat" ] && [ $(echo "$url" | grep -c -E "^file://") -eq 0 ]; then
+            has_update=1
             echo "$url" >> /etc/mosdns/rule/.ad_source
             filename=$(basename $url)
             if echo "$url" | grep -Eq "^https://raw.githubusercontent.com" ; then
-                [ "$google_status" -ne "204" ] && mirror="https://ghproxy.com/"
+                [ -n "$(uci -q get mosdns.config.github_proxy)" ] && mirror="$(uci -q get mosdns.config.github_proxy)/"
             fi
             echo -e "\e[1;32mDownloading $mirror$url\e[0m"
             curl --connect-timeout 5 -m 90 --ipv4 -kfSLo "$AD_TMPDIR/$filename" "$mirror$url"
-            has_update=1
         fi
     done
     if [ $? -ne 0 ]; then
@@ -82,15 +81,14 @@ adlist_update() {
             mkdir -p /etc/mosdns/rule/adlist
             rm -rf /etc/mosdns/rule/adlist/*
             \cp $AD_TMPDIR/* /etc/mosdns/rule/adlist
-            rm -rf "$AD_TMPDIR"
         }
     fi
+    rm -rf "$AD_TMPDIR"
 }
 
 geodat_update() (
     TMPDIR=$(mktemp -d) || exit 1
-    google_status=$(curl -I -4 -m 3 -o /dev/null -s -w %{http_code} http://www.google.com/generate_204)
-    [ "$google_status" -ne "204" ] && mirror="https://ghproxy.com/"
+    [ -n "$(uci -q get mosdns.config.github_proxy)" ] && mirror="$(uci -q get mosdns.config.github_proxy)/"
     # geoip.dat - cn-private
     echo -e "\e[1;32mDownloading "$mirror"https://github.com/Loyalsoldier/geoip/releases/latest/download/geoip-only-cn-private.dat\e[0m"
     curl --connect-timeout 5 -m 60 --ipv4 -kfSLo "$TMPDIR/geoip.dat" ""$mirror"https://github.com/Loyalsoldier/geoip/releases/latest/download/geoip-only-cn-private.dat"
@@ -125,11 +123,6 @@ geodat_update() (
 
 restart_service() {
     /etc/init.d/mosdns restart
-}
-
-ecs_remote() {
-    ipaddr=$(curl -s --user-agent "curl/8.2.1" --connect-timeout 3 -H "Host:v4.ident.me" 49.12.234.183) || ipaddr=110.34.181.1
-    echo "ecs ${ipaddr%.*}.0/24"
 }
 
 flush_cache() {
@@ -179,9 +172,6 @@ case $script_action in
     ;;
     "adlist_update")
         adlist_update && [ "$has_update" -eq 1 ] && restart_service
-    ;;
-    "ecs_remote")
-        ecs_remote
     ;;
     "flush")
         flush_cache
