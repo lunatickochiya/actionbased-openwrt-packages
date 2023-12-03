@@ -1,7 +1,7 @@
 #
 # This is free software, lisence use MIT.
-# 
-# 
+#
+#
 # <https://github.com/kiddin9/openwrt-packages>
 #
 
@@ -38,7 +38,7 @@ jobs:
     - uses: de-vri-es/setup-git-credentials@v2
       with:
         credentials: https://lunatickochiya:${{ secrets.TOKEN_KIDDIN9 }}@github.com/
-    
+
     - name: Set git identity
       run : |
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -106,6 +106,8 @@ jobs:
         git_clone https://github.com/pexcn/openwrt-chinadns-ng chinadns-ng
         git_clone https://github.com/xiaorouji/openwrt-passwall && mvdir openwrt-passwall
         git clone https://github.com/xiaorouji/openwrt-passwall -b luci-smartdns-dev openwrt-passwall-smartdns-dev && mvdir openwrt-passwall-smartdns-dev
+        #git_sparse_clone main "https://github.com/fw876/helloworld" "helloworld" && rm -rf helloworld/v2raya helloworld/v2ray-core && mvdir helloworld
+        #git clone https://github.com/XiaoliChan/helloworld -b mosdns-support && rm -rf helloworld/v2raya helloworld/v2ray-core helloworld/mosdns && mvdir helloworld
         git clone https://github.com/fw876/helloworld -b main && rm -rf helloworld/v2raya && mvdir helloworld
         git_clone https://github.com/Lienol/openwrt-package liep
         git clone https://github.com/AutoCONFIG/minieap-openwrt -b default
@@ -116,7 +118,7 @@ jobs:
         (
         git_clone https://github.com/jerrykuku/luci-theme-argon
         git_clone https://github.com/jerrykuku/luci-app-argon-config
-        #git_clone https://github.com/jerrykuku/luci-app-vssr
+        # git_clone https://github.com/jerrykuku/luci-app-vssr
         git_clone https://github.com/jerrykuku/luci-app-ttnode
         git_clone https://github.com/sirpdboy/luci-app-advanced
         git_clone https://github.com/sirpdboy/luci-app-autotimeset
@@ -168,7 +170,6 @@ jobs:
         (
         git_clone https://github.com/KyleRicardo/MentoHUST-OpenWrt-ipk
         git_clone https://github.com/frainzy1477/luci-app-clash
-        git_clone https://github.com/yichya/openwrt-cloudflared
         git_clone https://github.com/peter-tank/luci-app-fullconenat
         git_clone https://github.com/sbwml/openwrt-alist && mvdir openwrt-alist
         git_clone https://github.com/gSpotx2f/luci-app-log
@@ -224,6 +225,9 @@ jobs:
         git_clone https://github.com/Diciya/luci-app-broadbandacc
         git_clone https://github.com/wiwizcom/WiFiPortal && mvdir WiFiPortal
         git_clone https://github.com/gSpotx2f/luci-app-internet-detector
+        git_clone https://github.com/vinewx/NanoHatOLED; mv NanoHatOLED/nanohatoled ./;rm -rf NanoHatOLED
+        git_clone https://github.com/zerolabnet/luci-app-torbp
+        git_clone https://github.com/sbwml/luci-app-airconnect airconnect1 && mv airconnect1/* ./ && rm -rf airconnect1
         ) &
         (
         svn export https://github.com/Ysurac/openmptcprouter-feeds/trunk/luci-app-iperf
@@ -239,10 +243,10 @@ jobs:
         git_sparse_clone master "https://github.com/coolsnowwolf/packages" "leanpkg" net/miniupnpd net/mwan3 multimedia/UnblockNeteaseMusic-Go utils/bandwidthd \
         multimedia/UnblockNeteaseMusic net/amule net/softethervpn5 net/antileech net/baidupcs-web net/frp multimedia/gmediarender net/go-aliyundrive-webdav \
         net/qBittorrent-static net/phtunnel \
-        net/uugamebooster net/verysync net/vlmcsd net/dnsforwarder net/nps net/tcpping net/netatalk net/pgyvpn
+        net/uugamebooster net/verysync net/vlmcsd net/dnsforwarder net/tcpping net/netatalk net/pgyvpn
         mv -f miniupnpd miniupnpd-iptables
         git_sparse_clone openwrt-23.05 "https://github.com/openwrt/packages" "oppackages" \
-        utils/coremark utils/watchcat utils/dockerd net/uwsgi net/ddns-scripts net/smartdns net/curl \
+        utils/coremark utils/watchcat utils/dockerd utils/cgroupfs-mount net/uwsgi net/ddns-scripts net/smartdns net/curl \
         net/ariang admin/netdata net/rp-pppoe net/tailscale
         ) &
         (
@@ -262,7 +266,7 @@ jobs:
         net/go-nats net/go-wol net/simple-torrent net/bitsrunlogin-go net/transfer net/cloudreve net/daed \
         net/subconverter net/ngrokc net/oscam net/njitclient net/scutclient net/gost net/ua2f net/gowebdav net/qBittorrent-Enhanced-Edition \
         net/tinyportmapper net/tinyfecvpn net/nexttrace net/pcap-dnsproxy net/rustdesk-server net/tuic-server net/speedtest-go \
-        net/dns-forwarder net/ipset-lists net/ShadowVPN net/adguardhome \
+        net/dns-forwarder net/ipset-lists net/ShadowVPN net/adguardhome net/cloudflared net/nps \
         net/brook net/trojan-go net/trojan-plus net/v2ray-core lang/lua-maxminddb net/pdnsd-alt \
         admin/btop libs/jpcre2 libs/wxbase libs/rapidjson libs/libcron libs/quickjspp libs/toml11 libs/libtorrent-rasterbar \
         libs/libdouble-conversion libs/qt6base libs/cxxopts libs/jpcre2 libs/alac \
@@ -335,7 +339,7 @@ jobs:
              -H "Authorization: Bearer ${{ secrets.TOKEN_KIDDIN9 }}" \
              -X POST -d '{ "query": "query {repository(owner: \"'"$1"'\", name: \"'"$2"'\"){latestRelease{tagName tagCommit{oid}}refs(refPrefix:\"refs/tags/\",last:1,orderBy:{field:TAG_COMMIT_DATE,direction:ASC}){edges{node{name target{oid}}}}defaultBranchRef{target{...on Commit {oid}}}}}"}' https://api.github.com/graphql)
         }
-        for pkg in $(ls !(luci-*|libtorrent-rasterbar|xtables-wgobfs|nexttrace|tuic-server|subconverter|softethervpn5|shadowsocksr-libev|mt76|sub-web|mmdvm-host|alist|curl|qBittorrent-Enhanced-Edition|libwxwidgets|ysf-clients|natter|fullconenat|v2raya|r8152|amule|brook|3proxy|containerd|oscam|netmaker|n2n_v2|naiveproxy|miniupnpd-nft|upx|netdata|tailscale|mosdns|r8168|coremark|mbedtls|rtl8821cu|rtl8188eu|rtl8812au-ac|rtl88x2bu|rtl8189es|quickjspp|accel-ppp)/Makefile); do
+        for pkg in $(ls !(luci-*|cloudflared|joker|aria2|libtorrent-rasterbar|ua2f|homebox|xtables-wgobfs|nexttrace|tuic-server|subconverter|softethervpn5|shadowsocksr-libev|mt76|sub-web|mmdvm-host|alist|curl|qBittorrent-Enhanced-Edition|libwxwidgets|ysf-clients|natter|fullconenat|v2raya|r8152|amule|brook|3proxy|containerd|oscam|netmaker|n2n_v2|naiveproxy|miniupnpd-nft|upx|netdata|tailscale|mosdns|r8168|coremark|mbedtls|rtl8821cu|rtl8188eu|rtl8812au-ac|rtl88x2bu|rtl8189es|quickjspp|accel-ppp)/Makefile); do
           repo="$(grep PKG_SOURCE_URL $pkg | grep github | cut -f 4-5 -d '/' | sed -e 's/.git//' | grep -E '[0-9a-zA-Z_-]+$')" || true
           if [ "$repo" ]; then
             owner="$(echo $repo | cut -f 1 -d '/')"
@@ -360,7 +364,7 @@ jobs:
         done
         touch /tmp/ok
         ) &
-        
+
         (
         for pkg in $(find -maxdepth 1 -type d -name "luci-*" ! -name "luci-app-dockerman" ! -name "luci-app-store"); do
           if [ "$(grep "luci.mk" $pkg/Makefile)" ]; then
@@ -387,7 +391,7 @@ jobs:
         rm -rf luci-app-partexp/po/zh_Hans
         bash .github/diy/create_acl_for_luci.sh -a >/dev/null 2>&1 || true
         bash .github/diy/convert_translation.sh -a >/dev/null 2>&1 || true
-        
+
         #sed -i 's?"http://" + window.location.hostname?window.location.protocol + "//" + window.location.hostname?g' `find luci-app*/luasrc/view/ -maxdepth 2 -name "*.htm"`
         rm -f miniupnpd-iptables/patches/106-spam-syslog*
         sed -i "/minisign:minisign/d" luci-app-dnscrypt-proxy2/Makefile
@@ -426,7 +430,7 @@ jobs:
         rm -rf dns2tcp/patches/001-build-with-gcc-O3-optimizations.patch
         echo "#page>div[data-v-08ce2a3e]:first-child{display:none}
         button.btn_styles.color1[data-v-82a27618]:last-child{display:none}" >>luci-app-quickstart/htdocs/luci-static/quickstart/style.css
-        
+
         sed -i \
           -e 's?include \.\./\.\./\(lang\|devel\)?include $(TOPDIR)/feeds/packages/\1?' \
           -e "s/\(\(^\| \|	\)\(PKG_HASH\|PKG_MD5SUM\|PKG_MIRROR_HASH\|HASH\):=\).*/\1skip/" \
@@ -436,7 +440,7 @@ jobs:
           -e 's/+docker /+docker +dockerd /g' \
           */Makefile
         ) &
-        
+
         while [[ ! -f /tmp/ok ||  ! -f /tmp/ok2 ]]; do
             echo "wait"
           sleep 1
