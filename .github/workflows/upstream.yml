@@ -108,7 +108,7 @@ jobs:
         git clone https://github.com/xiaorouji/openwrt-passwall -b luci-smartdns-dev openwrt-passwall-smartdns-dev && mvdir openwrt-passwall-smartdns-dev
         #git_sparse_clone main "https://github.com/fw876/helloworld" "helloworld" && rm -rf helloworld/v2raya helloworld/v2ray-core && mvdir helloworld
         #git clone https://github.com/XiaoliChan/helloworld -b mosdns-support && rm -rf helloworld/v2raya helloworld/v2ray-core helloworld/mosdns && mvdir helloworld
-        git clone https://github.com/fw876/helloworld -b main && rm -rf helloworld/v2raya && mvdir helloworld
+        git clone https://github.com/fw876/helloworld -b main && rm -rf helloworld/{v2raya,naiveproxy} && mvdir helloworld
         git_clone https://github.com/Lienol/openwrt-package liep
         git clone https://github.com/AutoCONFIG/minieap-openwrt -b default
         git_clone https://github.com/rufengsuixing/luci-app-autoipsetadder
@@ -159,7 +159,6 @@ jobs:
         git_clone https://github.com/ophub/luci-app-amlogic amlogic && mv -n amlogic/luci-app-amlogic ./;rm -rf amlogic
         git_clone https://github.com/mingxiaoyu/luci-app-cloudflarespeedtest cloudflarespeedtest && mv -n cloudflarespeedtest/applications/* ./;rm -rf cloudflarespeedtest
         git_clone https://github.com/xiaorouji/openwrt-passwall2 passwall2 && mv -n passwall2/luci-app-passwall2 ./;rm -rf passwall2
-        git_clone https://github.com/xiaorouji/openwrt-passwall-packages && mvdir openwrt-passwall-packages
         git clone --depth 1 https://github.com/kiddin9/openwrt-packages && mv -n openwrt-packages/luci-app-bypass openwrt-packages/luci-app-fileassistant ./ ; rm -rf openwrt-packages
         #git_clone https://github.com/messense/aliyundrive-fuse aliyundrive && mv -n aliyundrive/openwrt/* ./;rm -rf aliyundrive
         git_clone https://github.com/linkease/nas-packages && mv -n nas-packages/{network/services/*,multimedia/*} ./; rm -rf nas-packages
@@ -207,7 +206,7 @@ jobs:
         ) &
         (
         git_clone https://github.com/linkease/openwrt-app-actions
-        git_clone https://github.com/xiaorouji/openwrt-passwall-packages && mvdir openwrt-passwall-packages
+        git_clone https://github.com/xiaorouji/openwrt-passwall-packages && rm -rf openwrt-passwall-packages/naiveproxy && mvdir openwrt-passwall-packages
         ) &
         (
         git_clone https://github.com/honwen/luci-app-shadowsocks-rust
@@ -219,7 +218,6 @@ jobs:
         git_clone https://github.com/lazywalker/mmdvm-openwrt; rm -rf mmdvm-openwrt/misc; mvdir mmdvm-openwrt
         ) &
         (
-        git_clone https://github.com/pexcn/openwrt-dns2tcp dns2tcp
         git_clone https://github.com/BoringCat/luci-app-minieap
         git_clone https://github.com/izilzty/luci-app-chinadns-ng
         git_clone https://github.com/Diciya/luci-app-broadbandacc
@@ -266,7 +264,7 @@ jobs:
         net/go-nats net/go-wol net/simple-torrent net/bitsrunlogin-go net/transfer net/cloudreve net/daed \
         net/subconverter net/ngrokc net/oscam net/njitclient net/scutclient net/gost net/ua2f net/gowebdav net/qBittorrent-Enhanced-Edition \
         net/tinyportmapper net/tinyfecvpn net/nexttrace net/pcap-dnsproxy net/rustdesk-server net/tuic-server net/speedtest-go \
-        net/dns-forwarder net/ipset-lists net/ShadowVPN net/adguardhome net/cloudflared net/nps \
+        net/dns-forwarder net/ipset-lists net/ShadowVPN net/adguardhome net/cloudflared net/nps net/naiveproxy \
         net/brook net/trojan-go net/trojan-plus net/v2ray-core lang/lua-maxminddb net/pdnsd-alt \
         admin/btop libs/jpcre2 libs/wxbase libs/rapidjson libs/libcron libs/quickjspp libs/toml11 libs/libtorrent-rasterbar \
         libs/libdouble-conversion libs/qt6base libs/cxxopts libs/jpcre2 libs/alac \
@@ -427,7 +425,6 @@ jobs:
         mkdir -p luci-app-passwall-smartdns-dev/root/www/luci-static/passwall
         cp -rf luci-app-bypass/root/www/luci-static/bypass/* luci-app-passwall-smartdns-dev/root/www/luci-static/passwall/
         cp -rf luci-app-bypass/root/usr/share/bypass/GeoLite2-Country.mmdb luci-app-passwall-smartdns-dev/root/usr/share/passwall/
-        rm -rf dns2tcp/patches/001-build-with-gcc-O3-optimizations.patch
         echo "#page>div[data-v-08ce2a3e]:first-child{display:none}
         button.btn_styles.color1[data-v-82a27618]:last-child{display:none}" >>luci-app-quickstart/htdocs/luci-static/quickstart/style.css
 
