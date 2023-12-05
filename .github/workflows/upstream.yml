@@ -228,14 +228,14 @@ jobs:
         git_clone https://github.com/sbwml/luci-app-airconnect airconnect1 && mv airconnect1/* ./ && rm -rf airconnect1
         ) &
         (
-        svn export https://github.com/Ysurac/openmptcprouter-feeds/trunk/luci-app-iperf
-        svn export https://github.com/QiuSimons/OpenWrt-Add/trunk/luci-app-irqbalance
-        #svn export https://github.com/sirpdboy/sirpdboy-package/trunk/luci-app-control-speedlimit
-        #svn export https://github.com/xiaoxifu64/immortalwrt/trunk/package/rooter/ext-rooter-basic
-        svn export https://github.com/openwrt/luci/branches/openwrt-22.03/applications/luci-app-wireguard
-        svn export https://github.com/lucikap/Brukamen/trunk/luci-app-ua2f
-        svn export https://github.com/HiGarfield/lede-17.01.4-Mod-a/trunk/package/extra/luci-app-openvpn-server
-        svn export https://github.com/xiaorouji/openwrt-passwall/branches/luci-smartdns-dev/luci-app-passwall luci-app-passwall-smartdns-dev; sed -i 's/luci-app-passwall/luci-app-passwall-smartdns-dev/g' luci-app-passwall-smartdns-dev/Makefile
+        svn co https://github.com/Ysurac/openmptcprouter-feeds/trunk/luci-app-iperf
+        svn co https://github.com/QiuSimons/OpenWrt-Add/trunk/luci-app-irqbalance
+        #svn co https://github.com/sirpdboy/sirpdboy-package/trunk/luci-app-control-speedlimit
+        #svn co https://github.com/xiaoxifu64/immortalwrt/trunk/package/rooter/ext-rooter-basic
+        svn co https://github.com/openwrt/luci/branches/openwrt-22.03/applications/luci-app-wireguard
+        svn co https://github.com/lucikap/Brukamen/trunk/luci-app-ua2f
+        svn co https://github.com/HiGarfield/lede-17.01.4-Mod-a/trunk/package/extra/luci-app-openvpn-server
+        svn co https://github.com/xiaorouji/openwrt-passwall/branches/luci-smartdns-dev/luci-app-passwall luci-app-passwall-smartdns-dev; sed -i 's/luci-app-passwall/luci-app-passwall-smartdns-dev/g' luci-app-passwall-smartdns-dev/Makefile
         ) &
         (
         git_sparse_clone master "https://github.com/coolsnowwolf/packages" "leanpkg" net/miniupnpd net/mwan3 multimedia/UnblockNeteaseMusic-Go utils/bandwidthd \
