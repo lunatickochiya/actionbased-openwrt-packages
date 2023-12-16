@@ -298,3 +298,277 @@ index cc39c00a21..079c9723b3 100755
  	option geoip_update '0'
  	list gfwlist_url 'https://fastly.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/gfw.txt'
  	list chnroute_url 'https://ispip.clang.cn/all_cn.txt'
+--- a/luci-app-passwall-smartdns-dev/luasrc/model/cbi/passwall/client/type/sing-box.lua
++++ b/luci-app-passwall-smartdns-dev/luasrc/model/cbi/passwall/client/type/sing-box.lua
+@@ -438,6 +438,7 @@ o = s:option(ListValue, option_name("transport"), translate("Transport"))
+ o:value("tcp", "TCP")
+ o:value("http", "HTTP")
+ o:value("ws", "WebSocket")
++o:value("httpupgrade", "HTTPUpgrade")
+ if singbox_tags:find("with_quic") then
+ 	o:value("quic", "QUIC")
+ end
+@@ -509,6 +510,14 @@ o:depends({ [option_name("ws_enableEarlyData")] = true })
+ o = s:option(Value, option_name("ws_earlyDataHeaderName"), translate("Early data header name"), translate("Recommended value: Sec-WebSocket-Protocol"))
+ o:depends({ [option_name("ws_enableEarlyData")] = true })
+
++-- [[ HTTPUpgrade部分 ]]--
++o = s:option(Value, option_name("httpupgrade_host"), translate("HTTPUpgrade Host"))
++o:depends({ [option_name("transport")] = "httpupgrade" })
++
++o = s:option(Value, option_name("httpupgrade_path"), translate("HTTPUpgrade Path"))
++o.placeholder = "/"
++o:depends({ [option_name("transport")] = "httpupgrade" })
++
+ -- [[ gRPC部分 ]]--
+ o = s:option(Value, option_name("grpc_serviceName"), "ServiceName")
+ o:depends({ [option_name("transport")] = "grpc" })
+diff --git a/luci-app-passwall-smartdns-dev/luasrc/model/cbi/passwall/server/type/sing-box.lua b/luci-app-passwall-smartdns-dev/luasrc/model/cbi/passwall/server/type/sing-box.lua
+index 48e6832351..9b659b5994 100644
+--- a/luci-app-passwall-smartdns-dev/luasrc/model/cbi/passwall/server/type/sing-box.lua
++++ b/luci-app-passwall-smartdns-dev/luasrc/model/cbi/passwall/server/type/sing-box.lua
+@@ -310,6 +310,7 @@ o = s:option(ListValue, option_name("transport"), translate("Transport"))
+ o:value("tcp", "TCP")
+ o:value("http", "HTTP")
+ o:value("ws", "WebSocket")
++o:value("httpupgrade", "HTTPUpgrade")
+ o:value("quic", "QUIC")
+ o:value("grpc", "gRPC")
+ o:depends({ [option_name("protocol")] = "shadowsocks" })
+@@ -333,6 +334,14 @@ o:depends({ [option_name("transport")] = "ws" })
+ o = s:option(Value, option_name("ws_path"), translate("WebSocket Path"))
+ o:depends({ [option_name("transport")] = "ws" })
+
++-- [[ HTTPUpgrade部分 ]]--
++
++o = s:option(Value, option_name("httpupgrade_host"), translate("HTTPUpgrade Host"))
++o:depends({ [option_name("transport")] = "httpupgrade" })
++
++o = s:option(Value, option_name("httpupgrade_path"), translate("HTTPUpgrade Path"))
++o:depends({ [option_name("transport")] = "httpupgrade" })
++
+ -- [[ gRPC部分 ]]--
+ o = s:option(Value, option_name("grpc_serviceName"), "ServiceName")
+ o:depends({ [option_name("transport")] = "grpc" })
+diff --git a/luci-app-passwall-smartdns-dev/luasrc/passwall/util_sing-box.lua b/luci-app-passwall-smartdns-dev/luasrc/passwall/util_sing-box.lua
+index 1dbb25f84d..5c05ddb403 100644
+--- a/luci-app-passwall-smartdns-dev/luasrc/passwall/util_sing-box.lua
++++ b/luci-app-passwall-smartdns-dev/luasrc/passwall/util_sing-box.lua
+@@ -146,6 +146,14 @@ function gen_outbound(flag, node, tag, proxy_table)
+ 			}
+ 		end
+
++		if node.transport == "httpupgrade" then
++			v2ray_transport = {
++				type = "httpupgrade",
++				host = node.httpupgrade_host,
++				path = node.httpupgrade_path or "/",
++			}
++		end
++
+ 		if node.transport == "quic" then
+ 			v2ray_transport = {
+ 				type = "quic"
+@@ -421,6 +429,14 @@ function gen_config_server(node)
+ 		}
+ 	end
+
++	if node.transport == "httpupgrade" then
++		v2ray_transport = {
++			type = "httpupgrade",
++			host = node.httpupgrade_host,
++			path = node.httpupgrade_path or "/",
++		}
++	end
++
+ 	if node.transport == "quic" then
+ 		v2ray_transport = {
+ 			type = "quic"
+--- a/luci-app-passwall-smartdns-dev/luasrc/model/cbi/passwall/client/type/sing-box.lua
++++ b/luci-app-passwall-smartdns-dev/luasrc/model/cbi/passwall/client/type/sing-box.lua
+@@ -542,8 +542,6 @@ o = s:option(Flag, option_name("mux"), translate("Mux"))
+ o.rmempty = false
+ o:depends({ [option_name("protocol")] = "vmess" })
+ o:depends({ [option_name("protocol")] = "vless", [option_name("flow")] = "" })
+-o:depends({ [option_name("protocol")] = "http" })
+-o:depends({ [option_name("protocol")] = "socks" })
+ o:depends({ [option_name("protocol")] = "shadowsocks", [option_name("uot")] = "" })
+ o:depends({ [option_name("protocol")] = "trojan" })
+
+@@ -554,13 +552,26 @@ o:value("h2mux")
+ o:depends({ [option_name("mux")] = true })
+
+ o = s:option(Value, option_name("mux_concurrency"), translate("Mux concurrency"))
+-o.default = 8
+-o:depends({ [option_name("mux")] = true })
++o.default = 4
++o:depends({ [option_name("mux")] = true, [option_name("tcpbrutal")] = false })
+
+ o = s:option(Flag, option_name("mux_padding"), translate("Padding"))
+ o.default = 0
+ o:depends({ [option_name("mux")] = true })
+
++-- [[ TCP Brutal ]]--
++o = s:option(Flag, option_name("tcpbrutal"), translate("TCP Brutal"))
++o.default = 0
++o:depends({ [option_name("mux")] = true })
++
++o = s:option(Value, option_name("tcpbrutal_up_mbps"), translate("Max upload Mbps"))
++o.default = "10"
++o:depends({ [option_name("tcpbrutal")] = true })
++
++o = s:option(Value, option_name("tcpbrutal_down_mbps"), translate("Max download Mbps"))
++o.default = "50"
++o:depends({ [option_name("tcpbrutal")] = true })
++
+ o = s:option(Flag, option_name("shadowtls"), "ShadowTLS")
+ o.default = 0
+ o:depends({ [option_name("protocol")] = "vmess", [option_name("tls")] = false })
+diff --git a/luci-app-passwall-smartdns-dev/luasrc/model/cbi/passwall/server/type/sing-box.lua b/luci-app-passwall-smartdns-dev/luasrc/model/cbi/passwall/server/type/sing-box.lua
+index 9b659b5994..50a084286a 100644
+--- a/luci-app-passwall-smartdns-dev/luasrc/model/cbi/passwall/server/type/sing-box.lua
++++ b/luci-app-passwall-smartdns-dev/luasrc/model/cbi/passwall/server/type/sing-box.lua
+@@ -346,6 +346,27 @@ o:depends({ [option_name("transport")] = "httpupgrade" })
+ o = s:option(Value, option_name("grpc_serviceName"), "ServiceName")
+ o:depends({ [option_name("transport")] = "grpc" })
+
++-- [[ Mux ]]--
++o = s:option(Flag, option_name("mux"), translate("Mux"))
++o.rmempty = false
++o:depends({ [option_name("protocol")] = "vmess" })
++o:depends({ [option_name("protocol")] = "vless", [option_name("flow")] = "" })
++o:depends({ [option_name("protocol")] = "shadowsocks" })
++o:depends({ [option_name("protocol")] = "trojan" })
++
++-- [[ TCP Brutal ]]--
++o = s:option(Flag, option_name("tcpbrutal"), translate("TCP Brutal"))
++o.default = 0
++o:depends({ [option_name("mux")] = true })
++
++o = s:option(Value, option_name("tcpbrutal_up_mbps"), translate("Max upload Mbps"))
++o.default = "10"
++o:depends({ [option_name("tcpbrutal")] = true })
++
++o = s:option(Value, option_name("tcpbrutal_down_mbps"), translate("Max download Mbps"))
++o.default = "50"
++o:depends({ [option_name("tcpbrutal")] = true })
++
+ o = s:option(Flag, option_name("bind_local"), translate("Bind Local"), translate("When selected, it can only be accessed locally, It is recommended to turn on when using reverse proxies or be fallback."))
+ o.default = "0"
+
+diff --git a/luci-app-passwall-smartdns-dev/luasrc/passwall/util_sing-box.lua b/luci-app-passwall-smartdns-dev/luasrc/passwall/util_sing-box.lua
+index 5c05ddb403..e49ec99465 100644
+--- a/luci-app-passwall-smartdns-dev/luasrc/passwall/util_sing-box.lua
++++ b/luci-app-passwall-smartdns-dev/luasrc/passwall/util_sing-box.lua
+@@ -116,10 +116,15 @@ function gen_outbound(flag, node, tag, proxy_table)
+ 			mux = {
+ 				enabled = true,
+ 				protocol = node.mux_type or "h2mux",
+-				max_connections = tonumber(node.mux_concurrency) or 4,
++				max_connections = ( (node.tcpbrutal == "1") and 1 ) or tonumber(node.mux_concurrency) or 4,
+ 				padding = (node.mux_padding == "1") and true or false,
+ 				--min_streams = 4,
+ 				--max_streams = 0,
++				brutal = {
++					enabled = (node.tcpbrutal == "1") and true or false,
++					up_mbps = tonumber(node.tcpbrutal_up_mbps) or 10,
++					down_mbps = tonumber(node.tcpbrutal_down_mbps) or 50,
++				},
+ 			}
+ 		end
+
+@@ -410,6 +415,19 @@ function gen_config_server(node)
+ 		}
+ 	end
+
++	local mux = nil
++	if node.mux == "1" then
++		mux = {
++			enabled = true,
++			padding = (node.mux_padding == "1") and true or false,
++			brutal = {
++				enabled = (node.tcpbrutal == "1") and true or false,
++				up_mbps = tonumber(node.tcpbrutal_up_mbps) or 10,
++				down_mbps = tonumber(node.tcpbrutal_down_mbps) or 50,
++			},
++		}
++	end
++
+ 	local v2ray_transport = nil
+
+ 	if node.transport == "http" then
+@@ -499,6 +517,7 @@ function gen_config_server(node)
+ 		protocol_table = {
+ 			method = node.method,
+ 			password = node.password,
++			multiplex = mux,
+ 		}
+ 	end
+
+@@ -515,6 +534,7 @@ function gen_config_server(node)
+ 			protocol_table = {
+ 				users = users,
+ 				tls = (node.tls == "1") and tls or nil,
++				multiplex = mux,
+ 				transport = v2ray_transport,
+ 			}
+ 		end
+@@ -533,6 +553,7 @@ function gen_config_server(node)
+ 			protocol_table = {
+ 				users = users,
+ 				tls = (node.tls == "1") and tls or nil,
++				multiplex = mux,
+ 				transport = v2ray_transport,
+ 			}
+ 		end
+@@ -552,6 +573,7 @@ function gen_config_server(node)
+ 				tls = (node.tls == "1") and tls or nil,
+ 				fallback = nil,
+ 				fallback_for_alpn = nil,
++				multiplex = mux,
+ 				transport = v2ray_transport,
+ 			}
+ 		end
+--- a/luci-app-passwall-smartdns-dev/luasrc/model/cbi/passwall/client/type/hysteria2.lua
++++ b/luci-app-passwall-smartdns-dev/luasrc/model/cbi/passwall/client/type/hysteria2.lua
+@@ -44,6 +44,9 @@ o = s:option(Value, option_name("tls_serverName"), translate("Domain"))
+ o = s:option(Flag, option_name("tls_allowInsecure"), translate("allowInsecure"), translate("Whether unsafe connections are allowed. When checked, Certificate validation will be skipped."))
+ o.default = "0"
+
++o = s:option(Value, option_name("tls_pinSHA256"), translate("PinSHA256"),translate("Certificate fingerprint"))
++o.rewrite_option = o.option
++
+ o = s:option(Value, option_name("up_mbps"), translate("Max upload Mbps"))
+ o.rewrite_option = o.option
+
+diff --git a/luci-app-passwall-smartdns-dev/luasrc/passwall/util_hysteria2.lua b/luci-app-passwall-smartdns-dev/luasrc/passwall/util_hysteria2.lua
+index a96d1f2f2d..54f723f85f 100644
+--- a/luci-app-passwall-smartdns-dev/luasrc/passwall/util_hysteria2.lua
++++ b/luci-app-passwall-smartdns-dev/luasrc/passwall/util_hysteria2.lua
+@@ -77,7 +77,8 @@ function gen_config(var)
+ 		auth = node.hysteria2_auth_password,
+ 		tls = {
+ 			sni = node.tls_serverName,
+-			insecure = (node.tls_allowInsecure == "1") and true or false
++			insecure = (node.tls_allowInsecure == "1") and true or false,
++			pinSHA256 = (node.hysteria2_tls_pinSHA256) and node.hysteria2_tls_pinSHA256 or nil,
+ 		},
+ 		quic = {
+ 			initStreamReceiveWindow = (node.hysteria2_recv_window) and tonumber(node.hysteria2_recv_window) or nil,
+diff --git a/luci-app-passwall-smartdns-dev/po/zh-cn/passwall.po b/luci-app-passwall-smartdns-dev/po/zh-cn/passwall.po
+index ec62291768..1483e14602 100644
+--- a/luci-app-passwall-smartdns-dev/po/zh-cn/passwall.po
++++ b/luci-app-passwall-smartdns-dev/po/zh-cn/passwall.po
+@@ -514,6 +514,12 @@ msgstr "认证密码"
+ msgid "Commands the client to use the BBR flow control algorithm"
+ msgstr "命令客户端使用 BBR 流量控制算法"
+
++msgid "PinSHA256"
++msgstr "PinSHA256"
++
++msgid "Certificate fingerprint"
++msgstr "证书指纹"
++
+ msgid "Max upload Mbps"
+ msgstr "最大上行(Mbps)"
+
