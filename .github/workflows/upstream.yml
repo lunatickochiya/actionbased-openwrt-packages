@@ -283,6 +283,7 @@ jobs:
         (
         git_sparse_clone master "https://github.com/x-wrt/com.x-wrt" "x-wrt" luci-app-macvlan luci-app-xwan
         git_sparse_clone master "https://github.com/sbwml/openwrt_pkgs" "openwrt_pkgs" luci-app-gowebdav luci-app-socat
+        git_sparse_clone master "https://github.com/coolsnowwolf/lede" "leanlede" package/lean package/wwan package/network/services/shellsync package/network/services/e2guardian package/network/services/noddos
         ) &
         git_sparse_clone master "https://github.com/coolsnowwolf/luci" "leluci" applications libs/luci-lib-fs
         mv -f applications luciapp
@@ -296,8 +297,6 @@ jobs:
             rm -rf $ipk
         	fi
         done
-
-        git_sparse_clone master "https://github.com/coolsnowwolf/lede" "leanlede" package/lean package/wwan package/network/services/shellsync package/network/services/e2guardian package/network/services/noddos
 
     - name: Delete duplicated packages
       run: |
