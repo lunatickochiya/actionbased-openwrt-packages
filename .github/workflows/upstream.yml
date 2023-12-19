@@ -306,7 +306,7 @@ jobs:
         mv -n liep/* ./ ; rm -Rf liep
         mv -n wwan/*/* ./; rm -rf wwan
         mv -n openwrt-app-actions/applications/* ./;rm -rf openwrt-app-actions
-        rm -Rf */.git
+        rm -Rf */.git */.svn
         for pkg in $(ls -d .github/diy/packages/*); do
           mv -f $pkg/Makefile.k $pkg/Makefile >/dev/null 2>&1 || true
         done
