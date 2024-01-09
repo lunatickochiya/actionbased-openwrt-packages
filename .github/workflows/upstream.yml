@@ -105,7 +105,7 @@ jobs:
         (
         git_clone https://github.com/pexcn/openwrt-chinadns-ng chinadns-ng
         git_clone https://github.com/xiaorouji/openwrt-passwall && mvdir openwrt-passwall
-        git clone https://github.com/xiaorouji/openwrt-passwall -b luci-smartdns-dev openwrt-passwall-smartdns-dev && mvdir openwrt-passwall-smartdns-dev
+        git clone https://github.com/xiaorouji/openwrt-passwall -b luci-smartdns-dev openwrt-passwall-smartdns-dev && mv openwrt-passwall-smartdns-dev/luci-app-passwall luci-app-passwall-smartdns-dev && sed -i 's/luci-app-passwall/luci-app-passwall-smartdns-dev/g' luci-app-passwall-smartdns-dev/Makefile && rm -rf openwrt-passwall-smartdns-dev
         #git_sparse_clone main "https://github.com/fw876/helloworld" "helloworld" && rm -rf helloworld/v2raya helloworld/v2ray-core && mvdir helloworld
         #git clone https://github.com/XiaoliChan/helloworld -b mosdns-support && rm -rf helloworld/v2raya helloworld/v2ray-core helloworld/mosdns && mvdir helloworld
         git clone https://github.com/fw876/helloworld -b main && rm -rf helloworld/{v2raya,naiveproxy} && mvdir helloworld
@@ -228,14 +228,10 @@ jobs:
         git_clone https://github.com/sbwml/luci-app-airconnect airconnect1 && mv airconnect1/* ./ && rm -rf airconnect1
         ) &
         (
-        svn co https://github.com/Ysurac/openmptcprouter-feeds/trunk/luci-app-iperf
-        svn co https://github.com/QiuSimons/OpenWrt-Add/trunk/luci-app-irqbalance
-        #svn co https://github.com/sirpdboy/sirpdboy-package/trunk/luci-app-control-speedlimit
-        #svn co https://github.com/xiaoxifu64/immortalwrt/trunk/package/rooter/ext-rooter-basic
-        svn co https://github.com/openwrt/luci/branches/openwrt-22.03/applications/luci-app-wireguard
-        svn co https://github.com/lucikap/Brukamen/trunk/luci-app-ua2f
-        svn co https://github.com/HiGarfield/lede-17.01.4-Mod-a/trunk/package/extra/luci-app-openvpn-server
-        svn co https://github.com/xiaorouji/openwrt-passwall/branches/luci-smartdns-dev/luci-app-passwall luci-app-passwall-smartdns-dev; sed -i 's/luci-app-passwall/luci-app-passwall-smartdns-dev/g' luci-app-passwall-smartdns-dev/Makefile
+        git_clone https://github.com/Ysurac/openmptcprouter-feeds; mv openmptcprouter-feeds/luci-app-iperf ./;rm -rf openmptcprouter-feeds
+        git_clone https://github.com/QiuSimons/OpenWrt-Add; mv OpenWrt-Add/luci-app-irqbalance ./;rm -rf OpenWrt-Add
+        git_clone https://github.com/lucikap/Brukamen; mv Brukamen/luci-app-ua2f ./;rm -rf Brukamen
+        git_clone https://github.com/HiGarfield/lede-17.01.4-Mod; mv lede-17.01.4-Mod/package/extra/luci-app-openvpn-server ./;rm -rf lede-17.01.4-Mod
         ) &
         (
         git_sparse_clone master "https://github.com/coolsnowwolf/packages" "leanpkg" net/miniupnpd net/mwan3 multimedia/UnblockNeteaseMusic-Go utils/bandwidthd \
@@ -261,7 +257,7 @@ jobs:
         (
         git_sparse_clone openwrt-23.05 "https://github.com/immortalwrt/packages" "immpkgs" net/mwol net/n2n net/dae \
         net/sub-web net/dnsproxy net/haproxy net/v2raya net/cdnspeedtest net/keepalived net/microsocks \
-        net/go-nats net/go-wol net/simple-torrent net/bitsrunlogin-go net/transfer net/cloudreve net/daed \
+        net/go-nats net/go-wol net/bitsrunlogin-go net/transfer net/cloudreve net/daed \
         net/subconverter net/ngrokc net/oscam net/njitclient net/scutclient net/gost net/ua2f net/gowebdav net/qBittorrent-Enhanced-Edition \
         net/tinyportmapper net/tinyfecvpn net/nexttrace net/pcap-dnsproxy net/rustdesk-server net/tuic-server net/speedtest-go \
         net/dns-forwarder net/ipset-lists net/ShadowVPN net/adguardhome net/cloudflared net/nps net/naiveproxy \
