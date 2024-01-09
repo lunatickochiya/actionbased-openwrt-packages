@@ -1,10 +1,5 @@
 #!/bin/sh
 
-if [ ! "$(grep "myvpn" /etc/config/openvpn)" ]; then
-rm -f /etc/config/openvpn
-mv -f /etc/config/openvpn-opkg /etc/config/openvpn
-fi
-
 openvpn_port="$(uci -q get openvpn.myvpn.port)"
 [ -z "$openvpn_port" ] && openvpn_port=1197
 
@@ -13,7 +8,7 @@ uci -q batch <<-EOF >/dev/null
 	set network.vpn0=interface
 	set network.vpn0.device='tun0'
 	set network.vpn0.proto='none'
-	
+
 	commit network
 
 	delete firewall.openvpn
@@ -49,6 +44,12 @@ uci -q batch <<-EOF >/dev/null
 	set firewall.lantovpn.dest='vpn'
 
 	commit firewall
+
+	delete ucitrack.@openvpn[-1]
+	add ucitrack openvpn
+	set ucitrack.@openvpn[-1].init=openvpn
+
+	commit ucitrack
 EOF
 
 /etc/init.d/network reload
