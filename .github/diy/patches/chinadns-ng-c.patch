@@ -1,0 +1,33 @@
+From 6ce9545c86358c19f21386d040c536bde05b3805 Mon Sep 17 00:00:00 2001
+From: "github-actions[bot]"
+ <41898282+github-actions[bot]@users.noreply.github.com>
+Date: Fri, 8 Mar 2024 07:51:26 +0800
+Subject: [PATCH] =?UTF-8?q?=E2=9C=A8=20Sync=202024-03-08=2007:51:26?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ chinadns-ng/Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/chinadns-ng/Makefile b/chinadns-ng/Makefile
+index 3f6e0dd7..4edea58f 100644
+--- a/chinadns-ng/Makefile
++++ b/chinadns-ng/Makefile
+@@ -1,12 +1,12 @@
+ include $(TOPDIR)/rules.mk
+ 
+ PKG_NAME:=chinadns-ng
+-PKG_VERSION:=2023.06.05
+-PKG_RELEASE:=1
++PKG_VERSION:=2023.10.28
++PKG_RELEASE:=1
+ 
+ PKG_SOURCE_PROTO:=git
+ PKG_SOURCE_URL:=https://github.com/zfl9/chinadns-ng.git
+-PKG_SOURCE_VERSION:=33e75ed57a8dd152ab67451216384ca1b23b9d66
++PKG_SOURCE_VERSION:=66426e2da2c9e34d70f25a5adf5cb3f588556f41
+ PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
+ PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION)
+ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)/$(PKG_SOURCE_SUBDIR)
