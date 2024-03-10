@@ -12,8 +12,16 @@ You may obtain a copy of the License at
 $Id$
 ]]--
 
-m = Map("vsftpd")
-m.description = translate("FTP Server - General Settings")
+local state_msg = ""
+local running=(luci.sys.call("pidof vsftpd > /dev/null") == 0)
+
+if running then
+	state_msg = "<b><font color=\"green\">" .. translate("Running") .. "</font></b>"
+else
+	state_msg = "<b><font color=\"red\">" .. translate("Not running") .. "</font></b>"
+end
+
+m = Map("vsftpd", translate("FTP Server - General Settings"), translate("vsftpd ") .. state_msg)
 
 sl = m:section(NamedSection, "listen", "listen", translate("Listening Settings"))
 

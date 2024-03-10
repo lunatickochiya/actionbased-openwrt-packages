@@ -7,12 +7,11 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=autocore
 PKG_FLAGS:=nonshared
-PKG_RELEASE:=3
+PKG_RELEASE:=4
 
 PKG_CONFIG_DEPENDS:= \
 	CONFIG_TARGET_bcm27xx \
 	CONFIG_TARGET_bcm53xx \
-	CONFIG_TARGET_mvebu \
 	CONFIG_TARGET_x86
 
 include $(INCLUDE_DIR)/package.mk
@@ -21,9 +20,8 @@ include $(INCLUDE_DIR)/target.mk
 define Package/autocore
   TITLE:=auto core loadbalance script.
   DEPENDS:=@(aarch64||arm||i386||i686||x86_64) \
-    +TARGET_bcm27xx:bcm27xx-userland \
+    +TARGET_bcm27xx:bcm27xx-utils \
     +TARGET_bcm53xx:nvram \
-    +(TARGET_mediatek_filogic||TARGET_mvebu):mhz \
     +TARGET_x86:ethtool \
     +TARGET_x86:lm-sensors
 endef
@@ -42,7 +40,7 @@ endif
 
 	$(INSTALL_DIR) $(1)/sbin
 	$(INSTALL_BIN) ./files/cpuinfo $(1)/sbin/
-ifneq ($(filter ipq% mediatek%, $(TARGETID)),)
+ifneq ($(filter ipq% mediatek% qualcommax%, $(TARGETID)),)
 	$(INSTALL_BIN) ./files/tempinfo $(1)/sbin/
 endif
 

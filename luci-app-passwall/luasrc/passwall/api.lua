@@ -73,7 +73,7 @@ end
 
 function curl_proxy(url, file, args)
 	--使用代理
-	local socks_server = luci.sys.exec("[ -f /tmp/etc/passwall/TCP_SOCKS_server ] && echo -n $(cat /tmp/etc/passwall/TCP_SOCKS_server) || echo -n ''")
+	local socks_server = luci.sys.exec("[ -f /tmp/etc/passwall/acl/default/TCP_SOCKS_server ] && echo -n $(cat /tmp/etc/passwall/acl/default/TCP_SOCKS_server) || echo -n ''")
 	if socks_server ~= "" then
 		if not args then args = {} end
 		local tmp_args = clone(args)
@@ -307,7 +307,7 @@ function get_domain_from_url(url)
 end
 
 function get_valid_nodes()
-	local nodes_ping = uci_get_type("global_other", "nodes_ping") or ""
+	local show_node_info = uci_get_type("global_other", "show_node_info") or "0"
 	local nodes = {}
 	uci:foreach(appname, "nodes", function(e)
 		e.id = e[".name"]
@@ -334,7 +334,7 @@ function get_valid_nodes()
 					end
 					if is_ipv6(address) then address = get_ipv6_full(address) end
 					e["remark"] = "%s：[%s]" % {type, e.remarks}
-					if nodes_ping:find("info") then
+					if show_node_info == "1" then
 						e["remark"] = "%s：[%s] %s:%s" % {type, e.remarks, address, e.port}
 					end
 					e.node_type = "normal"
@@ -919,7 +919,7 @@ function to_move(app_name,file)
 		sys.call(cmd_rm_tmp)
 		return {
 			code = 1,
-			error = i18n.translate("The client file is not suitable for current device.")..app_name.."__"..bin_path
+			error = i18n.translate("The client file is not suitable for current device.") .. app_name .. "__" .. bin_path
 		}
 	end
 

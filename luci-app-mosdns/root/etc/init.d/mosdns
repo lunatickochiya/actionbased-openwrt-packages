@@ -20,7 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-START=99
+START=51
 USE_PROCD=1
 
 PROG=/usr/bin/mosdns
@@ -228,7 +228,9 @@ start_service() {
         if [ -f "/etc/mosdns/rule/.ad_source" ]; then
             for url in $ad_source;
             do
-                [ "$url" = "geosite.dat" ] && continue
+                if [ "$url" = "geosite.dat" ] || [ $(echo "$url" | grep -c -E "^file://") -eq 1 ]; then
+                    continue
+                fi
 		        if [ $(grep -c "$url" "/etc/mosdns/rule/.ad_source") -eq 0 ]; then
                     update_list=1
                     break
