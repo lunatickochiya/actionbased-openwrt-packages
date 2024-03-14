@@ -195,9 +195,7 @@ function parseShareLink(uri, features) {
 				config.grpc_servicename = params.get('serviceName');
 				break;
 			case 'ws':
-				/* We don't parse "host" param when TLS is enabled, as some providers are abusing it (host vs sni)
-				 * config.ws_host = params.get('host') ? decodeURIComponent(params.get('host')) : null;
-				 */
+				config.ws_host = params.get('host') ? decodeURIComponent(params.get('host')) : null;
 				config.ws_path = params.get('path') ? decodeURIComponent(params.get('path')) : null;
 				if (config.ws_path && config.ws_path.includes('?ed=')) {
 					config.websocket_early_data_header = 'Sec-WebSocket-Protocol';
@@ -274,8 +272,7 @@ function parseShareLink(uri, features) {
 				}
 				break;
 			case 'ws':
-				/* We don't parse "host" param when TLS is enabled, as some providers are abusing it (host vs sni) */
-				config.ws_host = (config.tls !== '1' && params.get('host')) ? decodeURIComponent(params.get('host')) : null;
+				config.ws_host = params.get('host') ? decodeURIComponent(params.get('host')) : null;
 				config.ws_path = params.get('path') ? decodeURIComponent(params.get('path')) : null;
 				if (config.ws_path && config.ws_path.includes('?ed=')) {
 					config.websocket_early_data_header = 'Sec-WebSocket-Protocol';
@@ -294,7 +291,7 @@ function parseShareLink(uri, features) {
 			/* https://github.com/2dust/v2rayN/wiki/%E5%88%86%E4%BA%AB%E9%93%BE%E6%8E%A5%E6%A0%BC%E5%BC%8F%E8%AF%B4%E6%98%8E(ver-2) */
 			uri = JSON.parse(hp.decodeBase64Str(uri[1]));
 
-			if (uri.v !== '2')
+			if (uri.v != '2')
 				return null;
 			/* Unsupported protocols */
 			else if (uri.net === 'kcp')
@@ -332,8 +329,7 @@ function parseShareLink(uri, features) {
 				}
 				break;
 			case 'ws':
-				/* We don't parse "host" param when TLS is enabled, as some providers are abusing it (host vs sni) */
-				config.ws_host = (config.tls !== '1') ? uri.host : null;
+				config.ws_host = uri.host;
 				config.ws_path = uri.path;
 				if (config.ws_path && config.ws_path.includes('?ed=')) {
 					config.websocket_early_data_header = 'Sec-WebSocket-Protocol';
@@ -563,10 +559,6 @@ return view.extend({
 						var encmode = this.map.lookupOption('shadowsocks_encrypt_method', section_id)[0].formvalue(section_id);
 						if (encmode === 'none')
 							return true;
-						else if (encmode === '2022-blake3-aes-128-gcm')
-							return hp.validateBase64Key(24, section_id, value);
-						else if (['2022-blake3-aes-256-gcm', '2022-blake3-chacha20-poly1305'].includes(encmode))
-							return hp.validateBase64Key(44, section_id, value);
 					}
 					if (!value)
 						return _('Expecting: %s').format(_('non-empty value'));
@@ -944,6 +936,12 @@ return view.extend({
 		/* Transport config end */
 
 		/* Wireguard config start */
+		so = ss.option(form.Flag, 'wireguard_gso', _('Generic segmentation offload'));
+		so.default = so.disabled;
+		so.depends('type', 'wireguard');
+		so.rmempty = false;
+		so.modalonly = true;
+
 		so = ss.option(form.DynamicList, 'wireguard_local_address', _('Local address'),
 			_('List of IP (v4 or v6) addresses prefixes to be assigned to the interface.'));
 		so.datatype = 'cidr';
@@ -1156,7 +1154,7 @@ return view.extend({
 			so.default = so.disabled;
 			so.modalonly = true;
 
-			so = ss.option(form.Value, 'tls_ech_config', _('ECH config'));
+			so = ss.option(form.DynamicList, 'tls_ech_config', _('ECH config'));
 			so.depends('tls_ech', '1');
 			so.modalonly = true;
 		}
@@ -1165,16 +1163,21 @@ return view.extend({
 			so = ss.option(form.ListValue, 'tls_utls', _('uTLS fingerprint'),
 				_('uTLS is a fork of "crypto/tls", which provides ClientHello fingerprinting resistance.'));
 			so.value('', _('Disable'));
-			so.value('360', _('360'));
-			so.value('android', _('Android'));
-			so.value('chrome', _('Chrome'));
-			so.value('edge', _('Edge'));
-			so.value('firefox', _('Firefox'));
-			so.value('ios', _('iOS'));
-			so.value('qq', _('QQ'));
-			so.value('random', _('Random'));
-			so.value('randomized', _('Randomized'));
-			so.value('safari', _('Safari'));
+			so.value('360');
+			so.value('android');
+			so.value('chrome');
+			so.value('chrome_psk');
+			so.value('chrome_psk_shuffle');
+			so.value('chrome_padding_psk_shuffle');
+			so.value('chrome_pq');
+			so.value('chrome_pq_psk');
+			so.value('edge');
+			so.value('firefox');
+			so.value('ios');
+			so.value('qq');
+			so.value('random');
+			so.value('randomized');
+			so.value('safari');
 			so.depends({'tls': '1', 'type': /^((?!hysteria2?$).)+$/});
 			so.validate = function(section_id, value) {
 				if (section_id) {
@@ -1212,11 +1215,9 @@ return view.extend({
 		so.default = so.disabled;
 		so.modalonly = true;
 
-		if (features.has_mptcp) {
-			so = ss.option(form.Flag, 'tcp_multi_path', _('MultiPath TCP'));
-			so.default = so.disabled;
-			so.modalonly = true;
-		}
+		so = ss.option(form.Flag, 'tcp_multi_path', _('MultiPath TCP'));
+		so.default = so.disabled;
+		so.modalonly = true;
 
 		so = ss.option(form.Flag, 'udp_fragment', _('UDP Fragment'),
 			_('Enable UDP fragmentation.'));
@@ -1243,7 +1244,7 @@ return view.extend({
 		s.tab('subscription', _('Subscriptions'));
 
 		o = s.taboption('subscription', form.Flag, 'auto_update', _('Auto update'),
-			_('Auto update subscriptions, GeoIP and GeoSite.'));
+			_('Auto update subscriptions.'));
 		o.default = o.disabled;
 		o.rmempty = false;
 

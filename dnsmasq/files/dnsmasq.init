@@ -414,7 +414,7 @@ dhcp_this_host_add() {
 	local mode="$3"
 	local routerstub routername ifdashname
 	local lanaddr lanaddr6 lanaddrs6 ulaprefix
-	
+
 	network_get_ipaddr lanaddr "lan"
 	if [ -n $lanaddr ]; then
  	lanaddr="$(echo "$lanaddr" | sed -e "s/\/24//")"
@@ -979,7 +979,6 @@ dnsmasq_start()
 	append_bool "$cfg" noping "--no-ping"
 	append_bool "$cfg" rapidcommit "--dhcp-rapid-commit"
 	append_bool "$cfg" scriptarp "--script-arp"
-	append_parm "$cfg" mini_ttl "--min-ttl"
 
 	append_bool "$cfg" filter_aaaa "--filter-AAAA"
 	append_bool "$cfg" filter_a "--filter-A"

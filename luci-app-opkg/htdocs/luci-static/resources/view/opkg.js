@@ -998,7 +998,7 @@ function handleOpkg(ev)
 		var argv = [ cmd, '--force-removal-of-dependent-packages' ];
 
 		argv.push('--force-checksum');
-		
+
 		argv.push('--force-depends');
 
 		if (rem && rem.checked)
@@ -1104,10 +1104,10 @@ function updateLists(data)
 	return (data ? Promise.resolve(data) : downloadLists()).then(function(data) {
 		var pg = document.querySelector('.cbi-progressbar'),
 		    mount = L.toArray(data[0].filter(function(m) { return m.mount == '/' || m.mount == '/overlay' }))
-		    	.sort(function(a, b) { return a.mount > b.mount })[0] || { size: 0, free: 0 };
+				.sort(function(a, b) { return a.mount > b.mount })[0] || { size: 0, free: 0 };
 
-		pg.firstElementChild.style.width = Math.floor(mount.size ? ((100 / mount.size) * (mount.size-mount.free)) : 100) + '%';
-		pg.setAttribute('title', '%.1024mB / %.1024mB (%s)'.format((mount.size-mount.free), mount.size, pg.firstElementChild.style.width));
+		pg.firstElementChild.style.width = Math.floor(mount.size ? (100 / mount.size) * (mount.size - mount.free) : 100) + '%';
+		pg.setAttribute('title', _('%s used (%1024mB used of %1024mB, %1024mB free)').format(pg.firstElementChild.style.width, mount.size - mount.free, mount.size, mount.free));
 
 		parseList(data[1], packages.available);
 		parseList(data[2], packages.installed);
@@ -1146,7 +1146,7 @@ return view.extend({
 
 			E('div', { 'class': 'controls' }, [
 				E('div', {}, [
-					E('label', {}, _('Used space') + ':'),
+					E('label', {}, _('Disk space') + ':'),
 					E('div', { 'class': 'cbi-progressbar', 'title': _('unknown') }, E('div', {}, [ '\u00a0' ]))
 				]),
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"PO-Revision-Date: 2021-09-22 00:01+0000\n"
+"PO-Revision-Date: 2023-12-25 22:53+0000\n"
 "Last-Translator: Kristoffer Grundström <swedishsailfishosuser@tutanota.com>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsopkg/sv/>\n"
@@ -10,7 +10,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.9-dev\n"
+"X-Generator: Weblate 5.4-dev\n"
+
+#: applications/luci-app-opkg/htdocs/luci-static/resources/view/opkg.js:1095
+msgid "%s used (%1024mB used of %1024mB, %1024mB free)"
+msgstr ""
 
 #: applications/luci-app-opkg/htdocs/luci-static/resources/view/opkg.js:1155
 msgid "Actions"
@@ -70,6 +74,10 @@ msgstr "Beskrivning"
 msgid "Details for package <em>%h</em>"
 msgstr "Detaljer för paketet <em>%h</em>"
 
+#: applications/luci-app-opkg/htdocs/luci-static/resources/view/opkg.js:1134
+msgid "Disk space"
+msgstr ""
+
 #: applications/luci-app-opkg/htdocs/luci-static/resources/view/opkg.js:1030
 msgid "Dismiss"
 msgstr "Avfärda"
@@ -106,11 +114,7 @@ msgstr "Kör pakethanteraren"
 
 #: applications/luci-app-opkg/htdocs/luci-static/resources/view/opkg.js:1139
 msgid "Filter"
-msgstr "Filtrera"
-
-#: applications/luci-app-opkg/htdocs/luci-static/resources/view/opkg.js:1134
-msgid "Free space"
-msgstr "Fritt utrymme"
+msgstr "Filter"
 
 #: applications/luci-app-opkg/root/usr/share/rpcd/acl.d/luci-app-opkg.json:3
 msgid "Grant access to opkg management"

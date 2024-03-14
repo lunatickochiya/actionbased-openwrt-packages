@@ -10,7 +10,7 @@ end
 
 local singbox_tags = luci.sys.exec(singbox_bin .. " version  | grep 'Tags:' | awk '{print $2}'")
 
-local appname = api.appname
+local appname = "passwall"
 local uci = api.uci
 
 local type_name = "sing-box"
@@ -58,20 +58,20 @@ if singbox_tags:find("with_quic") then
 	o:value("hysteria2", "Hysteria2")
 end
 o:value("_shunt", translate("Shunt"))
-o:value("_iface", translate("Custom Interface") .. " (Only Support Xray)")
+o:value("_iface", translate("Custom Interface"))
 
 o = s:option(Value, option_name("iface"), translate("Interface"))
 o.default = "eth1"
 o:depends({ [option_name("protocol")] = "_iface" })
 
 local nodes_table = {}
-local balancers_table = {}
 local iface_table = {}
 for k, e in ipairs(api.get_valid_nodes()) do
 	if e.node_type == "normal" then
 		nodes_table[#nodes_table + 1] = {
 			id = e[".name"],
-			remarks = e["remark"]
+			remarks = e["remark"],
+			type = e["type"]
 		}
 	end
 	if e.protocol == "_iface" then
@@ -89,9 +89,6 @@ if #nodes_table > 0 then
 
 	o = s:option(Value, option_name("main_node"), string.format('<a style="color:red">%s</a>', translate("Preproxy Node")), translate("Set the node to be used as a pre-proxy. Each rule (including <code>Default</code>) has a separate switch that controls whether this rule uses the pre-proxy or not."))
 	o:depends({ [option_name("protocol")] = "_shunt", [option_name("preproxy_enabled")] = true })
-	for k, v in pairs(balancers_table) do
-		o:value(v.id, v.remarks)
-	end
 	for k, v in pairs(iface_table) do
 		o:value(v.id, v.remarks)
 	end
@@ -110,9 +107,6 @@ uci:foreach(appname, "shunt_rules", function(e)
 		o:depends({ [option_name("protocol")] = "_shunt" })
 
 		if #nodes_table > 0 then
-			for k, v in pairs(balancers_table) do
-				o:value(v.id, v.remarks)
-			end
 			for k, v in pairs(iface_table) do
 				o:value(v.id, v.remarks)
 			end
@@ -142,9 +136,6 @@ o:value("_direct", translate("Direct Connection"))
 o:value("_blackhole", translate("Blackhole"))
 
 if #nodes_table > 0 then
-	for k, v in pairs(balancers_table) do
-		o:value(v.id, v.remarks)
-	end
 	for k, v in pairs(iface_table) do
 		o:value(v.id, v.remarks)
 	end
@@ -231,10 +222,9 @@ if singbox_tags:find("with_shadowsocksr") then
 	o:depends({ [option_name("protocol")] = "shadowsocksr" })
 end
 
-o = s:option(Flag, option_name("uot"), translate("UDP over TCP"), translate("Need Xray-core or sing-box as server side."))
-o:depends({ [option_name("protocol")] = "shadowsocks", [option_name("ss_method")] = "2022-blake3-aes-128-gcm" })
-o:depends({ [option_name("protocol")] = "shadowsocks", [option_name("ss_method")] = "2022-blake3-aes-256-gcm" })
-o:depends({ [option_name("protocol")] = "shadowsocks", [option_name("ss_method")] = "2022-blake3-chacha20-poly1305" })
+o = s:option(Flag, option_name("uot"), translate("UDP over TCP"))
+o:depends({ [option_name("protocol")] = "socks" })
+o:depends({ [option_name("protocol")] = "shadowsocks" })
 
 o = s:option(Value, option_name("uuid"), translate("ID"))
 o.password = true
@@ -353,9 +343,8 @@ o = s:option(Flag, option_name("tls"), translate("TLS"))
 o.default = 0
 o:depends({ [option_name("protocol")] = "vmess" })
 o:depends({ [option_name("protocol")] = "vless" })
-o:depends({ [option_name("protocol")] = "socks" })
+o:depends({ [option_name("protocol")] = "http" })
 o:depends({ [option_name("protocol")] = "trojan" })
-o:depends({ [option_name("protocol")] = "shadowsocks" })
 
 o = s:option(ListValue, option_name("alpn"), translate("alpn"))
 o.default = "default"
@@ -438,6 +427,7 @@ o = s:option(ListValue, option_name("transport"), translate("Transport"))
 o:value("tcp", "TCP")
 o:value("http", "HTTP")
 o:value("ws", "WebSocket")
+o:value("httpupgrade", "HTTPUpgrade")
 if singbox_tags:find("with_quic") then
 	o:value("quic", "QUIC")
 end
@@ -509,6 +499,14 @@ o:depends({ [option_name("ws_enableEarlyData")] = true })
 o = s:option(Value, option_name("ws_earlyDataHeaderName"), translate("Early data header name"), translate("Recommended value: Sec-WebSocket-Protocol"))
 o:depends({ [option_name("ws_enableEarlyData")] = true })
 
+-- [[ HTTPUpgrade部分 ]]--
+o = s:option(Value, option_name("httpupgrade_host"), translate("HTTPUpgrade Host"))
+o:depends({ [option_name("transport")] = "httpupgrade" })
+
+o = s:option(Value, option_name("httpupgrade_path"), translate("HTTPUpgrade Path"))
+o.placeholder = "/"
+o:depends({ [option_name("transport")] = "httpupgrade" })
+
 -- [[ gRPC部分 ]]--
 o = s:option(Value, option_name("grpc_serviceName"), "ServiceName")
 o:depends({ [option_name("transport")] = "grpc" })
@@ -533,8 +531,6 @@ o = s:option(Flag, option_name("mux"), translate("Mux"))
 o.rmempty = false
 o:depends({ [option_name("protocol")] = "vmess" })
 o:depends({ [option_name("protocol")] = "vless", [option_name("flow")] = "" })
-o:depends({ [option_name("protocol")] = "http" })
-o:depends({ [option_name("protocol")] = "socks" })
 o:depends({ [option_name("protocol")] = "shadowsocks", [option_name("uot")] = "" })
 o:depends({ [option_name("protocol")] = "trojan" })
 
@@ -545,12 +541,25 @@ o:value("h2mux")
 o:depends({ [option_name("mux")] = true })
 
 o = s:option(Value, option_name("mux_concurrency"), translate("Mux concurrency"))
-o.default = 8
-o:depends({ [option_name("mux")] = true })
+o.default = 4
+o:depends({ [option_name("mux")] = true, [option_name("tcpbrutal")] = false })
 
 o = s:option(Flag, option_name("mux_padding"), translate("Padding"))
 o.default = 0
 o:depends({ [option_name("mux")] = true })
+
+-- [[ TCP Brutal ]]--
+o = s:option(Flag, option_name("tcpbrutal"), translate("TCP Brutal"))
+o.default = 0
+o:depends({ [option_name("mux")] = true })
+
+o = s:option(Value, option_name("tcpbrutal_up_mbps"), translate("Max upload Mbps"))
+o.default = "10"
+o:depends({ [option_name("tcpbrutal")] = true })
+
+o = s:option(Value, option_name("tcpbrutal_down_mbps"), translate("Max download Mbps"))
+o.default = "50"
+o:depends({ [option_name("tcpbrutal")] = true })
 
 o = s:option(Flag, option_name("shadowtls"), "ShadowTLS")
 o.default = 0
@@ -590,6 +599,41 @@ if singbox_tags:find("with_utls") then
 	-- o:value("randomized")
 	o.default = "chrome"
 	o:depends({ [option_name("shadowtls")] = true, [option_name("shadowtls_utls")] = true })
+end
+
+-- [[ SIP003 plugin ]]--
+o = s:option(Flag, option_name("plugin_enabled"), translate("plugin"))
+o.default = 0
+o:depends({ [option_name("protocol")] = "shadowsocks" })
+
+o = s:option(ListValue, option_name("plugin"), "SIP003 " .. translate("plugin"))
+o.default = "obfs-local"
+o:depends({ [option_name("plugin_enabled")] = true })
+o:value("obfs-local")
+o:value("v2ray-plugin")
+
+o = s:option(Value, option_name("plugin_opts"), translate("opts"))
+o:depends({ [option_name("plugin_enabled")] = true })
+
+o = s:option(ListValue, option_name("domain_strategy"), translate("Domain Strategy"), translate("If is domain name, The requested domain name will be resolved to IP before connect."))
+o.default = "prefer_ipv6"
+o:value("prefer_ipv4", translate("Prefer IPv4"))
+o:value("prefer_ipv6", translate("Prefer IPv6"))
+o:value("ipv4_only", translate("IPv4 Only"))
+o:value("ipv6_only", translate("IPv6 Only"))
+
+o = s:option(ListValue, option_name("to_node"), translate("Landing node"), translate("Only support a layer of proxy."))
+o.default = ""
+o:value("", translate("Close(Not use)"))
+for k, v in pairs(nodes_table) do
+	if v.type == "sing-box" then
+		o:value(v.id, v.remarks)
+	end
+end
+for i, v in ipairs(s.fields[option_name("protocol")].keylist) do
+	if not v:find("_") then
+		o:depends({ [option_name("protocol")] = v })
+	end
 end
 
 api.luci_types(arg[1], m, s, type_name, option_prefix)
