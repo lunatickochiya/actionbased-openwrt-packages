@@ -216,7 +216,6 @@ jobs:
         git_clone https://github.com/sbwml/package_kernel_r8125 r8125
         git_clone https://github.com/syb999/luci-theme-alpha
         git_clone https://github.com/animegasan/luci-app-alpha-config
-        git_clone https://github.com/sirpdboy/luci-theme-opentopd
         git_clone https://github.com/lazywalker/mmdvm-openwrt; rm -rf mmdvm-openwrt/misc; mvdir mmdvm-openwrt
         ) &
         (
