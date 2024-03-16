@@ -212,10 +212,11 @@ jobs:
         git_clone https://github.com/honwen/luci-app-shadowsocks-rust
         git_clone https://github.com/Hyy2001X/AutoBuild-Packages && rm -rf AutoBuild-Packages/luci-app-adguardhome && mvdir AutoBuild-Packages
         git_clone https://github.com/Ausaci/luci-app-nat6-helper
-        git clone https://github.com/gngpp/luci-theme-design -b js --depth 1
+        git clone https://github.com/gngpp/luci-theme-design -b js luci-theme-design && rm -rf luci-theme-design/.github
         git_clone https://github.com/sbwml/package_kernel_r8125 r8125
         git_clone https://github.com/syb999/luci-theme-alpha
         git_clone https://github.com/animegasan/luci-app-alpha-config
+        git_clone https://github.com/sirpdboy/luci-theme-opentopd
         git_clone https://github.com/lazywalker/mmdvm-openwrt; rm -rf mmdvm-openwrt/misc; mvdir mmdvm-openwrt
         ) &
         (
@@ -230,7 +231,7 @@ jobs:
         git_clone https://github.com/sbwml/luci-app-airconnect airconnect1 && mv airconnect1/* ./ && rm -rf airconnect1
         ) &
         (
-        git clone https://github.com/sirpdboy/luci-theme-kucat -b js --depth 1
+        git clone https://github.com/sirpdboy/luci-theme-kucat -b js luci-theme-kucat
         git_clone https://github.com/blueberry-pie-11/luci-app-natmap
         git_clone https://github.com/QiuSimons/luci-app-daed-next daed1 && mvdir daed1
         git_clone https://github.com/sirpdboy/luci-app-netdata
