@@ -62,7 +62,7 @@
 
 --- a/luci-app-passwall2/Makefile
 +++ b/luci-app-passwall2/Makefile
-@@ -29,7 +29,7 @@ LUCI_PKGARCH:=all
+@@ -31,7 +31,7 @@ LUCI_PKGARCH:=all
  LUCI_DEPENDS:=+coreutils +coreutils-base64 +coreutils-nohup +curl \
  	+ip-full +libuci-lua +lua +luci-compat +luci-lib-jsonc +resolveip +tcping \
  	+xray-core +v2ray-geoip +v2ray-geosite \
@@ -70,8 +70,7 @@
 +	+unzip +ipset +iptables-mod-iprange +iptables-mod-socket +iptables-mod-tproxy +iptables-mod-conntrack-extra +kmod-ipt-nat \
  	+PACKAGE_$(PKG_NAME)_INCLUDE_IPv6_Nat:ip6tables-mod-nat
 
-define Package/$(PKG_NAME)/config
-
+ define Package/$(PKG_NAME)/config
 --- a/msmtp/Makefile
 +++ b/msmtp/Makefile
 @@ -46,7 +46,7 @@ endef
