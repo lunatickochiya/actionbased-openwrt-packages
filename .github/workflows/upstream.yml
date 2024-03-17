@@ -19,7 +19,7 @@ on:
       ssh:
         description: 'ssh'
         required: false
-        default: 'true'
+        default: 'false'
   watch:
     types: started
   repository_dispatch:
@@ -45,7 +45,7 @@ jobs:
         git config --global user.name "github-actions[bot]"
         sudo timedatectl set-timezone "Asia/Shanghai"
 
-    - name: Syn upstream
+    - name: Sync upstream
       run: |
         shopt -s extglob
         set +e
