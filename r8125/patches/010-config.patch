@@ -1,5 +1,5 @@
---- a/Makefile
-+++ b/Makefile
+--- a/src/Makefile
++++ b/src/Makefile
 @@ -35,16 +35,16 @@ ENABLE_REALWOW_SUPPORT = n
  ENABLE_DASH_SUPPORT = n
  ENABLE_DASH_PRINTER_SUPPORT = n
