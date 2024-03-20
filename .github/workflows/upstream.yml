@@ -296,7 +296,7 @@ jobs:
         ) &
         git_sparse_clone master "https://github.com/coolsnowwolf/luci" "leluci" applications libs/luci-lib-fs
         mv -f applications luciapp
-        rm -rf luciapp/{luci-app-qbittorrent,luci-app-cpufreq,luci-app-zerotier,luci-app-ipsec-server,luci-app-ipsec-vpnd,luci-app-e2guardian,luci-app-aliyundrive-fuse}
+        rm -rf luciapp/{luci-app-qbittorrent,luci-app-cpufreq,luci-app-zerotier,luci-app-ipsec-server,luci-app-ipsec-vpnd,luci-app-e2guardian,luci-app-webdav,luci-app-aliyundrive-fuse}
         git_sparse_clone openwrt-23.05 "https://github.com/immortalwrt/luci" "immluci" applications protocols/luci-proto-minieap
         mv -n applications/* luciapp/; rm -rf applications
         rm -rf luciapp/{luci-app-ipsec-vpnd,luci-app-ipsec-vpnserver-manyusers}
