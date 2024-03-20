@@ -270,7 +270,7 @@ jobs:
         git_sparse_clone openwrt-23.05 "https://github.com/immortalwrt/packages" "immpkgs" net/mwol net/n2n net/dae \
         net/sub-web net/dnsproxy net/haproxy net/v2raya net/cdnspeedtest net/keepalived \
         net/go-nats net/go-wol net/bitsrunlogin-go net/transfer net/cloudreve net/daed \
-        net/subconverter net/ngrokc net/oscam net/njitclient net/scutclient net/gost net/ua2f net/gowebdav net/qBittorrent-Enhanced-Edition \
+        net/subconverter net/ngrokc net/oscam net/njitclient net/scutclient net/gost net/ua2f net/dufs net/qBittorrent-Enhanced-Edition \
         net/tinyportmapper net/tinyfecvpn net/nexttrace net/pcap-dnsproxy net/rustdesk-server net/tuic-server net/speedtest-go \
         net/dns-forwarder net/ipset-lists net/ShadowVPN net/adguardhome net/cloudflared net/nps net/naiveproxy \
         lang/lua-maxminddb net/pdnsd-alt \
@@ -290,7 +290,8 @@ jobs:
         ) &
         (
         git_sparse_clone master "https://github.com/x-wrt/com.x-wrt" "x-wrt" luci-app-macvlan luci-app-xwan
-        git_sparse_clone master "https://github.com/sbwml/openwrt_pkgs" "openwrt_pkgs" luci-app-gowebdav luci-app-socat
+        git_sparse_clone master "https://github.com/sbwml/openwrt_pkgs" "openwrt_pkgs" luci-app-socat
+        git_sparse_clone master "https://github.com/immortalwrt/luci" "immluci1" applications/luci-app-dufs
         git_sparse_clone master "https://github.com/coolsnowwolf/lede" "leanlede" package/lean package/qca/shortcut-fe package/wwan package/network/services/shellsync package/network/services/e2guardian package/network/services/noddos
         ) &
         git_sparse_clone master "https://github.com/coolsnowwolf/luci" "leluci" applications libs/luci-lib-fs
