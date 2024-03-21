@@ -11,7 +11,42 @@ Subject: [PATCH] update
  .../root/etc/uci-defaults/luci-passwall       |   2 +
  5 files changed, 185 insertions(+), 5 deletions(-)
  create mode 100644 luci-app-passwall/luasrc/view/passwall/global/status_bottom.htm
+--- a/luci-app-passwall/Makefile
++++ b/luci-app-passwall/Makefile
+@@ -65,7 +65,7 @@ config PACKAGE_$(PKG_NAME)_Nftables_Transparent_Proxy
+ config PACKAGE_$(PKG_NAME)_INCLUDE_Haproxy
+ 	bool "Include Haproxy"
+ 	select PACKAGE_haproxy
+-	default y if aarch64||arm||i386||x86_64
++	default n
 
+ config PACKAGE_$(PKG_NAME)_INCLUDE_Hysteria
+ 	bool "Include Hysteria"
+@@ -125,7 +125,7 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_SingBox
+ config PACKAGE_$(PKG_NAME)_INCLUDE_Trojan_Plus
+ 	bool "Include Trojan-Plus"
+ 	select PACKAGE_trojan-plus
+-	default y
++	default n
+
+ config PACKAGE_$(PKG_NAME)_INCLUDE_tuic_client
+ 	bool "Include tuic-client"
+@@ -142,13 +142,13 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_V2ray_Geodata
+ config PACKAGE_$(PKG_NAME)_INCLUDE_V2ray_Plugin
+ 	bool "Include V2ray-Plugin (Shadowsocks Plugin)"
+ 	select PACKAGE_v2ray-plugin
+-	default y if aarch64||arm||i386||x86_64
++	default n
+
+ config PACKAGE_$(PKG_NAME)_INCLUDE_Xray
+ 	bool "Include Xray"
+ 	select PACKAGE_xray-core
+ 	select PACKAGE_unzip
+-	default y if aarch64||arm||i386||x86_64
++	default y
+
+ config PACKAGE_$(PKG_NAME)_INCLUDE_Xray_Plugin
+ 	bool "Include Xray-Plugin (Shadowsocks Plugin)"
 diff --git a/luci-app-passwall/luasrc/controller/passwall.lua b/luci-app-passwall/luasrc/controller/passwall.lua
 index e9c49d031c..c4ba6e1c70 100644
 --- a/luci-app-passwall/luasrc/controller/passwall.lua
