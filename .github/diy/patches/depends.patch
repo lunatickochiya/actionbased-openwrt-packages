@@ -208,17 +208,3 @@
  	+PACKAGE_$(PKG_NAME)_INCLUDE_rclone-webui:rclone-webui-react \
  	+PACKAGE_$(PKG_NAME)_INCLUDE_rclone-ng:rclone-ng
 
-diff --git a/luci-app-torbp/Makefile b/luci-app-torbp/Makefile
-index 3a22bbf0..373f0c4d 100644
---- a/luci-app-torbp/Makefile
-+++ b/luci-app-torbp/Makefile
-@@ -14,7 +14,7 @@ include $(INCLUDE_DIR)/package.mk
- define Package/luci-app-torbp
- 	SECTION:=luci
- 	CATEGORY:=LuCI
--	DEPENDS:=+tor +tor-geoip +obfs4proxy
-+	DEPENDS:=+tor +PACKAGE_tor:tor-geoip +obfs4proxy
- 	TITLE:=Tor bridges proxy
- 	MAINTAINER:=ZeroChaos <dev@null.la>
- 	URL:=https://zerolab.net
-
