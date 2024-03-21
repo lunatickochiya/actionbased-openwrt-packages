@@ -6,7 +6,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-torbp
 PKG_VERSION:=1.0
-PKG_RELEASE:=3
+PKG_RELEASE:=4
 PKG_MAINTAINER:=ZeroChaos <dev@null.la>
 
 include $(INCLUDE_DIR)/package.mk
@@ -14,11 +14,19 @@ include $(INCLUDE_DIR)/package.mk
 define Package/luci-app-torbp
 	SECTION:=luci
 	CATEGORY:=LuCI
-	DEPENDS:=+tor +PACKAGE_tor:tor-geoip +obfs4proxy
+	DEPENDS:=+tor +obfs4proxy
 	TITLE:=Tor bridges proxy
 	MAINTAINER:=ZeroChaos <dev@null.la>
 	URL:=https://zerolab.net
 	PKGARCH:=all
+endef
+
+define Package/$(PKG_NAME)/config
+config PACKAGE_$(PKG_NAME)_geoip
+	bool "geoip"
+	select PACKAGE_tor-geoip
+	depends on PACKAGE_$(PKG_NAME)
+	default y
 endef
 
 define Package/luci-app-torbp/description
