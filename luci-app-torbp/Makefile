@@ -14,7 +14,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/luci-app-torbp
 	SECTION:=luci
 	CATEGORY:=LuCI
-	DEPENDS:=+tor +tor-geoip +obfs4proxy
+	DEPENDS:=+tor +PACKAGE_tor:tor-geoip +obfs4proxy
 	TITLE:=Tor bridges proxy
 	MAINTAINER:=ZeroChaos <dev@null.la>
 	URL:=https://zerolab.net

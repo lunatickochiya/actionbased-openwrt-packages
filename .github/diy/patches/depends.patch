@@ -140,18 +140,6 @@
  		if [ "$$$${CLI_VERSION}" != "$(PKG_VERSION)" ]; then \
  			echo "ERROR: Expected 'PKG_VERSION:=$(PKG_VERSION)' in '$$$${CLI_MAKEFILE}', found 'PKG_VERSION:=$$$${CLI_VERSION}'"; \
 
---- a/fullconenat/Makefile
-+++ b/fullconenat/Makefile
-@@ -36,7 +36,7 @@ define Package/ip6tables-mod-fullconenat
-   SECTION:=net
-   CATEGORY:=Network
-   TITLE:=FULLCONENAT ip6tables extension
--  DEPENDS:=ip6tables +kmod-nf-nat6 +kmod-ipt-fullconenat +ip6tables-mod-nat
-+  DEPENDS:=+ip6tables +kmod-nf-nat6 +kmod-ipt-fullconenat +ip6tables-mod-nat
- endef
-
- define KernelPackage/ipt-fullconenat
-
 --- a/phtunnel/Makefile
 +++ b/phtunnel/Makefile
 @@ -36,7 +36,6 @@ PKG_SOURCE:=phtunnel
@@ -219,4 +207,18 @@
 +LUCI_DEPENDS:=+rclone-config +fuse-overlayfs +fuse3-utils \
  	+PACKAGE_$(PKG_NAME)_INCLUDE_rclone-webui:rclone-webui-react \
  	+PACKAGE_$(PKG_NAME)_INCLUDE_rclone-ng:rclone-ng
+
+diff --git a/luci-app-torbp/Makefile b/luci-app-torbp/Makefile
+index 3a22bbf0..373f0c4d 100644
+--- a/luci-app-torbp/Makefile
++++ b/luci-app-torbp/Makefile
+@@ -14,7 +14,7 @@ include $(INCLUDE_DIR)/package.mk
+ define Package/luci-app-torbp
+ 	SECTION:=luci
+ 	CATEGORY:=LuCI
+-	DEPENDS:=+tor +tor-geoip +obfs4proxy
++	DEPENDS:=+tor +PACKAGE_tor:tor-geoip +obfs4proxy
+ 	TITLE:=Tor bridges proxy
+ 	MAINTAINER:=ZeroChaos <dev@null.la>
+ 	URL:=https://zerolab.net
 
