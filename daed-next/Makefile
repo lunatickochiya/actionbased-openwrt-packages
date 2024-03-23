@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 PKG_NAME:=daed-next
 PKG_VERSION:=2023-12-02-102cb56
 CORE_VERSION:=core-$(shell date "+%Y-%m-%d")
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_PROTO:=git
@@ -45,8 +45,16 @@ define Package/daed-next
   TITLE:=daed-next is a backend of dae
   # You need enable KERNEL_DEBUG_INFO_BTF and KERNEL_BPF_EVENTS
   DEPENDS:=$(GO_ARCH_DEPENDS) $(BPF_DEPENDS) \
-    +ca-bundle +kmod-sched-core +kmod-sched-bpf +kmod-xdp-sockets-diag +kmod-veth \
+    +ca-bundle +kmod-sched-core +kmod-sched-bpf +kmod-veth \
     +node +v2ray-geoip +v2ray-geosite +zoneinfo-asia
+endef
+
+define Package/$(PKG_NAME)/config
+config PACKAGE_$(PKG_NAME)_INCLUDE_kmod-xdp-sockets-diag
+	bool "kmod-xdp-sockets-diag"
+	select PACKAGE_kmod-xdp-sockets-diag
+	depends on PACKAGE_$(PKG_NAME)
+	default y
 endef
 
 define Package/daed-next/description

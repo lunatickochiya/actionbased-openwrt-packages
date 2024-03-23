@@ -5,7 +5,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=daed
-PKG_RELEASE:=9
+PKG_RELEASE:=10
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/daeuniverse/daed.git
@@ -48,20 +48,28 @@ define Package/daed
   TITLE:=A Modern Dashboard For dae
   # You need enable KERNEL_DEBUG_INFO_BTF and KERNEL_BPF_EVENTS
   DEPENDS:=$(GO_ARCH_DEPENDS) $(BPF_DEPENDS) \
-    +ca-bundle +kmod-sched-core +kmod-sched-bpf +kmod-xdp-sockets-diag
+    +ca-bundle +kmod-sched-core +kmod-sched-bpf
+endef
+
+define Package/$(PKG_NAME)/config
+config PACKAGE_$(PKG_NAME)_INCLUDE_kmod-xdp-sockets-diag
+	bool "kmod-xdp-sockets-diag"
+	select PACKAGE_kmod-xdp-sockets-diag
+	depends on PACKAGE_$(PKG_NAME)
+	default y
 endef
 
 define Package/daed-geoip
   $(call Package/daed/Default)
   TITLE:=geoip for daed
-  DEPENDS:=+daed +v2ray-geoip
+  DEPENDS:=daed +v2ray-geoip
   PKGARCH:=all
 endef
 
 define Package/daed-geosite
   $(call Package/daed/Default)
   TITLE:=geosite for daed
-  DEPENDS:=+daed +v2ray-geosite
+  DEPENDS:=daed +v2ray-geosite
   PKGARCH:=all
 endef
 

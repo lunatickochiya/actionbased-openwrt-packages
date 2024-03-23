@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=autocore
 PKG_FLAGS:=nonshared
-PKG_RELEASE:=6
+PKG_RELEASE:=7
 
 PKG_CONFIG_DEPENDS:= \
 	CONFIG_TARGET_bcm27xx \
@@ -20,7 +20,6 @@ include $(INCLUDE_DIR)/target.mk
 define Package/autocore
   TITLE:=auto core loadbalance script.
   DEPENDS:=@(aarch64||arm||i386||i686||x86_64) \
-    +TARGET_bcm27xx:bcm27xx-utils \
     +TARGET_bcm53xx:nvram \
     +TARGET_x86:ethtool \
     +TARGET_x86:lm-sensors
