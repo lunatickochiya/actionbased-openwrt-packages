@@ -20,6 +20,9 @@ fetch_pic_url() {
             jsonfilter -qe '@.images[0].url')
         [ -n "${picpath}" ] && echo "//www.bing.com${picpath}"
         ;;
+	ghser)
+		echo "https://api.vvhan.com/api/wallpaper/acg"
+		;;
     unsplash)
         if [ -z "$API_KEY" ]; then
             curl -fks --max-time 3 \
