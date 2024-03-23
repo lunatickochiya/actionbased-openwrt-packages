@@ -49,6 +49,9 @@ curl_bgurl() {
 		local ppath=`curl -s "http://wp.birdpaper.com.cn/intf/search?content=4k&pageno=$j&count=9" | awk -F '\"count\":9' '{print $2}' | awk -F ',\"processTime\"' '{print $1}' | sed 's#,#{#' |  jsonfilter -e "@.list[$i].url"`
 		[ -n "${ppath}" ] && echo "$ppath"
 		;;
+	5)
+		echo "https://api.vvhan.com/api/wallpaper/acg"
+		;;
 	esac
 }
 
