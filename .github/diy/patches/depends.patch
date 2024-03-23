@@ -208,3 +208,111 @@
  	+PACKAGE_$(PKG_NAME)_INCLUDE_rclone-webui:rclone-webui-react \
  	+PACKAGE_$(PKG_NAME)_INCLUDE_rclone-ng:rclone-ng
 
+diff --git a/autocore/Makefile b/autocore/Makefile
+index b816aed..25c743e 100644
+--- a/autocore/Makefile
++++ b/autocore/Makefile
+@@ -20,7 +20,6 @@ include $(INCLUDE_DIR)/target.mk
+ define Package/autocore
+   TITLE:=auto core loadbalance script.
+   DEPENDS:=@(aarch64||arm||i386||i686||x86_64) \
+-    +TARGET_bcm27xx:bcm27xx-utils \
+     +TARGET_bcm53xx:nvram \
+     +TARGET_x86:ethtool \
+     +TARGET_x86:lm-sensors
+diff --git a/dae/Makefile b/dae/Makefile
+index 6aeb632..60323c7 100644
+--- a/dae/Makefile
++++ b/dae/Makefile
+@@ -43,20 +43,28 @@ define Package/dae
+   TITLE:=A lightweight and high-performance transparent proxy solution
+   # You need enable KERNEL_DEBUG_INFO_BTF and KERNEL_BPF_EVENTS
+   DEPENDS:=$(GO_ARCH_DEPENDS) $(BPF_DEPENDS)  \
+-    +ca-bundle +kmod-sched-core +kmod-sched-bpf +kmod-xdp-sockets-diag +kmod-veth
++    +ca-bundle +kmod-sched-core +kmod-sched-bpf +kmod-veth
++endef
++
++define Package/$(PKG_NAME)/config
++config PACKAGE_$(PKG_NAME)_INCLUDE_kmod-xdp-sockets-diag
++	bool "kmod-xdp-sockets-diag"
++	select PACKAGE_kmod-xdp-sockets-diag
++	depends on PACKAGE_$(PKG_NAME)
++	default y
+ endef
+
+ define Package/dae-geoip
+   $(call Package/dae/Default)
+   TITLE:=geoip for dae
+-  DEPENDS:=+dae +v2ray-geoip
++  DEPENDS:=dae +v2ray-geoip
+   PKGARCH:=all
+ endef
+
+ define Package/dae-geosite
+   $(call Package/dae/Default)
+   TITLE:=geosite for dae
+-  DEPENDS:=+dae +v2ray-geosite
++  DEPENDS:=dae +v2ray-geosite
+   PKGARCH:=all
+ endef
+
+diff --git a/daed-next/Makefile b/daed-next/Makefile
+index 702f841..3edd9ab 100644
+--- a/daed-next/Makefile
++++ b/daed-next/Makefile
+@@ -45,10 +45,18 @@ define Package/daed-next
+   TITLE:=daed-next is a backend of dae
+   # You need enable KERNEL_DEBUG_INFO_BTF and KERNEL_BPF_EVENTS
+   DEPENDS:=$(GO_ARCH_DEPENDS) $(BPF_DEPENDS) \
+-    +ca-bundle +kmod-sched-core +kmod-sched-bpf +kmod-xdp-sockets-diag +kmod-veth \
++    +ca-bundle +kmod-sched-core +kmod-sched-bpf +kmod-veth \
+     +node +v2ray-geoip +v2ray-geosite +zoneinfo-asia
+ endef
+
++define Package/$(PKG_NAME)/config
++config PACKAGE_$(PKG_NAME)_INCLUDE_kmod-xdp-sockets-diag
++	bool "kmod-xdp-sockets-diag"
++	select PACKAGE_kmod-xdp-sockets-diag
++	depends on PACKAGE_$(PKG_NAME)
++	default y
++endef
++
+ define Package/daed-next/description
+   daed-next is a backend of dae, provides a method to bundle arbitrary
+   frontend, dae and geodata into one binary.
+diff --git a/daed/Makefile b/daed/Makefile
+index f236f33..1b76704 100644
+--- a/daed/Makefile
++++ b/daed/Makefile
+@@ -48,20 +48,28 @@ define Package/daed
+   TITLE:=A Modern Dashboard For dae
+   # You need enable KERNEL_DEBUG_INFO_BTF and KERNEL_BPF_EVENTS
+   DEPENDS:=$(GO_ARCH_DEPENDS) $(BPF_DEPENDS) \
+-    +ca-bundle +kmod-sched-core +kmod-sched-bpf +kmod-xdp-sockets-diag
++    +ca-bundle +kmod-sched-core +kmod-sched-bpf
++endef
++
++define Package/$(PKG_NAME)/config
++config PACKAGE_$(PKG_NAME)_INCLUDE_kmod-xdp-sockets-diag
++	bool "kmod-xdp-sockets-diag"
++	select PACKAGE_kmod-xdp-sockets-diag
++	depends on PACKAGE_$(PKG_NAME)
++	default y
+ endef
+
+ define Package/daed-geoip
+   $(call Package/daed/Default)
+   TITLE:=geoip for daed
+-  DEPENDS:=+daed +v2ray-geoip
++  DEPENDS:=daed +v2ray-geoip
+   PKGARCH:=all
+ endef
+
+ define Package/daed-geosite
+   $(call Package/daed/Default)
+   TITLE:=geosite for daed
+-  DEPENDS:=+daed +v2ray-geosite
++  DEPENDS:=daed +v2ray-geosite
+   PKGARCH:=all
+ endef
+
