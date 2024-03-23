@@ -10,3 +10,24 @@
 +fi
      uci commit netwizard 
  }
+--- a/luci-app-advancedplus/luasrc/model/cbi/advancedplus/kucatset.lua
++++ b/luci-app-advancedplus/luasrc/model/cbi/advancedplus/kucatset.lua
+@@ -43,6 +43,7 @@ e:value('1', translate('Auto download Iciba wallpaper'))
+ e:value('2', translate('Auto download unsplash wallpaper'))
+ e:value('3', translate('Auto download Bing wallpaper'))
+ e:value('4', translate('Auto download Bird 4K wallpaper'))
++e:value('5', translate('Auto download ACG wallpaper'))
+ e.default = '0'
+ e.rmempty = false
+
+--- a/luci-theme-kucat/root/usr/libexec/kucat/kucat_wallpaper
++++ b/luci-theme-kucat/root/usr/libexec/kucat/kucat_wallpaper
+@@ -49,6 +49,9 @@ curl_bgurl() {
+ 		local ppath=`curl -s "http://wp.birdpaper.com.cn/intf/search?content=4k&pageno=$j&count=9" | awk -F '\"count\":9' '{print $2}' | awk -F ',\"processTime\"' '{print $1}' | sed 's#,#{#' |  jsonfilter -e "@.list[$i].url"`
+ 		[ -n "${ppath}" ] && echo "$ppath"
+ 		;;
++	5)
++		echo "https://api.vvhan.com/api/wallpaper/acg"
++		;;
+ 	esac
+ }
