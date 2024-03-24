@@ -1,0 +1,13 @@
+diff --git a/shadowsocksr-libev/Makefile b/shadowsocksr-libev/Makefile
+index 98bbd9e8..6f03b899 100644
+--- a/shadowsocksr-libev/Makefile
++++ b/shadowsocksr-libev/Makefile
+@@ -57,7 +57,7 @@ CONFIGURE_ARGS += \
+ 	--disable-assert \
+ 	--enable-system-shared-lib
+ 
+-TARGET_CFLAGS += -flto
++TARGET_CFLAGS += -flto -Wno-use-after-free
+ TARGET_LDFLAGS += -Wl,--gc-sections,--as-needed
+ 
+ $(foreach component,$(SHADOWSOCKSR_COMPONENTS), \
