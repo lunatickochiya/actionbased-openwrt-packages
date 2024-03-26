@@ -116,10 +116,11 @@ jobs:
         git_clone https://github.com/riverscn/openwrt-iptvhelper && mvdir openwrt-iptvhelper
         ) &
         (
-        git_clone https://github.com/jerrykuku/luci-theme-argon
-        git_clone https://github.com/jerrykuku/luci-app-argon-config
+        # git_clone https://github.com/jerrykuku/luci-theme-argon
+        # git_clone https://github.com/jerrykuku/luci-app-argon-config
         # git_clone https://github.com/jerrykuku/luci-app-vssr
         # git_clone https://github.com/jerrykuku/luci-app-ttnode
+        git_clone https://github.com/sbwml/luci-theme-argon
         git_clone https://github.com/sirpdboy/luci-app-advancedplus
         git_clone https://github.com/sirpdboy/luci-app-autotimeset
         git_clone https://github.com/sirpdboy/luci-app-lucky oplucky && mv -f oplucky/*/ ./ && rm -rf oplucky
