@@ -10,6 +10,18 @@
 
  PKG_MAINTAINER:=Xingwang Liao <kuoruan@gmail.com>
 
+--- a/fullconenat/Makefile
++++ b/fullconenat/Makefile
+@@ -36,7 +36,7 @@ define Package/ip6tables-mod-fullconenat
+   SECTION:=net
+   CATEGORY:=Network
+   TITLE:=FULLCONENAT ip6tables extension
+-  DEPENDS:=ip6tables +kmod-nf-nat6 +kmod-ipt-fullconenat +ip6tables-mod-nat
++  DEPENDS:=@IPV6 +ip6tables +kmod-nf-nat6 +ip6tables-mod-nat +kmod-ipt-fullconenat
+ endef
+
+ define KernelPackage/ipt-fullconenat
+
 --- a/luci-app-samba4/Makefile
 +++ b//luci-app-samba4/Makefile
 @@ -3,7 +3,7 @@
@@ -35,14 +47,14 @@
 
 --- a/firewall/Makefile
 +++ b/firewall/Makefile
-@@ -28,9 +28,8 @@ define Package/firewall
+@@ -28,9 +28,9 @@ define Package/firewall
    SECTION:=net
    CATEGORY:=Base system
    TITLE:=OpenWrt C Firewall
 -  DEPENDS:=+libubox +libubus +libuci +libip4tc +IPV6:libip6tc +libiptext +IPV6:libiptext6 +libxtables +kmod-ipt-core +kmod-ipt-conntrack +IPV6:kmod-nf-conntrack6 +kmod-ipt-nat
-+  DEPENDS:=+libubox +libubus +libuci +libip4tc +IPV6:libip6tc +libiptext +IPV6:libiptext6 +libxtables +kmod-ipt-core +kmod-ipt-conntrack +IPV6:kmod-nf-conntrack6 +kmod-ipt-nat +kmod-ipt-nat6 +iptables-mod-fullconenat +ip6tables-mod-fullconenat +iptables +ip6tables +kmod-ipt-offload +miniupnpd-iptables
++  DEPENDS:=+libubox +libubus +libuci +libip4tc +IPV6:libip6tc +libiptext +IPV6:libiptext6 +libxtables +kmod-ipt-core +kmod-ipt-conntrack +IPV6:kmod-nf-conntrack6 +kmod-ipt-nat +IPV6:kmod-ipt-nat6 +iptables-mod-fullconenat +kmod-ipt-offload +IPV6:ip6tables-mod-fullconenat +iptables +IPV6:ip6tables
    PROVIDES:=uci-firewall
--  CONFLICTS:=firewall4
+   CONFLICTS:=firewall4
  endef
 
  define Package/firewall/description
@@ -55,7 +67,7 @@
  	+nftables-json \
 -	+ucode +ucode-mod-fs +ucode-mod-ubus +ucode-mod-uci
 +	+ucode +ucode-mod-fs +ucode-mod-ubus +ucode-mod-uci \
-+	+kmod-nft-fullcone +iptables-nft +ip6tables-nft +arptables-nft +ebtables-nft +xtables-nft +miniupnpd-nftables
++	+kmod-nft-fullcone +arptables-nft +ebtables-nft +xtables-nft +iptables-nft +IPV6:ip6tables-nft
    EXTRA_DEPENDS:=ucode (>= 2022-03-22)
    PROVIDES:=uci-firewall
  endef
