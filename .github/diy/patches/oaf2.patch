@@ -1,0 +1,61 @@
+From 2b88e71cde6858662a7f382ff9836e985ee5f61c Mon Sep 17 00:00:00 2001
+From: sbwml <admin@cooluc.com>
+Date: Mon, 11 Dec 2023 00:46:08 +0800
+Subject: [PATCH] oaf: fix build for linux-6.4
+
+Signed-off-by: sbwml <admin@cooluc.com>
+---
+ oaf/src/af_log.c            | 6 ++++++
+ oaf/src/app_filter_config.c | 5 +++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/oaf/src/af_log.c b/oaf/src/af_log.c
+index cf5aebc..f4feb7b 100755
+--- a/oaf/src/af_log.c
++++ b/oaf/src/af_log.c
+@@ -67,7 +67,9 @@ static struct ctl_table oaf_root_table[] = {
+ 	{
+ 		.procname	= "oaf",
+ 		.mode		= 0555,
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0))
+ 		.child		= oaf_table,
++#endif
+ 	},
+ 	{}
+ };
+@@ -76,7 +78,11 @@ static struct ctl_table_header *oaf_table_header;
+
+ static int af_init_log_sysctl(void)
+ {
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0))
+ 	oaf_table_header = register_sysctl_table(oaf_root_table);
++#else
++	oaf_table_header = register_sysctl(oaf_root_table->procname, oaf_table);
++#endif
+ 	if (oaf_table_header == NULL){
+ 		printk("init log sysctl...failed\n");
+ 		return -ENOMEM;
+diff --git a/oaf/src/app_filter_config.c b/oaf/src/app_filter_config.c
+index 58a07d9..566e279 100755
+--- a/oaf/src/app_filter_config.c
++++ b/oaf/src/app_filter_config.c
+@@ -12,6 +12,7 @@
+ #include <linux/cdev.h>
+ #include <linux/vmalloc.h>
+ #include <linux/device.h>
++#include <linux/version.h>
+ #include "cJSON.h"
+ #include "app_filter.h"
+ #include "af_utils.h"
+@@ -419,7 +420,11 @@ int af_register_dev(void)
+ 		goto REGION_OUT;
+ 	}
+
++#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
+ 	g_af_dev.c = class_create(THIS_MODULE, AF_DEV_NAME);
++#else
++    g_af_dev.c = class_create(AF_DEV_NAME);
++#endif
+ 	if (IS_ERR_OR_NULL(g_af_dev.c))
+ 	{
+ 		goto CDEV_OUT;
