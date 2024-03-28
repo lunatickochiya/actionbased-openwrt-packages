@@ -24,6 +24,7 @@
 #include "af_utils.h"
 #include "app_filter.h"
 #include "cJSON.h"
+#include "af_bypass.h"
 
 DEFINE_RWLOCK(af_client_lock);
 
@@ -222,7 +223,6 @@ void flush_expired_visit_info(af_client_info_t *node)
 
 		if (cur_timep - node->visit_info[i].latest_time > timeout)
 		{
-			// 3?��o?��??3y????
 			memset(&node->visit_info[i], 0x0, sizeof(app_visit_info_t));
 			count++;
 		}
@@ -297,17 +297,6 @@ void af_visit_info_report(void)
 	}
 	AF_CLIENT_UNLOCK_W();
 }
-static inline int get_packet_dir(struct net_device *in)
-{
-	if (0 == strncmp(in->name, "br", 2))
-	{
-		return PKT_DIR_UP;
-	}
-	else
-	{
-		return PKT_DIR_DOWN;
-	}
-}
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0)
 static u_int32_t af_client_hook(void *priv,
@@ -325,35 +314,16 @@ static u_int32_t af_client_hook(unsigned int hook,
 	struct ethhdr *ethhdr = NULL;
 	unsigned char smac[ETH_ALEN];
 	af_client_info_t *nfc = NULL;
-	int pkt_dir = 0;
 	struct iphdr *iph = NULL;
+	unsigned int ip = 0;
 
-// 4.10-->4.11 nfct-->_nfct
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
-	struct nf_conn *ct = (struct nf_conn *)skb->_nfct;
-#else
-	struct nf_conn *ct = (struct nf_conn *)skb->nfct;
-#endif
-	if (ct == NULL)
-	{
-		return NF_ACCEPT;
-	}
-
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0)
-	if (!skb->dev)
+	if (skb->protocol == htons(ETH_P_IP)) {
+		iph = ip_hdr(skb);
+		ip = iph->saddr;
+	} else if (AF_MODE_GATEWAY != af_work_mode)
 		return NF_ACCEPT;
 
-	pkt_dir = get_packet_dir(skb->dev);
-#else
-	if (!in)
-	{
-		AF_ERROR("in is NULL\n");
-		return NF_ACCEPT;
-	}
-	pkt_dir = get_packet_dir(in);
-#endif
-
-	if (PKT_DIR_UP != pkt_dir)
+	if (BYPASS_PACKET())
 		return NF_ACCEPT;
 
 	ethhdr = eth_hdr(skb);
@@ -366,37 +336,30 @@ static u_int32_t af_client_hook(unsigned int hook,
 		memcpy(smac, &skb->cb[40], ETH_ALEN);
 	}
 
-	iph = ip_hdr(skb);
-	if (!iph)
-	{
-		return NF_ACCEPT;
-	}
-
 	AF_CLIENT_LOCK_W();
 	nfc = find_af_client(smac);
 	if (!nfc)
 	{
 		if (skb->dev)
-			AF_DEBUG("from dev:%s [%s] %pI4--->%pI4", skb->dev->name, (iph->protocol == IPPROTO_TCP ? "TCP" : "UDP"),
-					 &iph->saddr, &iph->daddr);
+			AF_DEBUG("from dev:%s %pI4", skb->dev->name, &ip);
 		nfc = nf_client_add(smac);
 	}
-	if (nfc && nfc->ip != iph->saddr)
+	if (nfc && ip != 0 && nfc->ip != ip)
 	{
-		AF_DEBUG("update node " MAC_FMT " ip %pI4--->%pI4\n", MAC_ARRAY(nfc->mac), &nfc->ip, &iph->saddr);
+		AF_DEBUG("update node " MAC_FMT " ip %pI4--->%pI4\n", MAC_ARRAY(nfc->mac), &nfc->ip, &ip);
 		nfc->update_jiffies = jiffies;
-		nfc->ip = iph->saddr;
+		nfc->ip = ip;
 	}
 	AF_CLIENT_UNLOCK_W();
 
 	return NF_ACCEPT;
 }
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 16, 0)
 static struct nf_hook_ops af_client_ops[] = {
 	{
 		.hook = af_client_hook,
-		.pf = PF_INET,
+		.pf = NFPROTO_INET,
 		.hooknum = NF_INET_FORWARD,
 		.priority = NF_IP_PRI_FIRST + 1,
 	},
@@ -405,8 +368,19 @@ static struct nf_hook_ops af_client_ops[] = {
 static struct nf_hook_ops af_client_ops[] = {
 	{
 		.hook = af_client_hook,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 4, 0)
 		.owner = THIS_MODULE,
-		.pf = PF_INET,
+#endif
+		.pf = NFPROTO_IPV4,
+		.hooknum = NF_INET_FORWARD,
+		.priority = NF_IP_PRI_FIRST + 1,
+	},
+	{
+		.hook = af_client_hook,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 4, 0)
+		.owner = THIS_MODULE,
+#endif
+		.pf = NFPROTO_IPV6,
 		.hooknum = NF_INET_FORWARD,
 		.priority = NF_IP_PRI_FIRST + 1,
 	},
@@ -415,12 +389,16 @@ static struct nf_hook_ops af_client_ops[] = {
 
 int af_client_init(void)
 {
+	int err;
 	nf_client_list_init();
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
-	nf_register_net_hooks(&init_net, af_client_ops, ARRAY_SIZE(af_client_ops));
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0)
+	err = nf_register_net_hooks(&init_net, af_client_ops, ARRAY_SIZE(af_client_ops));
 #else
-	nf_register_hooks(af_client_ops, ARRAY_SIZE(af_client_ops));
+	err = nf_register_hooks(af_client_ops, ARRAY_SIZE(af_client_ops));
 #endif
+	if (err) {
+		AF_ERROR("oaf register client hooks failed!\n");
+	}
 	AF_INFO("init app afclient ........ok\n");
 
 	return 0;
@@ -428,7 +406,7 @@ int af_client_init(void)
 
 void af_client_exit(void)
 {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0)
 	nf_unregister_net_hooks(&init_net, af_client_ops, ARRAY_SIZE(af_client_ops));
 #else
 	nf_unregister_hooks(af_client_ops, ARRAY_SIZE(af_client_ops));

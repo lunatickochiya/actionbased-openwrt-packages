@@ -3,6 +3,9 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
 PKG_NAME:=oaf
+PKG_VERSION:=5.0.10
+PKG_RELEASE:=2
+
 include $(INCLUDE_DIR)/package.mk
 
 PKG_AUTOLOAD:=oaf
@@ -15,7 +18,6 @@ define KernelPackage/oaf
   FILES:=$(PKG_BUILD_DIR)/oaf.ko 
   DEPENDS:=+kmod-ipt-conntrack
   KCONFIG:=
-  AUTOLOAD:=$(call AutoLoad,0,$(PKG_AUTOLOAD))
 endef
 
 define KernelPackage/oaf/description

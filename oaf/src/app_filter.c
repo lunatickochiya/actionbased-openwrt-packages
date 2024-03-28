@@ -12,6 +12,7 @@
 #include <net/netfilter/nf_conntrack_acct.h>
 #include <linux/skbuff.h>
 #include <net/ip.h>
+#include <uapi/linux/ipv6.h>
 #include <linux/types.h>
 #include <net/sock.h>
 #include <linux/etherdevice.h>
@@ -23,6 +24,7 @@
 #include "af_client.h"
 #include "af_client_fs.h"
 #include "cJSON.h"
+#include "af_bypass.h"
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("destan19@126.com");
@@ -436,35 +438,87 @@ static void af_clean_feature_list(void)
 	feature_list_write_unlock();
 }
 
+// free by caller
+static unsigned char *read_skb(struct sk_buff *skb, unsigned int from, unsigned int len)
+{
+	struct skb_seq_state state;
+	unsigned char *msg_buf = NULL;
+	unsigned int consumed = 0;
+	if (from <= 0 || from > 1500)
+		return NULL;
+
+	if (len <= 0 || from+len > 1500)
+		return NULL;
+
+	msg_buf = kmalloc(len, GFP_KERNEL);
+	if (!msg_buf)
+		return NULL;
+
+	skb_prepare_seq_read(skb, from, from+len, &state);
+	while (1) {
+		unsigned int avail;
+		const u8 *ptr;
+		avail = skb_seq_read(consumed, &ptr, &state);
+		if (avail == 0) {
+			break;
+		}
+		memcpy(msg_buf + consumed, ptr, avail);
+		consumed += avail;
+		if (consumed >= len) {
+			skb_abort_seq_read(&state);
+			break;
+		}
+	}
+	return msg_buf;
+}
+
 int parse_flow_proto(struct sk_buff *skb, flow_info_t *flow)
 {
+	unsigned char *ipp;
+	int ipp_len;
 	struct tcphdr *tcph = NULL;
 	struct udphdr *udph = NULL;
 	struct nf_conn *ct = NULL;
 	struct iphdr *iph = NULL;
+	struct ipv6hdr *ip6h = NULL;
 	if (!skb)
 		return -1;
-	iph = ip_hdr(skb);
-	if (!iph)
+	switch (skb->protocol) {
+	case htons(ETH_P_IP):
+		iph = ip_hdr(skb);
+		flow->src = iph->saddr;
+		flow->dst = iph->daddr;
+		flow->l4_protocol = iph->protocol;
+		ipp = ((unsigned char *)iph) + iph->ihl * 4;
+		ipp_len = ((unsigned char *)iph) + ntohs(iph->tot_len) - ipp;
+		break;
+	case htons(ETH_P_IPV6):
+		ip6h = ipv6_hdr(skb);
+		flow->src6 = ip6h->saddr.s6_addr;
+		flow->dst6 = ip6h->daddr.s6_addr;
+		flow->l4_protocol = ip6h->nexthdr;
+		ipp = ((unsigned char *)ip6h) + sizeof(struct ipv6hdr);
+		ipp_len = ntohs(ip6h->payload_len);
+		break;
+	default:
 		return -1;
-	flow->src = iph->saddr;
-	flow->dst = iph->daddr;
-	flow->l4_protocol = iph->protocol;
-	switch (iph->protocol)
+	}
+
+	switch (flow->l4_protocol)
 	{
 	case IPPROTO_TCP:
-		tcph = (struct tcphdr *)(iph + 1);
-		flow->l4_data = skb->data + iph->ihl * 4 + tcph->doff * 4;
-		flow->l4_len = ntohs(iph->tot_len) - iph->ihl * 4 - tcph->doff * 4;
-		flow->dport = htons(tcph->dest);
-		flow->sport = htons(tcph->source);
+		tcph = (struct tcphdr *)ipp;
+		flow->l4_len = ipp_len - tcph->doff * 4;
+		flow->l4_data = ipp + tcph->doff * 4;
+		flow->dport = ntohs(tcph->dest);
+		flow->sport = ntohs(tcph->source);
 		return 0;
 	case IPPROTO_UDP:
-		udph = (struct udphdr *)(iph + 1);
-		flow->l4_data = skb->data + iph->ihl * 4 + 8;
+		udph = (struct udphdr *)ipp;
 		flow->l4_len = ntohs(udph->len) - 8;
-		flow->dport = htons(udph->dest);
-		flow->sport = htons(udph->source);
+		flow->l4_data = ipp + 8;
+		flow->dport = ntohs(udph->dest);
+		flow->sport = ntohs(udph->source);
 		return 0;
 	case IPPROTO_ICMP:
 		break;
@@ -488,36 +542,34 @@ int dpi_https_proto(flow_info_t *flow)
 		AF_ERROR("flow is NULL\n");
 		return -1;
 	}
-	if (NULL == p || data_len == 0)
+	if (NULL == p || data_len <= 0xb0)
 	{
 		return -1;
 	}
-	if (!(p[0] == 0x16 && p[1] == 0x03 && p[2] == 0x01))
+	if (!(p[0] == 0x16 && p[1] == 0x03 && p[2] == 0x01 && p[5] == 0x01)) // TLS Handshake TLS 1.0 Client Hello
 		return -1;
 
 
-	for (i = 0; i < data_len; i++)
+	for (i = 0; i < data_len; ++i)
 	{
 		if (i + HTTPS_URL_OFFSET >= data_len)
 		{
 			return -1;
 		}
-		
 
-		if (p[i] == 0x0 && p[i + 1] == 0x0 && p[i + 2] == 0x0 && p[i + 3] != 0x0)
+		if (p[i] == 0x0 && p[i + 1] == 0x0 && p[i + 2] == 0x0 && p[i + 3] != 0x0) // server_name
 		{
 			// 2 bytes
-			memcpy(&url_len, p + i + HTTPS_LEN_OFFSET, 2);
-
-			if (ntohs(url_len) <= MIN_HOST_LEN || ntohs(url_len) > data_len || ntohs(url_len) > MAX_HOST_LEN)
+			url_len = ntohs(*((uint16_t *)(p + (i + HTTPS_LEN_OFFSET)))); // server name length
+			if (url_len <= MIN_HOST_LEN || url_len > data_len || url_len > MAX_HOST_LEN)
 			{
 				continue;
 			}
-			if (i + HTTPS_URL_OFFSET + ntohs(url_len) < data_len)
+			if (i + HTTPS_URL_OFFSET + url_len < data_len)
 			{
 				flow->https.match = AF_TRUE;
-				flow->https.url_pos = p + i + HTTPS_URL_OFFSET;
-				flow->https.url_len = ntohs(url_len);
+				flow->https.url_pos = p + (i + HTTPS_URL_OFFSET);
+				flow->https.url_len = url_len;
 				return 0;
 			}
 		}
@@ -640,8 +692,8 @@ static void dump_flow_info(flow_info_t *flow)
 	}
 	if (flow->l4_len > 0)
 	{
-		AF_LMT_INFO("src=" NIPQUAD_FMT ",dst=" NIPQUAD_FMT ",sport: %d, dport: %d, data_len: %d\n",
-					NIPQUAD(flow->src), NIPQUAD(flow->dst), flow->sport, flow->dport, flow->l4_len);
+		AF_LMT_INFO("src=" NIPQUAD_FMT ",dst=" NIPQUAD_FMT ",sport: %d, dport: %d, data_len: %d, http: %d, https: %d\n",
+					NIPQUAD(flow->src), NIPQUAD(flow->dst), flow->sport, flow->dport, flow->l4_len, flow->http.match, flow->https.match);
 	}
 
 	if (flow->l4_protocol == IPPROTO_TCP)
@@ -781,10 +833,14 @@ int af_match_one(flow_info_t *flow, af_feature_node_t *node)
 	return ret;
 }
 
-int app_filter_match(flow_info_t *flow)
+int app_filter_redrop(u_int32_t app_id, unsigned char *mac)
+{
+	return af_get_app_status(app_id) && (!is_user_match_enable() || find_af_mac(mac));
+}
+
+int app_filter_match(flow_info_t *flow, unsigned char *mac)
 {
 	af_feature_node_t *n, *node;
-	af_client_info_t *client = NULL;
 	feature_list_read_lock();
 	if (!list_empty(&af_feature_head))
 	{
@@ -794,12 +850,8 @@ int app_filter_match(flow_info_t *flow)
 			{
 				flow->app_id = node->app_id;
 				strncpy(flow->app_name, node->app_name, sizeof(flow->app_name) - 1);
-				client = find_af_client_by_ip(flow->src);
-				if (!client)
-				{
-					goto EXIT;
-				}
-				if (is_user_match_enable() && !find_af_mac(client->mac))
+
+				if (is_user_match_enable() && !find_af_mac(mac))
 				{
 					goto EXIT;
 				}
@@ -823,6 +875,10 @@ EXIT:
 }
 
 #define NF_DROP_BIT 0x80000000
+#define NF_MARK_BIT 0x40000000
+#define NF_APP_BIT 0x3FFF0000
+#define NF_DROP_MARK (NF_DROP_BIT | NF_MARK_BIT)
+#define NF_MASK_BIT (NF_DROP_MARK | NF_APP_BIT)
 
 static int af_get_visit_index(af_client_info_t *node, int app_id)
 {
@@ -838,21 +894,29 @@ static int af_get_visit_index(af_client_info_t *node, int app_id)
 	return 0;
 }
 
-int af_update_client_app_info(af_client_info_t *node, int app_id, int drop)
+int af_update_client_app_info(unsigned char *mac, int app_id, int drop)
 {
+	af_client_info_t *node;
 	int index = -1;
-	if (!node)
+	AF_CLIENT_LOCK_W();
+	node = find_af_client(mac);
+	if (!node) {
+		AF_CLIENT_UNLOCK_W();
 		return -1;
+	}
 
 	index = af_get_visit_index(node, app_id);
-	if (index < 0 || index >= MAX_RECORD_APP_NUM)
+	if (index < 0 || index >= MAX_RECORD_APP_NUM) {
+		AF_CLIENT_UNLOCK_W();
 		return 0;
+	}
 	node->visit_info[index].total_num++;
 	if (drop)
 		node->visit_info[index].drop_num++;
 	node->visit_info[index].app_id = app_id;
 	node->visit_info[index].latest_time = af_get_timestamp_sec();
 	node->visit_info[index].latest_action = drop;
+	AF_CLIENT_UNLOCK_W();
 	return 0;
 }
 
@@ -917,26 +981,34 @@ u_int32_t app_filter_hook_bypass_handle(struct sk_buff *skb, struct net_device *
 	flow_info_t flow;
 	u_int8_t smac[ETH_ALEN];
 	af_client_info_t *client = NULL;
+	u_int32_t ret = NF_ACCEPT;
 
 	if (!skb || !dev)
 		return NF_ACCEPT;
 
 	if (0 == af_lan_ip || 0 == af_lan_mask)
 		return NF_ACCEPT;
-	if (strstr(dev->name, "docker"))
-		return NF_ACCEPT;
 
 	memset((char *)&flow, 0x0, sizeof(flow_info_t));
 	if (parse_flow_proto(skb, &flow) < 0)
 		return NF_ACCEPT;
-	
-	if (af_lan_ip == flow.src || af_lan_ip == flow.dst){
-		return NF_ACCEPT;
-	}
-	if (af_check_bcast_ip(&flow) || af_match_local_packet(&flow))
-		return NF_ACCEPT;
 
-	if ((flow.src & af_lan_mask) != (af_lan_ip & af_lan_mask)){
+	if (flow.src || flow.dst) {
+		if (af_lan_ip == flow.src || af_lan_ip == flow.dst){
+			return NF_ACCEPT;
+		}
+		if (af_check_bcast_ip(&flow) || af_match_local_packet(&flow))
+			return NF_ACCEPT;
+
+		if ((flow.src & af_lan_mask) != (af_lan_ip & af_lan_mask)){
+			return NF_ACCEPT;
+		}
+	} else if (flow.src6 && flow.dst6) {
+		if (flow.src6[0] == 0xff || flow.dst6[0] == 0xff) {
+			return NF_ACCEPT;
+		}
+		return NF_DROP;
+	} else {
 		return NF_ACCEPT;
 	}
 	af_get_smac(skb, smac);
@@ -948,95 +1020,143 @@ u_int32_t app_filter_hook_bypass_handle(struct sk_buff *skb, struct net_device *
 		return NF_ACCEPT;
 	}
 	client->update_jiffies = jiffies;
+	if (flow.src)
+		client->ip = flow.src;
 	AF_CLIENT_UNLOCK_W();
 
-	if (0 != dpi_main(skb, &flow))
-		return NF_ACCEPT;
+	if (skb_is_nonlinear(skb)) {
+		flow.l4_data = read_skb(skb, flow.l4_data - skb->data, flow.l4_len);
+		if (!flow.l4_data)
+			return NF_ACCEPT;
+	}
 
-	client->ip = flow.src;
-	app_filter_match(&flow);
+	if (0 != dpi_main(skb, &flow))
+		goto accept;
+
+	app_filter_match(&flow, smac);
 	if (flow.app_id != 0){
-		af_update_client_app_info(client, flow.app_id, flow.drop);
+		af_update_client_app_info(smac, flow.app_id, flow.drop);
 	}
 	if (flow.drop)
 	{
-		return NF_DROP;
+		ret = NF_DROP;
 	}
-	return NF_ACCEPT;
+
+accept:
+	if (skb_is_nonlinear(skb)) {
+		if (flow.l4_data) {
+			kfree(flow.l4_data);
+		}
+	}
+	return ret;
 }
 
 u_int32_t app_filter_hook_gateway_handle(struct sk_buff *skb, struct net_device *dev){
 	unsigned long long total_packets = 0;
 	flow_info_t flow;
+	u_int8_t smac[ETH_ALEN];
 	enum ip_conntrack_info ctinfo;
 	struct nf_conn *ct = NULL;
 	struct nf_conn_acct *acct;
 	af_client_info_t *client = NULL;
+	u_int32_t ret = NF_ACCEPT;
 	int app_id = 0;
 	int drop = 0;
+
+	ct = nf_ct_get(skb, &ctinfo);
+
+	if (ct == NULL || !nf_ct_is_confirmed(ct))
+		return NF_ACCEPT;
+
+	if ((ct->mark & NF_MASK_BIT) == NF_MARK_BIT)
+		return NF_ACCEPT;
+
+	if (strncmp(dev->name, "br-lan", 6)) {
+		if ((ct->mark & NF_DROP_MARK) == NF_DROP_MARK)
+			return NF_DROP;
+		return NF_ACCEPT;
+	}
+	if (CTINFO2DIR(ctinfo) == IP_CT_DIR_REPLY)
+		return NF_ACCEPT;
 
 	memset((char *)&flow, 0x0, sizeof(flow_info_t));
 	if (parse_flow_proto(skb, &flow) < 0)
 		return NF_ACCEPT;
 
-	ct = nf_ct_get(skb, &ctinfo);
-	if (ct == NULL || !nf_ct_is_confirmed(ct))
-		return NF_ACCEPT;
+	if (!flow.src)
+		af_get_smac(skb, smac);
 
 	AF_CLIENT_LOCK_R();
-	client = find_af_client_by_ip(flow.src);
+	client = flow.src?find_af_client_by_ip(flow.src):find_af_client(smac);
 	if (!client){
 		AF_CLIENT_UNLOCK_R();
 		return NF_ACCEPT;
 	}
 	client->update_jiffies = jiffies;
+	memcpy(smac, client->mac, ETH_ALEN);
 	AF_CLIENT_UNLOCK_R();
 
-	if (ct->mark != 0)
+	if ((ct->mark & NF_MARK_BIT) != 0)
 	{
-		app_id = ct->mark & (~NF_DROP_BIT);
+		app_id = (ct->mark & NF_APP_BIT) >> 16;
 		if (app_id > 1000 && app_id < 9999){
 			if (NF_DROP_BIT == (ct->mark & NF_DROP_BIT))
 				drop = 1;
-			AF_CLIENT_LOCK_W();
-			af_update_client_app_info(client, app_id, drop);
-			AF_CLIENT_UNLOCK_W();
+			else if (app_filter_redrop(app_id, smac)) {
+				ct->mark |= NF_DROP_BIT;
+				drop = 1;
+			}
+			af_update_client_app_info(smac, app_id, drop);
 
 			if (drop){
 				return NF_DROP;
 			}
 		}
+		return NF_ACCEPT;
 	}
 	acct = nf_conn_acct_find(ct);
 	if(!acct)
 		return NF_ACCEPT;
-	total_packets = (unsigned long long)atomic64_read(&acct->counter[IP_CT_DIR_ORIGINAL].packets) 
-		+ (unsigned long long)atomic64_read(&acct->counter[IP_CT_DIR_REPLY].packets);
-
-	if(total_packets > MAX_DPI_PKT_NUM)
+	total_packets = (unsigned long long)atomic64_read(&acct->counter[IP_CT_DIR_ORIGINAL].packets);
+	if (total_packets > 8 ||
+		total_packets + (unsigned long long)atomic64_read(&acct->counter[IP_CT_DIR_REPLY].packets) > MAX_DPI_PKT_NUM) {
+		ct->mark |= NF_MARK_BIT;
 		return NF_ACCEPT;
+	}
 
+	if (skb->len < 67 || skb->len > 1200)
+		return NF_ACCEPT;
+	if (skb_is_nonlinear(skb)) {
+		flow.l4_data = read_skb(skb, flow.l4_data - skb->data, flow.l4_len);
+		if (!flow.l4_data)
+			return NF_ACCEPT;
+	}
 	if (0 != dpi_main(skb, &flow))
-		return NF_ACCEPT;
+		goto accept;
 
-	app_filter_match(&flow);
+	app_filter_match(&flow, smac);
 
 	if (flow.app_id != 0)
 	{
-		ct->mark = flow.app_id;
-		AF_CLIENT_LOCK_W();
-		af_update_client_app_info(client, flow.app_id, flow.drop);
-		AF_CLIENT_UNLOCK_W();
+		ct->mark = (ct->mark & (~NF_APP_BIT)) | (flow.app_id << 16) | NF_MARK_BIT;
+		af_update_client_app_info(smac, flow.app_id, flow.drop);
 		AF_LMT_INFO("match %s %pI4(%d)--> %pI4(%d) len = %d, %d\n ", IPPROTO_TCP == flow.l4_protocol ? "tcp" : "udp",
 					&flow.src, flow.sport, &flow.dst, flow.dport, skb->len, flow.app_id);
+		if (flow.drop)
+		{
+			ct->mark |= NF_DROP_BIT;
+			AF_LMT_INFO("##Drop app %s flow, appid is %d\n", flow.app_name, flow.app_id);
+			ret = NF_DROP;
+		}
 	}
-	if (flow.drop)
-	{
-		ct->mark |= NF_DROP_BIT;
-		AF_LMT_INFO("##Drop app %s flow, appid is %d\n", flow.app_name, flow.app_id);
-		return NF_DROP;
+
+accept:
+	if (skb_is_nonlinear(skb)) {
+		if (flow.l4_data) {
+			kfree(flow.l4_data);
+		}
 	}
-	return NF_ACCEPT;
+	return ret;
 }
 
 
@@ -1077,22 +1197,51 @@ static u_int32_t app_filter_by_pass_hook(unsigned int hook,
 		return NF_ACCEPT;
 	if (AF_MODE_GATEWAY == af_work_mode)
 		return NF_ACCEPT;
+	if (BYPASS_PACKET())
+		return NF_ACCEPT;
 	return app_filter_hook_bypass_handle(skb, skb->dev);
 }
 
-
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 16, 0)
 static struct nf_hook_ops app_filter_ops[] __read_mostly = {
 	{
 		.hook = app_filter_hook,
-		.pf = PF_INET,
+		.pf = NFPROTO_INET,
 		.hooknum = NF_INET_FORWARD,
 		.priority = NF_IP_PRI_MANGLE + 1,
 
 	},
 	{
 		.hook = app_filter_by_pass_hook,
-		.pf = PF_INET,
+		.pf = NFPROTO_INET,
+		.hooknum = NF_INET_PRE_ROUTING,
+		.priority = NF_IP_PRI_MANGLE + 1,
+	},
+};
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0)
+static struct nf_hook_ops app_filter_ops[] __read_mostly = {
+	{
+		.hook = app_filter_hook,
+		.pf = NFPROTO_IPV4,
+		.hooknum = NF_INET_FORWARD,
+		.priority = NF_IP_PRI_MANGLE + 1,
+	},
+	{
+		.hook = app_filter_by_pass_hook,
+		.pf = NFPROTO_IPV4,
+		.hooknum = NF_INET_PRE_ROUTING,
+		.priority = NF_IP_PRI_MANGLE + 1,
+	},
+	{
+		.hook = app_filter_hook,
+		.pf = NFPROTO_IPV6,
+		.hooknum = NF_INET_FORWARD,
+		.priority = NF_IP_PRI_MANGLE + 1,
+
+	},
+	{
+		.hook = app_filter_by_pass_hook,
+		.pf = NFPROTO_IPV6,
 		.hooknum = NF_INET_PRE_ROUTING,
 		.priority = NF_IP_PRI_MANGLE + 1,
 	},
@@ -1102,7 +1251,14 @@ static struct nf_hook_ops app_filter_ops[] __read_mostly = {
 	{
 		.hook = app_filter_hook,
 		.owner = THIS_MODULE,
-		.pf = PF_INET,
+		.pf = NFPROTO_IPV4,
+		.hooknum = NF_INET_FORWARD,
+		.priority = NF_IP_PRI_MANGLE + 1,
+	},
+	{
+		.hook = app_filter_hook,
+		.owner = THIS_MODULE,
+		.pf = NFPROTO_IPV6,
 		.hooknum = NF_INET_FORWARD,
 		.priority = NF_IP_PRI_MANGLE + 1,
 	},
@@ -1247,6 +1403,7 @@ int netlink_oaf_init(void)
 
 static int __init app_filter_init(void)
 {
+	int err;
 	if (0 != load_feature_config())
 	{
 		return -1;
@@ -1259,11 +1416,14 @@ static int __init app_filter_init(void)
 	af_init_app_status();
 	init_af_client_procfs();
 	af_client_init();
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
-	nf_register_net_hooks(&init_net, app_filter_ops, ARRAY_SIZE(app_filter_ops));
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0)
+	err = nf_register_net_hooks(&init_net, app_filter_ops, ARRAY_SIZE(app_filter_ops));
 #else
-	nf_register_hooks(app_filter_ops, ARRAY_SIZE(app_filter_ops));
+	err = nf_register_hooks(app_filter_ops, ARRAY_SIZE(app_filter_ops));
 #endif
+	if (err) {
+		AF_ERROR("oaf register filter hooks failed!\n");
+	}
 	init_oaf_timer();
 	AF_INFO("init app filter ........ok\n");
 	return 0;
@@ -1273,7 +1433,7 @@ static void app_filter_fini(void)
 {
 	AF_INFO("app filter module exit\n");
 	fini_oaf_timer();
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0)
 	nf_unregister_net_hooks(&init_net, app_filter_ops, ARRAY_SIZE(app_filter_ops));
 #else
 	nf_unregister_hooks(app_filter_ops, ARRAY_SIZE(app_filter_ops));
