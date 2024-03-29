@@ -245,6 +245,7 @@ jobs:
         git_clone https://github.com/QiuSimons/OpenWrt-Add; mv OpenWrt-Add/luci-app-irqbalance ./;rm -rf OpenWrt-Add
         git_clone https://github.com/lucikap/Brukamen; mv Brukamen/luci-app-ua2f ./;rm -rf Brukamen
         git_clone https://github.com/HiGarfield/lede-17.01.4-Mod; mv lede-17.01.4-Mod/package/extra/luci-app-openvpn-server ./;rm -rf lede-17.01.4-Mod
+        git_clone https://github.com/syb999/openwrt-15.05; mv openwrt-15.05/package/network/services/openwrt-netem/luci-app-netem; mv openwrt-15.05/package/network/services/openwrt-netem/netem-control ./;rm -rf openwrt-15.05
         git clone --branch openwrt-22.03 --depth 1 https://github.com/openwrt/luci op-luci && mv op-luci/applications/luci-app-wireguard . && rm -rf op-luci/applications && rm -rf op-luci
         ) &
         (
