@@ -284,11 +284,11 @@ jobs:
         ) &
         (
         git_sparse_clone develop "https://github.com/Ysurac/openmptcprouter-feeds" "openmptcp" luci-app-snmpd \
-        luci-app-packet-capture luci-app-mail msmtp
+        luci-app-packet-capture luci-app-mail msmtp luci-app-iperf atinout
         git_sparse_clone master "https://github.com/xiaoqingfengATGH/feeds-xiaoqingfeng" "xiaoqingfeng" homeredirect luci-app-homeredirect
         git_sparse_clone master "https://github.com/immortalwrt/immortalwrt" "immortal" \
-        package/kernel/r8168 package/kernel/r8125 package/kernel/rtl8821cu package/kernel/rtl8189es package/emortal/autocore package/emortal/automount \
-        package/network/utils/fullconenat package/network/utils/fullconenat-nft package/network/utils/nftables \
+        package/kernel/r8168 package/kernel/r8125 package/kernel/rtl8188eu package/kernel/rtl8192eu package/kernel/rtl8812au-ac package/kernel/rtl8189es package/emortal/autocore package/emortal/automount \
+        package/network/utils/fullconenat package/network/utils/fullconenat-nft package/network/utils/nftables package/emortal/cpufreq \
         package/utils/mhz package/libs/libnftnl package/firmware/wireless-regdb
         ) &
         (
@@ -300,7 +300,7 @@ jobs:
         git_sparse_clone master "https://github.com/coolsnowwolf/luci" "leluci" applications libs/luci-lib-fs
         mv -f applications luciapp
         rm -rf luciapp/{luci-app-qbittorrent,luci-app-cpufreq,luci-app-zerotier,luci-app-ipsec-server,luci-app-ipsec-vpnd,luci-app-e2guardian,luci-app-webdav,luci-app-aliyundrive-fuse}
-        git_sparse_clone openwrt-23.05 "https://github.com/immortalwrt/luci" "immluci" applications protocols/luci-proto-minieap
+        git_sparse_clone master "https://github.com/immortalwrt/luci" "immluci" applications protocols/luci-proto-minieap
         mv -n applications/* luciapp/; rm -rf applications
         rm -rf luciapp/{luci-app-ipsec-vpnd,luci-app-ipsec-vpnserver-manyusers}
 
