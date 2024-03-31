@@ -72,7 +72,8 @@ return view.extend({
 
 		if (L.hasSystemFeature('fullconenat')) {
 		o = s.option(form.Flag, 'fullcone', _('FullCone NAT'), _('Using FullCone NAT can improve gaming performance effectively'));
-		o = s.option(form.Flag, 'fullcone6', _('Enable FullCone NAT6'));
+		if (fw4)
+			o = s.option(form.Flag, 'fullcone6', _('Enable FullCone NAT6'));
 		}
 
 		/* Netfilter flow offload support */
