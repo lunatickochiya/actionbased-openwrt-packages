@@ -240,8 +240,10 @@ index 6aeb632..60323c7 100644
    TITLE:=A lightweight and high-performance transparent proxy solution
    # You need enable KERNEL_DEBUG_INFO_BTF and KERNEL_BPF_EVENTS
    DEPENDS:=$(GO_ARCH_DEPENDS) $(BPF_DEPENDS)  \
--    +ca-bundle +kmod-sched-core +kmod-sched-bpf +kmod-xdp-sockets-diag +kmod-veth
-+    +ca-bundle +kmod-sched-core +kmod-sched-bpf +kmod-veth
+-    +ca-bundle +kmod-sched-core +kmod-sched-bpf +kmod-xdp-sockets-diag \
+-    +kmod-veth
++    +ca-bundle +kmod-sched-core +kmod-sched-bpf \
++    +kmod-veth
 +endef
 +
 +define Package/$(PKG_NAME)/config
@@ -276,8 +278,10 @@ index 702f841..3edd9ab 100644
    TITLE:=daed-next is a backend of dae
    # You need enable KERNEL_DEBUG_INFO_BTF and KERNEL_BPF_EVENTS
    DEPENDS:=$(GO_ARCH_DEPENDS) $(BPF_DEPENDS) \
--    +ca-bundle +kmod-sched-core +kmod-sched-bpf +kmod-xdp-sockets-diag +kmod-veth \
-+    +ca-bundle +kmod-sched-core +kmod-sched-bpf +kmod-veth \
+-    +ca-bundle +kmod-sched-core +kmod-sched-bpf +kmod-xdp-sockets-diag \
+-    +kmod-veth
++    +ca-bundle +kmod-sched-core +kmod-sched-bpf \
++    +kmod-veth
      +node +v2ray-geoip +v2ray-geosite +zoneinfo-asia
  endef
 
