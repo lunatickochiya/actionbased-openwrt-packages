@@ -8,8 +8,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lucky
-PKG_VERSION:=2.7.2
-PKG_RELEASE:=6
+PKG_VERSION:=2.8.3
+PKG_RELEASE:=7
 
 ifeq ($(ARCH),mipsel)
 	LUCKY_ARCH:=mipsle_softfloat
@@ -26,8 +26,12 @@ endif
 ifeq ($(ARCH),arm)
 	LUCKY_ARCH:=armv7
 endif
+
+ifeq ($(ARCH),arm64)
+	LUCKY_ARCH:=arm64
+endif
 ifeq ($(BOARD),bcm53xx)
-	LUCKY_ARCH:=armv6
+	LUCKY_ARCH:=armv7
 ifeq ($(word 2,$(subst +,$(space),$(call qstrip,$(CONFIG_CPU_TYPE)))),)
 	LUCKY_ARCH:=armv5
 endif
