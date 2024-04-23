@@ -5,12 +5,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=daed
-PKG_RELEASE:=12
+PKG_VERSION=0.4.1
+PKG_RELEASE:=13
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/daeuniverse/daed.git
-PKG_SOURCE_DATE:=2024-03-27
-PKG_SOURCE_VERSION:=2841ec229ff3a0675293b95a23f0f3aac2604982
+PKG_SOURCE_VERSION:=5c4904de82e4d79bb472f04352d72c18e483cc9f
 PKG_MIRROR_HASH:=skip
 
 PKG_LICENSE:=AGPL-3.0-only MIT
@@ -86,7 +86,8 @@ endef
 
 WEB_FILE:=$(PKG_NAME)-web-$(PKG_VERSION).zip
 define Download/daed-web
-	URL:=@IMMORTALWRT
+	URL:=https://github.com/daeuniverse/daed/releases/download/v$(PKG_VERSION)
+	URL_FILE:=web.zip
 	FILE:=$(WEB_FILE)
 	HASH:=skip
 endef
