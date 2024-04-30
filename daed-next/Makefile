@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 PKG_NAME:=daed-next
 PKG_VERSION:=2023-12-02-102cb56
 CORE_VERSION:=core-$(shell date "+%Y-%m-%d")
-PKG_RELEASE:=5
+PKG_RELEASE:=6
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_PROTO:=git
@@ -81,11 +81,11 @@ define Build/Prepare
 	rm -rf $(PKG_BUILD_DIR)/dae-core && git clone https://github.com/daeuniverse/dae $(PKG_BUILD_DIR)/dae-core ; \
 	rm -rf $(PKG_BUILD_DIR)/dae-core/control/kern/headers && git clone https://github.com/daeuniverse/dae_bpf_headers $(PKG_BUILD_DIR)/dae-core/control/kern/headers ; \
 	pushd $(PKG_BUILD_DIR)/dae-core ; \
-	go get -u ; \
+	go get -u=patch ; \
 	go mod tidy ; \
 	popd ; \
 	pushd $(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)/wing ; \
-	go get -u ; \
+	go get -u=patch ; \
 	go mod tidy ; \
 	popd ; \
 	)
