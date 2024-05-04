@@ -1,8 +1,8 @@
 local fs = require "nixio.fs"
 local sys = require "luci.sys"
 
-m = Map("samba", translate("<font color=\"green\">CUPS高级配置</font>"), translate("<font color=\"red\">此处修改的是/etc/cups/cupsd.conf文件。</font><input class=\"cbi-button cbi-button-apply\" type=\"submit\" value=\" "..translate("点击此处可下载并浏览添加打印机教程文件").." \" onclick=\"window.open('http://'+window.location.hostname+'/cups.pdf')\"/>"))
-s = m:section(TypedSection, "samba")
+m = Map("cupsd", translate("<font color=\"green\">CUPS高级配置</font>"), translate("<font color=\"red\">此处修改的是/etc/cups/cupsd.conf文件。</font><input class=\"cbi-button cbi-button-apply\" type=\"submit\" value=\" "..translate("点击此处可下载并浏览添加打印机教程文件").." \" onclick=\"window.open('http://'+window.location.hostname+'/cups.pdf')\"/>"))
+s = m:section(TypedSection, "cupsd")
 s.anonymous=true
 
 o = s:option(TextValue, "/etc/cups/cupsd.conf")
