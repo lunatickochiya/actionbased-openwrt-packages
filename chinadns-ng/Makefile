@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=chinadns-ng
 PKG_VERSION:=2023.10.28
-PKG_RELEASE:=6
+PKG_RELEASE:=7
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/zfl9/chinadns-ng.git
@@ -67,6 +67,7 @@ endef
 
 define Package/chinadns-ng/postrm
 #!/bin/sh
+exec 2>/dev/null
 rmdir --ignore-fail-on-non-empty /etc/chinadns-ng
 (crontab -l | grep -v "chinadns-ng") | crontab -
 exit 0
