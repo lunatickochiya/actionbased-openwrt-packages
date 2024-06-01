@@ -64,14 +64,14 @@ diff --git a/luci-app-passwall-smartdns-dev/luasrc/controller/passwall.lua b/luc
 index e9c49d031c..c4ba6e1c70 100644
 --- a/luci-app-passwall-smartdns-dev/luasrc/controller/passwall.lua
 +++ b/luci-app-passwall-smartdns-dev/luasrc/controller/passwall.lua
-@@ -20,6 +20,7 @@ function index()
+@@ -21,6 +21,7 @@ function index()
  	entry({"admin", "services", appname, "reset_config"}, call("reset_config")).leaf = true
  	entry({"admin", "services", appname, "show"}, call("show_menu")).leaf = true
  	entry({"admin", "services", appname, "hide"}, call("hide_menu")).leaf = true
 +	entry({"admin", "services", appname, "ip"}, call('check_ip')).leaf = true
- 	if not nixio.fs.access("/etc/config/passwall") then return end
- 	if nixio.fs.access("/etc/config/passwall_show") then
- 		e = entry({"admin", "services", appname}, alias("admin", "services", appname, "settings"), _("Pass Wall"), -1)
+ 	if uci:get(appname, "@global[0]", "hide_from_luci") == "1" then
+ 		return
+ 	end
 @@ -194,6 +195,58 @@ function status()
  	luci.http.write_json(e)
  end
