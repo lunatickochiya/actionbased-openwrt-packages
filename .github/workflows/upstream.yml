@@ -250,7 +250,7 @@ jobs:
         ) &
         (
         git_sparse_clone master "https://github.com/coolsnowwolf/packages" "leanpkg" net/miniupnpd net/mwan3 multimedia/UnblockNeteaseMusic-Go utils/bandwidthd \
-        multimedia/UnblockNeteaseMusic net/amule net/softethervpn5 net/antileech net/baidupcs-web multimedia/gmediarender multimedia/pppwn-cpp net/go-aliyundrive-webdav \
+        multimedia/UnblockNeteaseMusic net/softethervpn5 net/baidupcs-web multimedia/gmediarender multimedia/pppwn-cpp net/go-aliyundrive-webdav \
         net/qBittorrent-static net/phtunnel net/frp \
         net/uugamebooster net/verysync net/vlmcsd net/dnsforwarder net/tcpping net/netatalk net/pgyvpn
         mv -f miniupnpd miniupnpd-iptables
@@ -271,13 +271,13 @@ jobs:
 
         (
         git_sparse_clone openwrt-23.05 "https://github.com/immortalwrt/packages" "immpkgs" net/mwol net/n2n net/dae \
-        net/sub-web net/dnsproxy net/haproxy net/v2raya net/cdnspeedtest net/keepalived \
+        net/sub-web net/dnsproxy net/haproxy net/v2raya net/cdnspeedtest net/keepalived net/amule libs/antileech \
         net/go-nats net/go-wol net/bitsrunlogin-go net/transfer net/cloudreve net/daed \
         net/subconverter net/ngrokc net/oscam net/njitclient net/scutclient net/gost net/ua2f net/dufs net/qBittorrent-Enhanced-Edition \
         net/tinyportmapper net/tinyfecvpn net/nexttrace net/pcap-dnsproxy net/rustdesk-server net/tuic-server net/speedtest-go \
         net/dns-forwarder net/ipset-lists net/ShadowVPN net/adguardhome net/cloudflared net/nps net/naiveproxy \
         lang/lua-maxminddb net/pdnsd-alt \
-        libs/jpcre2 libs/wxbase libs/rapidjson libs/libcron libs/quickjspp libs/toml11 libs/libtorrent-rasterbar \
+        libs/jpcre2 libs/wxbase libs/rapidjson libs/libcron libs/libcryptopp libs/quickjspp libs/toml11 libs/libtorrent-rasterbar \
         libs/libdouble-conversion libs/qt6base libs/cxxopts libs/jpcre2 libs/alac sound/spotifyd \
         utils/qt6tools utils/cpulimit utils/filebrowser utils/cups utils/cups-bjnp utils/joker net/udp2raw net/msd_lite \
         multimedia/you-get multimedia/lux multimedia/ykdl multimedia/gallery-dl devel/go-rice admin/gotop admin/netdata
@@ -298,7 +298,8 @@ jobs:
         git_sparse_clone master "https://github.com/sbwml/openwrt_pkgs" "openwrt_pkgs" luci-app-socat
         git_sparse_clone master "https://github.com/immortalwrt/luci" "immluci1" applications/luci-app-dufs applications/luci-app-libreswan applications/luci-app-strongswan-swanctl
         git_sparse_clone master "https://github.com/immortalwrt/packages" "immpkgs1" utils/swanmon libs/davici
-        git_sparse_clone master "https://github.com/coolsnowwolf/lede" "leanlede" package/lean package/qca/shortcut-fe package/wwan package/network/services/shellsync package/network/services/e2guardian package/network/services/noddos
+        git_sparse_clone master "https://github.com/immortalwrt/wwan-packages" "wwan-immpkgs1" applications/luci-app-3ginfo-lite applications/luci-app-modemband applications/luci-app-sms-tool-js applications/luci-proto-quectel drivers/fibocom-qmi-wwan drivers/quectel-gobinet drivers/quectel-mhi-pcie drivers/quectel-qmi-wwan drivers/quectel-sprd-pcie utils/fibocom-dial utils/modemband utils/quectel-cm
+        git_sparse_clone master "https://github.com/coolsnowwolf/lede" "leanlede" package/lean package/qca/shortcut-fe package/network/services/shellsync package/network/services/e2guardian package/network/services/noddos
         ) &
         git_sparse_clone master "https://github.com/coolsnowwolf/luci" "leluci" applications libs/luci-lib-fs
         mv -f applications luciapp
