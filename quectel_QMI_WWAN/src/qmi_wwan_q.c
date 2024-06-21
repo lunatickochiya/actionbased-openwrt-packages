@@ -829,32 +829,25 @@ static struct rtnl_link_stats64 *_rmnet_vnd_get_stats64(struct net_device *net, 
 
 		do {
 #if (LINUX_VERSION_CODE < KERNEL_VERSION( 6,6,0 ))
- 			start = u64_stats_fetch_begin_irq(&stats64->syncp);
+			start = u64_stats_fetch_begin_irq(&stats64->syncp);
 #else
 			start = u64_stats_fetch_begin(&stats64->syncp);
 #endif
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5,18,0)
 			rx_packets = stats64->rx_packets;
 			rx_bytes = stats64->rx_bytes;
 			tx_packets = stats64->tx_packets;
 			tx_bytes = stats64->tx_bytes;
-#else
-			rx_packets = u64_stats_read(&stats64->rx_packets);
-			rx_bytes = u64_stats_read(&stats64->rx_bytes);
-			tx_packets = u64_stats_read(&stats64->tx_packets);
-			tx_bytes = u64_stats_read(&stats64->tx_bytes);
-#endif
 #if (LINUX_VERSION_CODE < KERNEL_VERSION( 6,6,0 ))
- 		} while (u64_stats_fetch_retry_irq(&stats64->syncp, start));
+		} while (u64_stats_fetch_retry_irq(&stats64->syncp, start));
 #else
 		} while (u64_stats_fetch_retry(&stats64->syncp, start));
 #endif
 
-		stats->rx_packets += rx_packets;
-		stats->rx_bytes += rx_bytes;
-		stats->tx_packets += tx_packets;
-		stats->tx_bytes += tx_bytes;
-
+        stats->rx_packets += u64_stats_read(&rx_packets);
+		stats->rx_bytes += u64_stats_read(&rx_bytes);
+		stats->tx_packets += u64_stats_read(&tx_packets);
+		stats->tx_bytes += u64_stats_read(&tx_bytes);
+#endif
 	}
 
 	return stats;
