@@ -66,9 +66,9 @@ index e9c49d031c..c4ba6e1c70 100644
  	entry({"admin", "services", appname, "show"}, call("show_menu")).leaf = true
  	entry({"admin", "services", appname, "hide"}, call("hide_menu")).leaf = true
 +	entry({"admin", "services", appname, "ip"}, call('check_ip')).leaf = true
- 	if uci:get(appname, "@global[0]", "hide_from_luci") == "1" then
- 		return
- 	end
+ 	local e
+ 	if uci:get(appname, "@global[0]", "hide_from_luci") ~= "1" then
+ 		e = entry({"admin", "services", appname}, alias("admin", "services", appname, "settings"), _("Pass Wall"), -1)
 @@ -209,6 +210,58 @@ function clear_log()
  	luci.sys.call("echo '' > /tmp/log/passwall.log")
  end
