@@ -81,7 +81,6 @@ function read_config(){
 	[ -z "$login_ip_white_timeout" ] && login_ip_white_timeout="600"
 	[ "$iw_version" ] && wlan_interface=`iw dev 2>/dev/null|grep Interface|awk '{print $2}'` >/dev/null 2>&1
 	[ -z "$server_port" ] && server_port="22"
-	cpu_notification_delay=$((${cpu_notification_delay} - ${cpu_threshold_duration}))
 	output_dir="${dir}json_output"
 	mkdir -p "$output_dir"
 	if ( echo "$lite_enable"|grep -q "content" ); then
@@ -305,6 +304,19 @@ function getname(){
 	echo "$tmp_name" | tr -d '\n\r' | awk '$1=$1' | sed 's/_/ /g' | sort -u | head -n1
 }
 
+#  查询 http/https 端口
+function check_http_access(){
+	local ip=$1
+
+	curl --head --silent --fail --connect-timeout 2 "http://$ip" >/dev/null
+	[ $? -eq 0 ] && echo "http" && return
+
+	curl --head --silent --fail --connect-timeout 2 "https://$ip" >/dev/null
+	[ $? -eq 0 ] && echo "https" && return
+
+	echo "" && return 1
+}
+
 # 从光猫处获取设备信息
 function getgateway(){
 	[ -z "$gateway_info_enable" ] && return
@@ -423,7 +435,7 @@ function soc_temp(){
 }
 # 流量数据
 function usage(){
-	[ ! -f "/usr/sbin/wrtbwmon" ] || [ ! "$1" ] && return
+	[ ! -f "/usr/sbin/wrtbwmon" ] || [ ! "$1" ] && echo "" && return
 	# 更新
 	if [ $1 == "update" ] ;then
 		function version_le() { test "$(echo "$@"|tr " " "\n"|sort -n|head -n 1)" == "$1"; }
@@ -576,8 +588,6 @@ function cut_str {
 	echo "$(echo -n "$1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -c -$temp_length).."
 }
 
-
-
 # 随机数
 function rand(){
 	local min=$1
@@ -615,39 +625,12 @@ function first(){
 		}&
 	done
 	wait
-
-	[ -z "$passive_mode" ] && return
-	[ "$passive_mode" -ne "1" ] && return
-	for ip in $IPLIST; do
-		if ( ! echo "$IPLIST_ipAddress"|grep -q -i -w $ip ); then
-			ip_mac=`getmac $ip`
-			ip_name=`getname ${ip} ${ip_mac}`
-			ip_interface=`getinterface ${ip_mac}`
-			echo "{'ip': '${ip}','mac': '${ip_mac}','name': '${ip_name}','uptime': '0秒','interface': '${ip_interface}','usage': ''}" > ${dir}client/${ip}
-			usage down ${ip}
-			echo "${ip} ${ip_mac} ${ip_name// /_} `date +%s` ${ip_interface}" >> ${dir}ipAddress
-		fi
-	done
-	for ip in $IPLIST_ipAddress; do
-		if ( echo "$IPLIST"|grep -q -i -w $ip ); then
-			ip_mac=`getmac $ip`
-			ip_name=`getname ${ip} ${ip_mac}`
-			ip_interface=`getinterface ${ip_mac}`
-			time_up=`cat ${dir}ipAddress|grep -w ${ip}|awk '{print $4}'|grep -v "^$"|sort -u|head -n1`
-			time1=`date +%s`
-			time1=$(time_for_humans `expr ${time1} - ${time_up}`)
-			echo "{'ip': '${ip}','mac': '${ip_mac}','name': '${ip_name}','uptime': '${time1}','interface': '${ip_interface}','usage': '`usage get $ip_mac`'}" > ${dir}client/${ip}
-		else
-			sed -i "/^${ip} /d" ${dir}ipAddress
-			rm -f ${dir}client/${ip} >/dev/null 2>&1
-		fi
-	done
 }
 
 # 创建计划任务
 function cron(){
 	function del_cron(){
-		( echo `crontab -l 2>/dev/null`|grep -q "wechatpush" ) && crontab -l > conf && sed -i "/wechatpush/d" conf && crontab conf && rm -f conf >/dev/null 2>&1
+		crontab -l | grep -v "wechatpush" | crontab -
 	}
 	function re_cron(){
 		/etc/init.d/cron stop
@@ -661,21 +644,22 @@ function cron(){
 
 	# 重置流量
 	if [ ! -z "$reset_regularly" ] && [ "$reset_regularly" -eq "1" ]; then
-		crontab -l 2>/dev/null > conf && echo -e "0 0 * * * rm ${dir}usage.db >/dev/null 2>&1" >> conf && crontab conf && rm -f conf >/dev/null 2>&1
-		crontab -l 2>/dev/null > conf && echo -e "0 0 * * * rm ${dir}usage6.db >/dev/null 2>&1" >> conf && crontab conf && rm -f conf >/dev/null 2>&1
+		(crontab -l 2>/dev/null; echo "0 0 * * * rm ${dir}usage.db >/dev/null 2>&1") | crontab -
+		(crontab -l 2>/dev/null; echo "0 0 * * * rm ${dir}usage6.db >/dev/null 2>&1") | crontab -
 	fi
 
 	# 定时发送
 	if [ -n "$crontab_regular_time" ]; then
-		crontab_regular_time=`echo $crontab_regular_time|sed 's/ /,/g'` 2>/dev/null
-		crontab -l 2>/dev/null > conf && echo -e "0 $crontab_regular_time * * * /usr/share/wechatpush/wechatpush send &" >> conf && crontab conf && rm -f conf >/dev/null 2>&1
+		crontab_regular_time=$(echo "$crontab_regular_time" | sed 's/ /,/g')
+		(crontab -l 2>/dev/null; echo "0 $crontab_regular_time * * * /usr/share/wechatpush/wechatpush send &") | crontab -
 	# 间隔发送
 	elif [ -n "$crontab_interval_time" ]; then
-		crontab -l 2>/dev/null > conf && echo -e "0 */$crontab_interval_time * * * /usr/share/wechatpush/wechatpush send &" >> conf && crontab conf && rm -f conf >/dev/null 2>&1
+		(crontab -l 2>/dev/null; echo "0 */$crontab_interval_time * * * /usr/share/wechatpush/wechatpush send &") | crontab -
 	fi
 
 	re_cron
 }
+
 
 # 免打扰检测
 function disturb(){
@@ -749,10 +733,10 @@ function geterrdevicealiases(){
 	[ -z "$unattended_device_aliases" ] && return
 	[ -f ${dir}ipAddress ] && local logrow=$(grep -c "" ${dir}ipAddress) || local logrow="0";[ $logrow -eq "0" ] && return
 
-	local MACLIST=`cat ${dir}ipAddress|awk '{print $2}'|grep -v "^$"|sort -u`
-	for mac in $MACLIST; do
-		[ -z "$unattended_mac" ] && [ ! -z "$mac" ] && local unattended_mac=`echo "$unattended_device_aliases"|grep -i $mac|grep -v "^$"|sort -u|head -n1`
+	for mac in $unattended_device_aliases; do
+		[ ! -z "$mac" ] && local unattended_mac=$(cat ${dir}ipAddress|awk '{print $2}'|grep -i $mac|grep -v "^$"|sort -u|head -n1) && break
 	done
+
 	# 进入免打扰时间已经超过一小时
 	if [ ! -z "$sheep_starttime" ] && [ "$((`date +%s`-$sheep_starttime))" -ge "3600" ]; then
 		> ${dir}sheep_usage
@@ -761,8 +745,8 @@ function geterrdevicealiases(){
 			[ ! -z "$mac" ] && local tmptotal=`usage get ${mac} bytes`
 			[ ! -z "$tmptotal" ] && awk 'BEGIN{printf "%.0f\n",'$tmptotal'/'204800'}' 2>/dev/null >> ${dir}sheep_usage
 		done <<< "$MACLIST"
-		old_sheep_usage=`cat ${dir}old_sheep_usage` 2>/dev/null
-		sheep_usage=`cat ${dir}sheep_usage` 2>/dev/null
+		[ -f ${dir}old_sheep_usage ] && local old_sheep_usage=`cat ${dir}old_sheep_usage` 2>/dev/null || local old_sheep_usage=""
+		[ -f ${dir}sheep_usage ] && local sheep_usage=`cat ${dir}sheep_usage` 2>/dev/null || local sheep_usage=""
 		[ "$old_sheep_usage" == "$sheep_usage" ] && [ -z "$sheep_nousage_starttime" ] && sheep_nousage_starttime=`date +%s`
 		[ "$old_sheep_usage" != "$sheep_usage" ] && unset sheep_nousage_starttime && cat ${dir}sheep_usage 2>/dev/null > ${dir}old_sheep_usage
 		[ ! -z "$sheep_nousage_starttime" ] && [ "$((`date +%s`-$sheep_nousage_starttime))" -ge "300" ] && unset unattended_mac
@@ -794,25 +778,24 @@ function unattended(){
 function check_connect(){
 	# 获取网络状态
 	is_online() {
-        local urls=(http://connect.rom.miui.com/generate_204 http://wifi.vivo.com.cn/generate_204 http://connectivitycheck.platform.hicloud.com/generate_204 http://www.apple.com/library/test/success.html)
-        local shuffled_urls=($(for i in "${urls[@]}"; do echo "$i"; done | awk 'BEGIN {srand()} {print rand(), $0}' | sort -n | cut -d' ' -f2-))
+		local urls=(http://connect.rom.miui.com/generate_204 http://wifi.vivo.com.cn/generate_204 http://connectivitycheck.platform.hicloud.com/generate_204 http://www.apple.com/library/test/success.html)
+		local shuffled_urls=($(for i in "${urls[@]}"; do echo "$i"; done | awk 'BEGIN {srand()} {print rand(), $0}' | sort -n | cut -d' ' -f2-))
 
-        for url in "${shuffled_urls[@]}"; do
-            local status_code
-            status_code=$(curl -o /dev/null -sI -w "%{http_code}" "$url")
-            [[ "$status_code" -eq 204 || "$status_code" -eq 200 ]] && return 0
-        done
-        return 1 
-    }
+		for url in "${shuffled_urls[@]}"; do
+			local status_code
+			status_code=$(curl -o /dev/null -sI -w "%{http_code}" "$url")
+			[[ "$status_code" -eq 204 || "$status_code" -eq 200 ]] && return 0
+		done
+		return 1 
+	}
 
 	local network_state="unknown"
 	while true; do
 		if is_online; then
-			[ ! -z "$network_state" ] && [ "$network_state" == "down" ] && echo "`date "+%Y-%m-%d %H:%M:%S"` 【网络状态】网络恢复正常.." >> ${logfile}
-			local network_state="up"
+			[ "$network_state" == "down" ] && echo "`date "+%Y-%m-%d %H:%M:%S"` 【网络状态】网络恢复正常.." >> ${logfile}
 			break
 		else
-			[ -z "$network_state" ] || [ "$network_state" == "up" ] && echo "`date "+%Y-%m-%d %H:%M:%S"` 【！！！！】当前网络不通！停止检测！ " >> ${logfile}
+			[ "$network_state" == "unknown" ] && echo "`date "+%Y-%m-%d %H:%M:%S"` 【！！！！】当前网络不通！停止检测！ " >> ${logfile}
 			local network_state="down"
 			# 无人值守、待弃用或改进
 			[ -z "$network_unattended_time" ] && network_unattended_time=`date +%s`
@@ -867,14 +850,14 @@ function ip_changes(){
 		local last_IPv4=$(cat "${dir}ip"|grep IPv4|awk '{print $2}'|grep -v "^$"|sort -u|head -n1)
 		local last_IPv6=$(cat "${dir}ip"|grep IPv6|awk '{print $2}'|grep -v "^$"|sort -u|head -n1)
 		if [ "$get_ipv4_mode" -ne "0" ] && [ ! -z "$IPv4" ] && ( ! echo ${IPv4}|grep -w -q ${last_IPv4} ); then
-			echo "`date "+%Y-%m-%d %H:%M:%S"` ${disturb_text}当前 IP：${IPv4}    from：${IPv4_URL}" >> ${logfile}
+			echo "`date "+%Y-%m-%d %H:%M:%S"` ${disturb_text}当前 IP：${IPv4}	from：${IPv4_URL}" >> ${logfile}
 			echo IPv4 $IPv4 > ${dir}ip && echo -e IPv6 $last_IPv6 >> ${dir}ip
 			title="IP 地址变化"
 			content="${content}${str_splitline}${str_title_start} IP 地址变化${str_title_end}${str_linefeed}${str_tab}当前 IP：${IPv4}"
 		fi
 
 		if [ "$get_ipv6_mode" -ne "0" ] && [ ! -z "$IPv6" ] && ( ! echo "$IPv6"|grep -w -q ${last_IPv6} ); then
-			echo "`date "+%Y-%m-%d %H:%M:%S"` ${disturb_text}当前 IPv6：${IPv6}    from：${IPv6_URL}" >> ${logfile}
+			echo "`date "+%Y-%m-%d %H:%M:%S"` ${disturb_text}当前 IPv6：${IPv6}	from：${IPv6_URL}" >> ${logfile}
 			echo IPv4 $IPv4 > ${dir}ip && echo -e IPv6 $IPv6 >> ${dir}ip
 			[ -z "$title" ] && title="IPv6 地址变化"
 			[ ! -z "$title" ] && title="IP 地址变化"
@@ -884,8 +867,8 @@ function ip_changes(){
 	# 临时文件目录为空
 	else
 		echo "`date "+%Y-%m-%d %H:%M:%S"` ${disturb_text}路由器已经重启!" >> ${logfile}
-		[ "$get_ipv4_mode" -ne "0" ] && echo "`date "+%Y-%m-%d %H:%M:%S"` ${disturb_text}当前 IP: ${IPv4}    from：${IPv4_URL}" >> ${logfile}
-		[ "$get_ipv6_mode" -ne "0" ] && echo "`date "+%Y-%m-%d %H:%M:%S"` ${disturb_text}当前 IPv6: ${IPv6}    from：${IPv6_URL}" >> ${logfile}
+		[ "$get_ipv4_mode" -ne "0" ] && echo "`date "+%Y-%m-%d %H:%M:%S"` ${disturb_text}当前 IP: ${IPv4}	from：${IPv4_URL}" >> ${logfile}
+		[ "$get_ipv6_mode" -ne "0" ] && echo "`date "+%Y-%m-%d %H:%M:%S"` ${disturb_text}当前 IPv6: ${IPv6}	from：${IPv6_URL}" >> ${logfile}
 		echo IPv4 $IPv4 > ${dir}ip && echo -e IPv6 $IPv6 >> ${dir}ip
 		title="路由器重新启动"
 		content="${content}${str_splitline}${str_title_start} 路由器重新启动${str_title_end}"
@@ -906,38 +889,28 @@ function ip_changes(){
 function up(){
 	[ -f ${dir}ipAddress ] && ( cat ${dir}ipAddress|grep -q -w $1 ) && return
 
-	local ip_mac=`getmac $1`
-	local ip_name=`getname ${1} ${ip_mac}`
+	local ip="$1"
+	local ip_mac=`getmac $ip`
+	local ip_name=`getname ${ip} ${ip_mac}`
 	local ip_interface=`getinterface ${ip_mac}`
-	getping ${1} ${ip_mac} ${up_timeout} "1";local ping_online=$?
+	getping ${ip} ${ip_mac} ${up_timeout} "1";local ping_online=$?
 
 	# 连通
 	if [ "$ping_online" -eq "0" ]; then
 		LockFile lock
-		[ ! -z "$up_down_push_blacklist" ] && local tmp_mac=`echo "${up_down_push_blacklist}"|grep -w -i ${ip_mac}`
-		[ ! -z "$up_down_push_whitelist" ] && local tmp_mac=`echo "${up_down_push_whitelist}"|grep -w -i ${ip_mac}`
-		echo "{'ip': '${1}','mac': '${ip_mac}','name': '${ip_name}','uptime': '0秒','interface': '${ip_interface}','usage': ''}" > ${dir}client/${1}
-		# ？？？
-		if [ ! -z "$tmp_mac" ] && ( cat ${dir}ipAddress|grep -q -w -i ${tmp_mac} ); then
-			usage down ${1}
-			echo "${1} ${ip_mac} ${ip_name// /_} `date +%s` ${ip_interface}" >> ${dir}ipAddress
-			LockFile unlock && return
-		# ？？？
-		elif [ ! -z "$tmp_mac" ] && [ -f "${dir}tmp_downlist" ] && ( cat ${dir}tmp_downip|grep -q -w -i ${tmp_mac} ); then
-			local tmp_downip=`cat ${dir}tmp_downlist|grep -w -i ${tmp_mac}|awk '{print $1}'|grep -v "^$"|sort -u|head -n1`
-			usage down $tmp_downip
-			sed -i "/^${tmp_downip} /d" ${dir}tmp_downlist
-			LockFile unlock && return
-		fi
+		time_up=`date +%s`
+		[ -f "${dir}client/${ip}" ] && local http_access=`jq -r '.http_access' "${dir}client/${ip}"` || local http_access=`check_http_access ${ip}`
+		echo "{\"ip\": \"${ip}\", \"mac\": \"${ip_mac}\", \"name\": \"${ip_name}\", \"uptime\": \"${time_up}\", \"interface\": \"${ip_interface}\", \"usage\": \"\", \"http_access\": \"${http_access}\"}" > ${dir}client/${ip}
+
 		# 从离线二次验证区恢复信息
-		[ -f "${dir}tmp_downlist" ] && local tmp_downip=`cat ${dir}tmp_downlist|grep -w ${1}|grep -v "^$"|sort -u|head -n1`
+		[ -f "${dir}tmp_downlist" ] && local tmp_downip=`cat ${dir}tmp_downlist|grep -w ${ip}|grep -v "^$"|sort -u|head -n1`
 		if [ ! -z "$tmp_downip" ]; then
-			cat ${dir}tmp_downlist|grep -w ${1}|grep -v "^$"|sort -u|head -n1 >> ${dir}ipAddress
-			sed -i "/^${1} /d" ${dir}tmp_downlist
+			cat ${dir}tmp_downlist|grep -w ${ip}|grep -v "^$"|sort -u|head -n1 >> ${dir}ipAddress
+			sed -i "/^${ip} /d" ${dir}tmp_downlist
 		# up
 		else
-			usage down $1
-			echo "$1 ${ip_mac} ${ip_name// /_} `date +%s` ${ip_interface}" >> ${dir}ipAddress
+			usage down ${ip}
+			echo "${ip} ${ip_mac} ${ip_name// /_} $(date +%s) ${ip_interface}" >> ${dir}ipAddress
 			blackwhitelist ${ip_mac};local ip_blackwhite=$?
 			[ -f "${dir}send_enable.lock" ] || [ -z "$notification_online" ] || [ -z "$ip_blackwhite" ] && LockFile unlock && return
 			[ -z "$ip_blackwhite" ] || [ "$ip_blackwhite" -ne "0" ] && LockFile unlock && return
@@ -946,15 +919,15 @@ function up(){
 			[ -f "${dir}content" ] && local content=`cat ${dir}content`
 			if [ -z "$title" ]; then
 				local title="$ip_name 连接了你的路由器"
-				local content="${str_splitline}${str_title_start} 新设备连接${str_title_end}${str_linefeed}${str_tab}客户端名：${str_space}${str_space}${str_space}${str_space}${str_space}${ip_name}${str_linefeed}${str_tab}客户端IP： ${str_space}${str_space}${str_space}${str_space}${1}${str_linefeed}${str_tab}客户端MAC：${str_space}${str_space}${str_space}${str_space}${ip_mac}${str_linefeed}${str_tab}网络接口：${str_space}${str_space}${str_space}${str_space}${str_space}${ip_interface}"
+				local content="${str_splitline}${str_title_start} 新设备连接${str_title_end}${str_linefeed}${str_tab}客户端名：${str_space}${str_space}${str_space}${str_space}${str_space}${ip_name}${str_linefeed}${str_tab}客户端IP： ${str_space}${str_space}${str_space}${str_space}${ip}${str_linefeed}${str_tab}客户端MAC：${str_space}${str_space}${str_space}${str_space}${ip_mac}${str_linefeed}${str_tab}网络接口：${str_space}${str_space}${str_space}${str_space}${str_space}${ip_interface}"
 			elif ( echo ${title}|grep -q "连接了你的路由器" ); then
 				local title="${ip_name} ${title}"
-				local content="${str_splitline}${str_tab}客户端名：${str_space}${str_space}${str_space}${str_space}${str_space}${ip_name}${str_linefeed}${str_tab}客户端IP： ${str_space}${str_space}${str_space}${str_space}${1}${str_linefeed}${str_tab}客户端MAC：${str_space}${str_space}${str_space}${str_space}${ip_mac}${str_linefeed}${str_tab}网络接口：${str_space}${str_space}${str_space}${str_space}${str_space}${ip_interface}"
+				local content="${str_splitline}${str_tab}客户端名：${str_space}${str_space}${str_space}${str_space}${str_space}${ip_name}${str_linefeed}${str_tab}客户端IP： ${str_space}${str_space}${str_space}${str_space}${ip}${str_linefeed}${str_tab}客户端MAC：${str_space}${str_space}${str_space}${str_space}${ip_mac}${str_linefeed}${str_tab}网络接口：${str_space}${str_space}${str_space}${str_space}${str_space}${ip_interface}"
 			else
 				local title="设备状态变化"
-				local content="${str_splitline}${str_title_start} 新设备连接${str_title_end}${str_linefeed}${str_tab}客户端名：${str_space}${str_space}${str_space}${str_space}${str_space}${ip_name}${str_linefeed}${str_tab}客户端IP： ${str_space}${str_space}${str_space}${str_space}${1}${str_linefeed}${str_tab}客户端MAC：${str_space}${str_space}${str_space}${str_space}${ip_mac}${str_linefeed}${str_tab}网络接口：${str_space}${str_space}${str_space}${str_space}${str_space}${ip_interface}"
+				local content="${str_splitline}${str_title_start} 新设备连接${str_title_end}${str_linefeed}${str_tab}客户端名：${str_space}${str_space}${str_space}${str_space}${str_space}${ip_name}${str_linefeed}${str_tab}客户端IP： ${str_space}${str_space}${str_space}${str_space}${ip}${str_linefeed}${str_tab}客户端MAC：${str_space}${str_space}${str_space}${str_space}${ip_mac}${str_linefeed}${str_tab}网络接口：${str_space}${str_space}${str_space}${str_space}${str_space}${ip_interface}"
 			fi
-			echo "`date "+%Y-%m-%d %H:%M:%S"` ${disturb_text}新设备 ${ip_name} ${1} 连接了">> ${logfile}
+			echo "`date "+%Y-%m-%d %H:%M:%S"` ${disturb_text}新设备 ${ip_name} ${ip} 连接了">> ${logfile}
 			#[ ! -z "$up_down_push_blacklist" ] && local title="你偷偷关注的设备上线了"
 			[ ! -z "$title" ] && echo "$title" >${dir}title
 			[ ! -z "$content" ] && echo -n "$content" >>${dir}content
@@ -965,36 +938,37 @@ function up(){
 
 # 检测设备离线
 function down(){
-	local ip_mac=`getmac $1`
-	local ip_name=`getname ${1} ${ip_mac}`
+	local ip="$1"
+	local ip_mac=`getmac ${ip}`
+	local ip_name=`getname ${ip} ${ip_mac}`
+	local time_up=$(cat ${dir}ipAddress|grep -w ${ip}|awk '{print $4}'|grep -v "^$"|sort -u|head -n1)
 	local ip_interface=`getinterface ${ip_mac}`
 
 	tmp_timeout=$down_timeout && tmp_retry_count=$timeout_retry_count
 	[ -n "$only_timeout_push" ] && blackwhitelist ${ip_mac};local ip_blackwhite=$? && [ "$ip_blackwhite" -ne "0" ] && tmp_timeout=10 && tmp_retry_count=2
-	getping ${1} ${ip_mac} ${tmp_timeout} ${tmp_retry_count};local ping_online=$?
+	getping ${ip} ${ip_mac} ${tmp_timeout} ${tmp_retry_count};local ping_online=$?
 	# 离线，置入二次验证区
 	if [ "$ping_online" -eq "1" ]; then
 		LockFile lock
-		[ ! -f "${dir}send_enable.lock" ] && cat ${dir}ipAddress|grep -w ${1}|grep -v "^$"|sort -u|head -n1 >> ${dir}tmp_downlist
-		sed -i "/^${1} /d" ${dir}ipAddress
-		rm -f ${dir}client/${1} >/dev/null 2>&1
+		[ ! -f "${dir}send_enable.lock" ] && cat ${dir}ipAddress|grep -w ${ip}|grep -v "^$"|sort -u|head -n1 >> ${dir}tmp_downlist
+		sed -i "/^${ip} /d" ${dir}ipAddress
+		rm -f ${dir}client/${ip} >/dev/null 2>&1
 		LockFile unlock
 	# 更新主机名或 MAC
 	else
-		local tmp_name=`cat ${dir}ipAddress|grep -w ${1}|awk '{print $3}'|grep -v "^$"|sort -u|head -n1`
-		local tmp_mac=`cat ${dir}ipAddress|grep -w ${1}|awk '{print $2}'|grep -v "^$"|sort -u|head -n1`
+		LockFile lock
+		local tmp_name=`cat ${dir}ipAddress|grep -w ${ip}|awk '{print $3}'|grep -v "^$"|sort -u|head -n1`
+		local tmp_mac=`cat ${dir}ipAddress|grep -w ${ip}|awk '{print $2}'|grep -v "^$"|sort -u|head -n1`
 		if [ "${ip_name// /_}" != "${tmp_name}" ] || [ "${ip_mac}" != "${tmp_mac}" ]; then
-			LockFile lock
-			olduptime=$(cat ${dir}ipAddress|grep -w ${1}|awk '{print $4}'|grep -v "^$"|sort -u|head -n1)
-			sed -i "/^${1} /d" ${dir}ipAddress
 			[ "${ip_mac}" != "${tmp_mac}" ] && ip_name="unknown" # MAC 变化时应删除主机名重新获取
-			echo "$1  ${ip_mac} ${ip_name// /_} ${olduptime} ${ip_interface}" >> ${dir}ipAddress
-			LockFile unlock
+			sed -i "/^${ip} /d" ${dir}ipAddress
+			echo "${ip} ${ip_mac} ${ip_name// /_} ${time_up} ${ip_interface}" >> ${dir}ipAddress
+			rm -f ${dir}client/${ip} >/dev/null 2>&1
 		fi
-		local time_up=`cat ${dir}ipAddress|grep -w ${1}|awk '{print $4}'|grep -v "^$"|sort -u|head -n1`
-		local time1=`date +%s`
-		local time1=$(time_for_humans `expr ${time1} - ${time_up}`)
-		echo "{'ip': '${1}','mac': '${ip_mac}','name': '${ip_name}','uptime': '${time1}','interface': '${ip_interface}','usage': '`usage get $ip_mac`'}" > ${dir}client/${1}
+		# 客户端列表文件不存在或需要更新
+		[ -f "${dir}client/${ip}" ] && local ip_total=`usage get $ip_mac` && [ ! -z "$ip_total" ] && jq -c --arg new_usage "$ip_total" '.usage = $new_usage' "${dir}client/${ip}" > "${dir}tmp.json" && mv "${dir}tmp.json" "${dir}client/${ip}"
+		[ ! -f "${dir}client/${ip}" ] && echo "{\"ip\": \"${ip}\", \"mac\": \"${ip_mac}\", \"name\": \"${ip_name}\", \"uptime\": \"${time_up}\", \"interface\": \"${ip_interface}\", \"usage\": \"`usage get $ip_mac`\", \"http_access\": \"${http_access}\"}" > ${dir}client/${ip}
+		LockFile unlock
 	fi
 }
 
@@ -1008,9 +982,6 @@ function down_send(){
 		blackwhitelist ${ip_mac};local ip_blackwhite=$?
 		[ -z "$notification_offline" ] || [ -z "$ip_blackwhite" ] && continue
 		[ -z "$ip_blackwhite" ] || [ "$ip_blackwhite" -ne "0" ] && continue
-		[ ! -z "$up_down_push_blacklist" ] && local tmp_mac=`echo "${up_down_push_blacklist}"|grep -w -i ${ip_mac}`
-		[ ! -z "$up_down_push_whitelist" ] && local tmp_mac=`echo "${up_down_push_whitelist}"|grep -w -i ${ip_mac}`
-		[ ! -z "$tmp_mac" ] && ( cat ${dir}ipAddress|grep -q -w -i ${tmp_mac} ) && continue
 
 		local ip_name=`getname ${ip} ${ip_mac}`
 		local time_up=`cat ${dir}tmp_downlist|grep -w ${ip}|awk '{print $4}'|grep -v "^$"|sort -u|head -n1`
@@ -1080,7 +1051,7 @@ function cpu_load(){
 			title="CPU 温度过高！"
 			temperaturecd_time=`date +%s`
 			echo "`date "+%Y-%m-%d %H:%M:%S"` ${disturb_text} CPU 温 度过高: ${cpu_temp}" >> ${logfile}
-			content="${content}${str_splitline}${str_title_start} CPU 温度过高${str_title_end}${str_linefeed}${str_tab}CPU 温度已连续 $(time_for_humans $cpu_load_threshold) 超过预设${str_linefeed}${str_tab}接下来 $(time_for_humans $cpu_notification_delay) 不再提示${str_linefeed}${str_tab}当前温度：${cpu_temp}℃"
+			content="${content}${str_splitline}${str_title_start} CPU 温度过高${str_title_end}${str_linefeed}${str_tab}CPU 温度已连续 $(time_for_humans $(( $(date +%s) - $cpu_last_overload_time ))) 超过预设${str_linefeed}${str_tab}接下来 $(time_for_humans $cpu_notification_delay) 不再提示${str_linefeed}${str_tab}当前温度：${cpu_temp}℃"
 		elif [ ! -z "$temperaturecd_time" ] && [ "$((`date +%s`-$temperaturecd_time))" -ge "$cpu_notification_delay" ] ;then
 			unset temperaturecd_time
 		fi
@@ -1106,7 +1077,7 @@ function cpu_load(){
 			fi
 			cpucd_time=`date +%s`
 			echo "`date "+%Y-%m-%d %H:%M:%S"` ${disturb_text} CPU 负 载过高: ${cpu_fuzai}" >> ${logfile}
-			content="${content}${str_splitline}${str_title_start} CPU 负载过高${str_title_end}${str_linefeed}${str_tab}CPU 负载已连续 $(time_for_humans $cpu_load_threshold) 超过预设${str_linefeed}${str_tab}接下来 $(time_for_humans $cpu_notification_delay) 不再提示${str_linefeed}${str_tab}当前负载：${cpu_fuzai}"
+			content="${content}${str_splitline}${str_title_start} CPU 负载过高${str_title_end}${str_linefeed}${str_tab}CPU 负载已连续 $(time_for_humans $(( $(date +%s) - $cpu_last_overload_time ))) 超过预设${str_linefeed}${str_tab}接下来 $(time_for_humans $cpu_notification_delay) 不再提示${str_linefeed}${str_tab}当前负载：${cpu_fuzai}"
 			cputop
 		elif [ ! -z "$cpucd_time" ] && [ "$((`date +%s`-$cpucd_time))" -ge "$cpu_notification_delay" ] ;then
 			unset cpucd_time
@@ -1133,24 +1104,29 @@ function cputop(){
 function get_disk() {
 	mkdir -p "${dir}disk_info"
 	local_disk_names=()
-	pve_disk_names=()
+	remote_disk_names=()
+	
+	# 获取磁盘名称函数
+	get_disk_names() {
+		local disk_names=($(lsblk -dno NAME,TYPE | awk '$2=="disk" && $1 !~ /^mtd/ && $1 !~ /^ubiblock/ {print $1}' | sort -u))
+		[ -z "$disk_names" ] && disk_names=($(df -h 2>/dev/null | awk '$1 ~ /^\/dev/ && !/^\/dev\/(mtd|ubiblock)/ {if ($NF ~ /^\/[a-zA-Z0-9]/) { sub("/dev/", "", $1); sub(/[0-9]+$/, "", $1); print $1 }}' | sort -u))
+		echo "${disk_names[@]}"
+	}
 
 	# 查询本地硬盘名
-	local_disk_names=($(lsblk 2>/dev/null | awk '$NF=="disk" {print $1}' | sort -u))
-	# 如未安装 lsblk，查找以 /dev/ 开头，但挂载点不是根目录 / 的设备，然后提取硬盘的名称(准确性较低)
-	[ -z "$local_disk_names" ] && local_disk_names=($(df -h 2>/dev/null | awk '$1 ~ /^\/dev/ {if ($NF ~ /^\/[a-zA-Z0-9]/) { sub("/dev/", "", $1); sub(/[0-9]+$/, "", $1); print $1 }}' | sort -u))
+	local_disk_names=($(get_disk_names))
 	local_disk_tags=($(for _ in "${local_disk_names[@]}"; do echo "local"; done))
 
 	# 查询远程硬盘名
 	if [ -n "$server_host" ]; then
 		ssh_command="ssh -o StrictHostKeyChecking=yes -o BatchMode=yes -i /root/.ssh/id_rsa root@${server_host} -p ${server_port}"
-		pve_disk_names=($(eval ${ssh_command} lsblk | awk '$NF=="disk" {print $1}' | sort -u))
-		pve_disk_tags=($(for _ in "${pve_disk_names[@]}"; do echo "pve"; done))
+		remote_disk_names=($(eval ${ssh_command} "$(declare -f get_disk_names); get_disk_names"))
+		remote_disk_tags=($(for _ in "${remote_disk_names[@]}"; do echo "remote"; done))
 	fi
 
 	# 合并本地和远程硬盘名及标记
-	all_disk_names=("${local_disk_names[@]}" "${pve_disk_names[@]}")
-	all_disk_tags=("${local_disk_tags[@]}" "${pve_disk_tags[@]}")
+	all_disk_names=("${local_disk_names[@]}" "${remote_disk_names[@]}")
+	all_disk_tags=("${local_disk_tags[@]}" "${remote_disk_tags[@]}")
 
 	for i in "${!all_disk_names[@]}"; do
 		tmp_name=${all_disk_names[i]}
@@ -1159,9 +1135,9 @@ function get_disk() {
 		unset tmp_command disk_type disk_err
 
 		# 判断硬盘类型
-		if [ "$tmp_tag" == "pve" ]; then
+		if [ "$tmp_tag" == "remote" ]; then
 			tmp_command="$ssh_command"
-			disk_type="_pve"
+			disk_type="_remote"
 		fi
 		file_path="${dir}disk_info/${tmp_name}${disk_type}"
 
@@ -1547,13 +1523,15 @@ function set_ip_black(){
 	[ -z "$nftables_version" ] && fw_info_blacklist=$(ipset list wechatpush_blacklist | grep "timeout" 2>/dev/null)
 	[ -z "$nftables_version" ] && fw_info_blacklistv6=$(ipset list wechatpush_blacklistv6 | grep "timeout" 2>/dev/null)
 
-	fw_info_blacklist="${fw_info_blacklist}\n${fw_info_blacklistv6}"
+	[ -n "$fw_info_blacklist" ] && [ -n "$fw_info_blacklistv6" ] && combined_fw_info_blacklist="${fw_info_blacklist}\n${fw_info_blacklistv6}"
+	[ -z "$fw_info_blacklist" ] && combined_fw_info_blacklist="${fw_info_blacklistv6}" || combined_fw_info_blacklist="${fw_info_blacklist}"
+	
 	while IFS= read -r ip_black_info; do
 		ip_black=$(echo "$ip_black_info"|grep -Eo "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}")
 		[ -z "$ip_black" ] && ip_black=$(echo "$ip_black_info"|grep -Eo "([\da-fA-F0-9]{1,4}(:{1,2})){1,15}[\da-fA-F0-9]{1,4}")
 		[ -z "$ip_black" ] && continue
 		cat ${ip_blacklist_path}|grep -q -w -i ${ip_black} && sed -i "/^${ip_black}/d" ${ip_blacklist_path} && echo ${ip_black_info} >> ${ip_blacklist_path} || del_ip_black ${ip_black}
-	done <<< "$fw_info_blacklist"
+	done <<< "$combined_fw_info_blacklist"
 }
 
 # 发送定时数据
@@ -1643,7 +1621,11 @@ function send(){
 
 	if [ -z "$1" ] && ( echo "$send_notification"|grep -q "client_list" ); then
 		wait
-		awk '{ lines[i++] = $0 } END { for (j = i-1; j >= 0; j--) print lines[j] }' "${dir}ipAddress" > "${dir}tmp_sort_file"
+		# 按在线时间（短到长）
+		#awk '{ lines[i++] = $0 } END { for (j = i-1; j >= 0; j--) print lines[j] }' "${dir}ipAddress" > "${dir}tmp_sort_file"
+		# 按 IP 顺序
+		sort -V -k 1,1 "${dir}ipAddress" > "${dir}tmp_sort_file"
+
 		logrow=$(awk 'END {print NR}' ${dir}ipAddress)
 		send_content="${send_content}${str_splitline}${str_title_start} 现有在线设备 ${logrow} 台${str_title_end}"
 		[ "$logrow" -eq "0" ] && send_content="${send_content}${str_splitline}${str_title_start} 当前无在线设备${str_title_end}"
@@ -1654,7 +1636,7 @@ function send(){
 			time_online=$(time_for_humans $((time_now - time_up)))
 			ip_total=$(usage get "$tmp_mac")
 			[ -n "$ip_total" ] && ip_total="总计流量：${ip_total}  "
-			send_content="${send_content}${str_linefeed}【${tmp_name}】  ${ip_total}${str_linefeed}${str_tab}${tmp_ip}    在线 ${time_online}"
+			send_content="${send_content}${str_linefeed}【${tmp_name}】  ${ip_total}${str_linefeed}${str_tab}${tmp_ip}	在线 ${time_online}"
 		done < "${dir}tmp_sort_file"
 	fi
 
@@ -1830,6 +1812,9 @@ while [ "$enable" -eq "1" ]; do
 	# 登录提醒通知
 	#[ ! -f "${dir}send_enable.lock" ] && login_send
 	# 因修改为实时推送，白名单设备并不会再更新时间，暂时性修复
+	# 修改为实时推送后，防火墙列表读取和设置需单独列出，移除黑名单无法实时，待改善
+	set_ip_black
+
 	tmp_ip_list=`echo "$login_ip_white_list"|grep -v "^$"|sort -u`
 	while IFS= read -r tmp_ip; do
 		[ -n "$tmp_ip" ] && add_ip_white "$tmp_ip" "0"
