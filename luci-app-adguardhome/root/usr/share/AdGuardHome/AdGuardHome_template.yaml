@@ -84,20 +84,20 @@ tls:
   strict_sni_check: false
 querylog:
   ignored: []
-  interval: 2160h
+  interval: 24h
   size_memory: 1000
   enabled: true
   file_enabled: true
 statistics:
   ignored: []
-  interval: 24h
+  interval: 720h
   enabled: true
 filters:
   - enabled: true
     url: https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
     name: AdGuard DNS filter
     id: 1
-  - enabled: false
+  - enabled: true
     url: https://anti-ad.net/easylist.txt
     name: 'CHN: anti-AD'
     id: 2
