@@ -22,10 +22,12 @@ function index()
 	entry({"admin", "services", appname, "show"}, call("show_menu")).leaf = true
 	entry({"admin", "services", appname, "hide"}, call("hide_menu")).leaf = true
 	entry({"admin", "services", appname, "ip"}, call('check_ip')).leaf = true
-	if uci:get(appname, "@global[0]", "hide_from_luci") == "1" then
-		return
+	local e
+	if uci:get(appname, "@global[0]", "hide_from_luci") ~= "1" then
+		e = entry({"admin", "services", appname}, alias("admin", "services", appname, "settings"), _("Pass Wall"), -1)
+	else
+		e = entry({"admin", "services", appname}, alias("admin", "services", appname, "settings"), nil, -1)
 	end
-	e = entry({"admin", "services", appname}, alias("admin", "services", appname, "settings"), _("Pass Wall"), -1)
 	e.dependent = true
 	e.acl_depends = { "luci-app-passwall" }
 	--[[ Client ]]
@@ -210,26 +212,6 @@ function clear_log()
 	luci.sys.call("echo '' > /tmp/log/passwall.log")
 end
 
-function index_status()
-	local e = {}
-	local dns_shunt = uci:get(appname, "@global[0]", "dns_shunt") or "dnsmasq"
-	if dns_shunt == "smartdns" then
-		e.dns_mode_status = luci.sys.call("pidof smartdns >/dev/null") == 0
-	else
-		e.dns_mode_status = luci.sys.call("netstat -apn | grep ':15353 ' >/dev/null") == 0
-	end
-	e.haproxy_status = luci.sys.call(string.format("/bin/busybox top -bn1 | grep -v grep | grep '%s/bin/' | grep haproxy >/dev/null", appname)) == 0
-	e["tcp_node_status"] = luci.sys.call("/bin/busybox top -bn1 | grep -v 'grep' | grep '/tmp/etc/passwall/bin/' | grep 'default' | grep 'TCP' >/dev/null") == 0
-
-	if (uci:get(appname, "@global[0]", "udp_node") or "nil") == "tcp" then
-		e["udp_node_status"] = e["tcp_node_status"]
-	else
-		e["udp_node_status"] = luci.sys.call("/bin/busybox top -bn1 | grep -v 'grep' | grep '/tmp/etc/passwall/bin/' | grep 'default' | grep 'UDP' >/dev/null") == 0
-	end
-	luci.http.prepare_content("application/json")
-	luci.http.write_json(e)
-end
-
 function get_iso(ip)
     local mm = require 'maxminddb'
     local db = mm.open('/usr/share/passwall/GeoLite2-Country.mmdb')
@@ -280,6 +262,26 @@ function check_ip()
     e.youtube = check_site('www.youtube.com', port)
     luci.http.prepare_content('application/json')
     luci.http.write_json(e)
+end
+
+function index_status()
+	local e = {}
+	local dns_shunt = uci:get(appname, "@global[0]", "dns_shunt") or "dnsmasq"
+	if dns_shunt == "smartdns" then
+		e.dns_mode_status = luci.sys.call("pidof smartdns >/dev/null") == 0
+	else
+		e.dns_mode_status = luci.sys.call("netstat -apn | grep ':15353 ' >/dev/null") == 0
+	end
+	e.haproxy_status = luci.sys.call(string.format("/bin/busybox top -bn1 | grep -v grep | grep '%s/bin/' | grep haproxy >/dev/null", appname)) == 0
+	e["tcp_node_status"] = luci.sys.call("/bin/busybox top -bn1 | grep -v 'grep' | grep '/tmp/etc/passwall/bin/' | grep 'default' | grep 'TCP' >/dev/null") == 0
+
+	if (uci:get(appname, "@global[0]", "udp_node") or "nil") == "tcp" then
+		e["udp_node_status"] = e["tcp_node_status"]
+	else
+		e["udp_node_status"] = luci.sys.call("/bin/busybox top -bn1 | grep -v 'grep' | grep '/tmp/etc/passwall/bin/' | grep 'default' | grep 'UDP' >/dev/null") == 0
+	end
+	luci.http.prepare_content("application/json")
+	luci.http.write_json(e)
 end
 
 function haproxy_status()
