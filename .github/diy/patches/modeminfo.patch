@@ -8,3 +8,4 @@
 +$(eval $(call SerialPlugin,thales,+kmod-usb-serial-option,Thales MV31-W T99W175,THALES))
  $(eval $(call BuildPackage,$(PKG_NAME)-qmi))
  $(eval $(call BuildPackage,$(PKG_NAME)-telegram))
+ 
