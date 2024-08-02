@@ -5,8 +5,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=naiveproxy
-PKG_VERSION:=126.0.6478.40-1
-PKG_RELEASE:=9
+PKG_VERSION:=127.0.6533.64-1
+PKG_RELEASE:=10
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/klzgrad/naiveproxy/tar.gz/v$(PKG_VERSION)?
@@ -55,7 +55,7 @@ ifneq ($(CONFIG_CCACHE),)
   export naive_ccache_flags=cc_wrapper="$(CCACHE)"
 endif
 
-CLANG_VER:=19-init-9433-g76ea5feb-1
+CLANG_VER:=19-init-10646-g084e2b53-57
 CLANG_FILE:=clang-llvmorg-$(CLANG_VER).tgz
 define Download/CLANG
 	URL:=https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64
@@ -64,7 +64,7 @@ define Download/CLANG
 	HASH:=skip
 endef
 
-PGO_VER:=6478-1717523827-2e4ca5cbbcdb8e932ea9670182ccab7f5198b486-125e99da241448dbfda2b828f4018cef48c4b737
+PGO_VER:=6533-1721647559-b59d3252e50dcc0e34a9d5ca3790d80421583ca4-419f07950174cbcea67e9a8035fcc0a2ced2ff1e
 PGO_FILE:=chrome-linux-$(PGO_VER).profdata
 define Download/PGO_PROF
 	URL:=https://storage.googleapis.com/chromium-optimization-profiles/pgo_profiles
