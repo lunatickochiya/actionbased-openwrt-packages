@@ -339,7 +339,6 @@ jobs:
         #git clone --branch openwrt-22.03 --depth 1 https://github.com/openwrt/luci op-luci1 && mv op-luci1/applications/luci-app-wireguard ./ && rm -rf op-luci1
         ) &
         (
-        git_sparse_clone istoreos-22.03 "https://github.com/jjm2473/packages" net/miniupnpd
         git_sparse_clone master "https://github.com/coolsnowwolf/packages" "leanpkg" net/miniupnpd net/mwan3 multimedia/UnblockNeteaseMusic-Go utils/bandwidthd \
         multimedia/UnblockNeteaseMusic net/softethervpn5 net/baidupcs-web multimedia/gmediarender multimedia/pppwn-cpp net/go-aliyundrive-webdav \
         net/qBittorrent-static net/phtunnel net/frp \
