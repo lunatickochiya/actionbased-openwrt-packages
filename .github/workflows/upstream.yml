@@ -308,7 +308,7 @@ jobs:
         git_clone https://github.com/tkmsst/luci-app-cellularstatus cellularstatus && mv cellularstatus/luci/applications/* ./;rm -rf cellularstatus
         git_clone https://github.com/tracemouse/luci-app-coredns coredns && mv coredns/luci-app-coredns ./;rm -rf coredns
         git_clone https://github.com/arenekosreal/luci-app-nginx
-        git_clone https://github.com/zfdx123/luci-app-school
+        git_clone https://github.com/lunatickochiya/luci-app-school
         git_clone https://github.com/hczjxhdyz/luci-app-cns-server
         git_clone https://github.com/tano-systems/luci-app-tn-lldpd
         git_clone https://github.com/DRAWCORE/luci-app-qos-emong
