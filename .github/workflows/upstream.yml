@@ -238,7 +238,7 @@ jobs:
         git_clone https://github.com/JiaY-shi/fancontrol fanc && mvdir fanc
         git_clone https://github.com/Siriling/5G-Modem-Support && mv -n 5G-Modem-Support/{luci-app-modem,luci-app-cpe,luci-app-sms-tool} ./;rm -rf 5G-Modem-Support
         git_clone https://github.com/danchexiaoyang/luci-app-syncthing
-        git_clone https://github.com/aa65535/openwrt-dist-luci
+        #git_clone https://github.com/aa65535/openwrt-dist-luci
         git_clone https://github.com/morytyann/OpenWrt-msd && mvdir OpenWrt-msd
         ) &
         (
@@ -328,6 +328,7 @@ jobs:
         git_clone https://github.com/hequan2017/luci-app-forcedata
         git_clone https://github.com/Atomseek/luci-app-gxu-webconnect
         git_clone https://github.com/sbwml/luci-app-openai opai && mvdir opai
+        git_clone https://github.com/CHN-beta/rkp-ipid
         # git_clone https://github.com/0x676e67/luci-app-wireguard-ui wireguardui && mvdir wireguardui
         ) &
         (
