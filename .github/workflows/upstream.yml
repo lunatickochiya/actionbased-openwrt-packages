@@ -173,7 +173,6 @@ jobs:
         git_clone https://github.com/frainzy1477/luci-app-clash
         git_clone https://github.com/peter-tank/luci-app-fullconenat
         git_clone https://github.com/sbwml/openwrt-alist && mvdir openwrt-alist
-        git_clone https://github.com/gSpotx2f/luci-app-log
         git_clone https://github.com/KFERMercer/luci-app-tcpdump
         git_clone https://github.com/ykxVK8yL5L/pikpak-webdav pikpak && mv -n pikpak/openwrt/* ./;rm -rf pikpak
         git_clone https://github.com/jjm2473/openwrt-apps && rm -rf openwrt-apps/{luci-app-cpufreq,luci-app-ota,luci-alias.mk} && sed -i "s/luci-alias.mk/..\/luci.mk/" openwrt-apps/*/Makefile && mvdir openwrt-apps
@@ -225,18 +224,9 @@ jobs:
         git_clone https://github.com/izilzty/luci-app-chinadns-ng
         git_clone https://github.com/Diciya/luci-app-broadbandacc
         git_clone https://github.com/wiwizcom/WiFiPortal && mvdir WiFiPortal
-        git_clone https://github.com/gSpotx2f/luci-app-internet-detector
         git_clone https://github.com/vinewx/NanoHatOLED; mv NanoHatOLED/nanohatoled ./;rm -rf NanoHatOLED
         git_clone https://github.com/zerolabnet/luci-app-torbp
-        git_clone https://github.com/muink/luci-app-tinyfilemanager
         git_clone https://github.com/sbwml/luci-app-airconnect airconnect1 && mv airconnect1/* ./ && rm -rf airconnect1
-        ) &
-        (
-        git_clone https://github.com/blueberry-pie-11/luci-app-natmap
-        git_clone https://github.com/QiuSimons/luci-app-daed-next daed1 && mvdir daed1
-        git_clone https://github.com/sirpdboy/luci-app-eqosplus && rm -rf luci-app-eqosplus/po/zh_Hans
-        git_clone https://github.com/JiaY-shi/fancontrol fanc && mvdir fanc
-
         ) &
         (
         git clone https://github.com/sirpdboy/luci-theme-kucat -b js --depth 1
@@ -341,7 +331,7 @@ jobs:
         # git_clone https://github.com/0x676e67/luci-app-wireguard-ui wireguardui && mvdir wireguardui
         ) &
         (
-        git_clone https://github.com/Ysurac/openmptcprouter-feeds; mv openmptcprouter-feeds/luci-app-iperf ./;rm -rf openmptcprouter-feeds
+        # git_clone https://github.com/Ysurac/openmptcprouter-feeds; mv openmptcprouter-feeds/luci-app-iperf ./;rm -rf openmptcprouter-feeds
         git_clone https://github.com/QiuSimons/OpenWrt-Add; mv OpenWrt-Add/luci-app-irqbalance ./;rm -rf OpenWrt-Add
         git_clone https://github.com/lucikap/Brukamen; mv Brukamen/luci-app-ua2f ./;rm -rf Brukamen
         git_clone https://github.com/HiGarfield/lede-17.01.4-Mod; mv lede-17.01.4-Mod/package/extra/luci-app-openvpn-server ./;rm -rf lede-17.01.4-Mod
