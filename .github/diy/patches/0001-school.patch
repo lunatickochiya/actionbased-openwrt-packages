@@ -1,0 +1,31 @@
+From 218e0dc3ab58021a15b6da245dd1ea90df6f4cf1 Mon Sep 17 00:00:00 2001
+From: lunatickochiya <125438787@qq.com>
+Date: Sat, 3 Aug 2024 16:10:10 +0800
+Subject: [PATCH] school
+
+---
+ luci-app-school/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/luci-app-school/Makefile b/luci-app-school/Makefile
+index c7195378..3ff1e7c6 100644
+--- a/luci-app-school/Makefile
++++ b/luci-app-school/Makefile
+@@ -1,11 +1,11 @@
+ include $(TOPDIR)/rules.mk
+ 
+ LUCI_TITLE:=Luci for School Bypass
+-LUCI_DEPENDS:=+rkp-ipid +ua2f
++LUCI_DEPENDS:=+kmod-rkp-ipid +ua2f
+ LUCI_PKGARCH:=all
+ 
+ PKG_NAME:=luci-app-school
+ 
+ include $(TOPDIR)/feeds/luci/luci.mk
+ 
+-# call BuildPackage - OpenWrt buildroot signature
+\ No newline at end of file
++# call BuildPackage - OpenWrt buildroot signature
+-- 
+2.34.1
+
