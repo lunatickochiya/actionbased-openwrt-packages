@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=sing-box
 PKG_VERSION:=1.9.3
-PKG_RELEASE:=28
+PKG_RELEASE:=29
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/SagerNet/sing-box/tar.gz/v$(PKG_VERSION)?
@@ -133,17 +133,10 @@ GO_PKG_TAGS:=$(subst $(space),$(comma),$(strip \
 ))
 
 define Package/$(PKG_NAME)/conffiles
-/etc/sing-box/config.json
 endef
 
 define Package/$(PKG_NAME)/install
 	$(call GoPackage/Package/Install/Bin,$(1))
-
-	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) ./files/sing-box.init $(1)/etc/init.d/sing-box
-
-	$(INSTALL_DIR) $(1)/etc/sing-box
-	$(INSTALL_DATA) ./files/config.json.example $(1)/etc/sing-box/config.json.example
 endef
 
 $(eval $(call GoBinPackage,sing-box))
