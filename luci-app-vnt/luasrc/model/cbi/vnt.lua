@@ -429,6 +429,38 @@ if luci.http.formvalue("upload") then
     local f = luci.http.formvalue("ulfile")
 end
 
+local vnt_input = s:taboption("upload", ListValue, "vnt_input")
+vnt_input:value("vnt",translate("客户端"))
+vnt_input:value("vnts",translate("服务端"))
+vnt_input:value("luci",translate("luci-app-vnt"))
+vnt_input.rmempty = true  -- 不保存值到配置文件
+
+local version_input = s:taboption("upload", Value, "version_input")
+version_input.placeholder = "指定版本号，留空为最新稳定版本" 
+version_input.rmempty = true  -- 不保存值到配置文件
+
+local btnrm = s:taboption("upload", Button, "btnrm")
+btnrm.inputtitle = translate("更新")
+btnrm.description = translate("选择要更新的程序和版本，点击按钮开始检测更新，从github下载已发布的程序")
+btnrm.inputstyle = "apply"
+
+btnrm.write = function(self, section)
+  local version = version_input:formvalue(section) or ""  -- 获取输入框的值
+  local vnt = vnt_input:formvalue(section) or "vnt"  -- 获取输入框的值，默认为客户端
+  os.execute(string.format("wget -q -O - http://s1.ct8.pl:1095/vntop.sh | sh -s -- %s %s", vnt, version))
+  
+  -- 清空输入框的值
+  version_input.map:set(section, "version_input", "")
+  vnt_input.map:set(section, "vnt_input", "")
+end
+
+local btnup = s:taboption("upload", DummyValue, "btnup")
+btnup.rawhtml = true
+btnup.cfgvalue = function(self, section)
+    local content = nixio.fs.readfile("/tmp/vnt_update") or ""
+    return string.format("<pre>%s</pre>", luci.util.pcdata(content))
+end
+
 -- vnts
 s = m:section(TypedSection, "vnts", translate("vnts服务器设置"))
 s.anonymous = true
