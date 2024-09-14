@@ -6,12 +6,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=sms-tool
-PKG_RELEASE:=9
+PKG_RELEASE:=10
 
 PKG_SOURCE_URL:=https://github.com/obsy/sms_tool
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_DATE:=2023-09-21
-PKG_SOURCE_VERSION:=null
+PKG_SOURCE_VERSION:=fce2b931c8d749c28b8281363950e963c98324eb
 PKG_MIRROR_HASH:=skip
 
 PKG_MAINTAINER:=Andrey Butirsky <butirsky@gmail.com>

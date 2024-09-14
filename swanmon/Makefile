@@ -9,11 +9,11 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=swanmon
 PKG_VERSION:=0.1
-PKG_RELEASE:=4
+PKG_RELEASE:=5
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/TDT-AG/swanmon
-PKG_SOURCE_VERSION:=null
+PKG_SOURCE_VERSION:=f6aa6b659d1123868b5c212019353531641f9dfb
 PKG_MIRROR_HASH:=skip
 
 PKG_MAINTAINER:=Lukas Voegl <lvoegl@tdt.de>
