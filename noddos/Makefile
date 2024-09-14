@@ -9,8 +9,8 @@ include $(TOPDIR)/rules.mk
 
 # Name and release number of this package
 PKG_NAME:=noddos
-PKG_VERSION:=0.5.6
-PKG_RELEASE:=3
+PKG_VERSION:=0.5.5
+PKG_RELEASE:=4
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=https://github.com/noddos/noddos/releases/download/v$(PKG_VERSION)/
