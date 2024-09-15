@@ -26,7 +26,7 @@
  	//         sta->mac_addr))
  	//    return;
  	if (!sta->ps.active) {
--	printk("sta %pM is not in Power Save mode", sta->mac_addr);
+-		AICWFDBG(LOGTRACE,"sta %pM is not in Power Save mode", sta->mac_addr);
  		return;
  	}
  #ifdef CREATE_TRACE_POINTS
