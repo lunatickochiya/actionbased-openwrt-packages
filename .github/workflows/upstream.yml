@@ -176,6 +176,7 @@ jobs:
         git_clone https://github.com/KFERMercer/luci-app-tcpdump
         git_clone https://github.com/ykxVK8yL5L/pikpak-webdav pikpak && mv -n pikpak/openwrt/* ./;rm -rf pikpak
         git_clone https://github.com/jjm2473/openwrt-apps && rm -rf openwrt-apps/{luci-app-cpufreq,luci-app-ota,luci-alias.mk} && sed -i "s/luci-alias.mk/..\/luci.mk/" openwrt-apps/*/Makefile && mvdir openwrt-apps
+        git_clone https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic
         ) &
         (
         git_clone https://github.com/tty228/luci-app-wechatpush
@@ -183,7 +184,10 @@ jobs:
         git_clone https://github.com/4IceG/luci-app-modemband modemb  && mv -n modemb/* ./;rm -rf modemb
         git_clone https://github.com/ZeaKyX/speedtest-web
         git_clone https://github.com/ZeaKyX/luci-app-speedtest-web
+        git_clone https://github.com/yichya/luci-app-xray yichya && mv -f yichya/status ./luci-app-xray-status;mv -f yichya/core ./luci-app-xray;rm -rf yichya
+        git_clone https://github.com/rafmilecki/luci-app-xjay
         git_clone https://github.com/jhonathanc/ps3netsrv-openwrt && mv -n ps3netsrv-openwrt/* ./;rm -rf ps3netsrv-openwrt
+        git_clone https://github.com/kiddin9/openwrt-thunder && mvdir openwrt-thunder
         ) &
         (
         git_clone https://github.com/honwen/luci-app-aliddns
@@ -204,6 +208,11 @@ jobs:
         git_clone https://github.com/shanglanxin/luci-app-homebridge
         git_clone https://github.com/ykxVK8yL5L/luci-app-synology synology && mv -n synology/luci-app-synology ./ && rm -rf synology
         git_clone https://github.com/htynkn/openwrt-switch-lan-play && mv -n openwrt-switch-lan-play/package/* ./ && rm -rf openwrt-switch-lan-play
+        git_clone https://github.com/xptsp/luci-app-nodogsplash
+        git_clone https://github.com/xptsp/luci-mod-listening-ports
+        git_clone https://github.com/xptsp/luci-app-squid-adv
+        git_clone https://github.com/xptsp/openwrt-bcrypt-tool
+        git_clone https://github.com/kongfl888/openwrt-my-dnshelper && mvdir openwrt-my-dnshelper
         ) &
         (
         git_clone https://github.com/linkease/openwrt-app-actions
