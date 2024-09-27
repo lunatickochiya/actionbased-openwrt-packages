@@ -1,0 +1,19 @@
+diff --git a/luci-app-sakurafrp/Makefile b/luci-app-sakurafrp/Makefile
+index 0fb99e61..169339c2 100644
+--- a/luci-app-sakurafrp/Makefile
++++ b/luci-app-sakurafrp/Makefile
+@@ -60,6 +60,7 @@ define Package/luci-app-sakurafrp/install
+ 
+ 	$(INSTALL_DATA) ./luasrc/model/cbi/sakurafrp/api.lua $(1)/usr/lib/lua/luci/model/cbi/sakurafrp/api.lua
+ 	$(INSTALL_DATA) ./luasrc/model/cbi/sakurafrp/natfrpapi.lua $(1)/usr/lib/lua/luci/model/cbi/sakurafrp/natfrpapi.lua
++	$(INSTALL_DATA) ./luasrc/model/cbi/sakurafrp/natfrpapi.lua $(1)/usr/lib/lua/luci/model/cbi/sakurafrp/ini_engine.lua
+ 
+ 	$(INSTALL_DATA) ./luasrc/model/cbi/sakurafrp/pages/index.lua $(1)/usr/lib/lua/luci/model/cbi/sakurafrp/pages/index.lua
+ 	$(INSTALL_DATA) ./luasrc/model/cbi/sakurafrp/pages/log.lua $(1)/usr/lib/lua/luci/model/cbi/sakurafrp/pages/log.lua
+@@ -81,4 +82,4 @@ define Package/luci-app-sakurafrp/install
+ 	$(INSTALL_DATA) ./root/usr/share/sakurafrp/install.sh $(1)/usr/share/sakurafrp/install.sh
+ endef
+ 
+-$(eval $(call BuildPackage,luci-app-sakurafrp))
+\ No newline at end of file
++$(eval $(call BuildPackage,luci-app-sakurafrp))
