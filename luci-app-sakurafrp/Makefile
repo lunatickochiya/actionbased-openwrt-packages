@@ -4,7 +4,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-sakurafrp
 PKG_VERSION=1.0.0
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 LUCI_TITLE:=LuCI support for SakuraFrp
 LUCI_DEPENDS:=+curl+wget+jsonc
@@ -60,6 +60,7 @@ define Package/luci-app-sakurafrp/install
 
 	$(INSTALL_DATA) ./luasrc/model/cbi/sakurafrp/api.lua $(1)/usr/lib/lua/luci/model/cbi/sakurafrp/api.lua
 	$(INSTALL_DATA) ./luasrc/model/cbi/sakurafrp/natfrpapi.lua $(1)/usr/lib/lua/luci/model/cbi/sakurafrp/natfrpapi.lua
+	$(INSTALL_DATA) ./luasrc/model/cbi/sakurafrp/natfrpapi.lua $(1)/usr/lib/lua/luci/model/cbi/sakurafrp/ini_engine.lua
 
 	$(INSTALL_DATA) ./luasrc/model/cbi/sakurafrp/pages/index.lua $(1)/usr/lib/lua/luci/model/cbi/sakurafrp/pages/index.lua
 	$(INSTALL_DATA) ./luasrc/model/cbi/sakurafrp/pages/log.lua $(1)/usr/lib/lua/luci/model/cbi/sakurafrp/pages/log.lua
