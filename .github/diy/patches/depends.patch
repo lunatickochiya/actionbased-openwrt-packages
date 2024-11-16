@@ -174,17 +174,6 @@
  include ../../luci.mk
 
 
---- a/luci-app-openclash/Makefile
-+++ b/luci-app-openclash/Makefile
-@@ -32,7 +32,7 @@ define Package/$(PKG_NAME)
- 	TITLE:=LuCI support for clash
- 	PKGARCH:=all
- 	DEPENDS:=+dnsmasq-full +coreutils +coreutils-nohup +bash +curl +ca-certificates +ipset +ip-full \
--	+libcap +libcap-bin +ruby +ruby-yaml +kmod-tun +unzip
-+	+libcap +libcap-bin +ruby +ruby-yaml +kmod-tun +unzip +kmod-inet-diag +kmod-ipt-nat +iptables-mod-tproxy +iptables-mod-extra
- 	MAINTAINER:=vernesong
- endef
-
 --- a/wifidog-wiwiz/Makefile
 +++ b/wifidog-wiwiz/Makefile
 @@ -21,7 +21,7 @@ define Package/wifidog-wiwiz
