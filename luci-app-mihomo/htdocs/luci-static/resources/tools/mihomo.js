@@ -6,6 +6,7 @@
 
 const homeDir = '/etc/mihomo';
 const profilesDir = `${homeDir}/profiles`;
+const subscriptionsDir = `${homeDir}/subscriptions`;
 const mixinFilePath = `${homeDir}/mixin.yaml`;
 const runDir = `${homeDir}/run`;
 const runProfilePath = `${runDir}/config.yaml`;
@@ -19,6 +20,7 @@ const reservedIP6NFT = `${nftDir}/reserved_ip6.nft`;
 return baseclass.extend({
     homeDir: homeDir,
     profilesDir: profilesDir,
+    subscriptionsDir: subscriptionsDir,
     mixinFilePath: mixinFilePath,
     runDir: runDir,
     appLogPath: appLogPath,
@@ -54,6 +56,10 @@ return baseclass.extend({
         return L.resolveDefault(fs.list(this.profilesDir), []);
     },
 
+    updateSubscription: function (section_id) {
+        return fs.exec_direct('/usr/libexec/mihomo-call', ['subscription', 'update', section_id]);
+    },
+
     status: async function () {
         try {
             return (await this.callServiceList('mihomo'))['mihomo']['instances']['mihomo']['running'];
@@ -71,11 +77,11 @@ return baseclass.extend({
     },
 
     appVersion: function () {
-        return L.resolveDefault(fs.exec_direct('/usr/libexec/mihomo-call', ['version', 'app']), 'Unknown');
+        return L.resolveDefault(fs.exec_direct('/usr/libexec/mihomo-call', ['version', 'app']), _('Unknown'));
     },
 
     coreVersion: function () {
-        return L.resolveDefault(fs.exec_direct('/usr/libexec/mihomo-call', ['version', 'core']), 'Unknown');
+        return L.resolveDefault(fs.exec_direct('/usr/libexec/mihomo-call', ['version', 'core']), _('Unknown'));
     },
 
     callMihomoAPI: async function (method, path, body) {
@@ -110,5 +116,17 @@ return baseclass.extend({
         } else {
             alert(_('Service is not running.'));
         }
+    },
+
+    getUsers: function () {
+        return fs.lines('/etc/passwd').then(function (lines) {
+            return lines.map(function (line) { return line.split(/:/)[0] }).filter(function (user) { return user !== 'root' && user !== 'mihomo' });
+        });
+    },
+
+    getGroups: function () {
+        return fs.lines('/etc/group').then(function (lines) {
+            return lines.map(function (line) { return line.split(/:/)[0] }).filter(function (group) { return group !== 'root' && group !== 'mihomo' });
+        });
     },
 })

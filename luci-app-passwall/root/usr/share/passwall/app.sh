@@ -208,13 +208,16 @@ check_port_exists() {
 check_depends() {
 	local depends
 	local tables=${1}
+	local file_path="/usr/lib/opkg/info"
+	local file_ext=".control"
+	[ -d "/lib/apk/packages" ] && file_path="/lib/apk/packages" && file_ext=".list"
 	if [ "$tables" == "iptables" ]; then
 		for depends in "iptables-mod-tproxy" "iptables-mod-socket" "iptables-mod-iprange" "iptables-mod-conntrack-extra" "kmod-ipt-nat"; do
-			[ -s "/usr/lib/opkg/info/${depends}.control" ] || echolog "$tables透明代理基础依赖 $depends 未安装..."
+			[ -s "${file_path}/${depends}${file_ext}" ] || echolog "$tables透明代理基础依赖 $depends 未安装..."
 		done
 	else
 		for depends in "kmod-nft-socket" "kmod-nft-tproxy" "kmod-nft-nat"; do
-			[ -s "/usr/lib/opkg/info/${depends}.control" ] || echolog "$tables透明代理基础依赖 $depends 未安装..."
+			[ -s "${file_path}/${depends}${file_ext}" ] || echolog "$tables透明代理基础依赖 $depends 未安装..."
 		done
 	fi
 }
@@ -551,10 +554,10 @@ run_chinadns_ng() {
 	local _LOG_FILE=$TMP_ACL_PATH/$_flag/chinadns_ng.log
 	_LOG_FILE="/dev/null"
 
-	_extra_param="-FLAG ${_flag} -LISTEN_PORT ${_listen_port} -DNS_LOCAL ${_dns_local} -DNS_TRUST ${_dns_trust}"
-	_extra_param="${_extra_param} -USE_DIRECT_LIST ${_use_direct_list} -USE_PROXY_LIST ${_use_proxy_list} -GFWLIST ${_gfwlist} -CHNLIST ${_chnlist}"
-	_extra_param="${_extra_param} -NO_IPV6_TRUST ${_no_ipv6_trust} -DEFAULT_MODE ${_default_mode} -DEFAULT_TAG ${_default_tag} -NFTFLAG ${nftflag}"
-	_extra_param="${_extra_param} -NO_LOGIC_LOG ${_no_logic_log} -TCP_NODE ${_tcp_node}"
+	_extra_param="-FLAG ${_flag} -TCP_NODE ${_tcp_node} -LISTEN_PORT ${_listen_port} -DNS_LOCAL ${_dns_local} -DNS_TRUST ${_dns_trust}"
+	_extra_param="${_extra_param} -USE_DIRECT_LIST ${_use_direct_list} -USE_PROXY_LIST ${_use_proxy_list} -USE_BLOCK_LIST ${_use_block_list}"
+	_extra_param="${_extra_param} -GFWLIST ${_gfwlist} -CHNLIST ${_chnlist} -NO_IPV6_TRUST ${_no_ipv6_trust} -DEFAULT_MODE ${_default_mode}"
+	_extra_param="${_extra_param} -DEFAULT_TAG ${_default_tag} -NFTFLAG ${nftflag} -NO_LOGIC_LOG ${_no_logic_log}"
 
 	lua $APP_PATH/helper_chinadns_add.lua ${_extra_param} > ${_CONF_FILE}
 	ln_run "$(first_type chinadns-ng)" chinadns-ng "${_LOG_FILE}" -C ${_CONF_FILE}
@@ -1500,6 +1503,7 @@ start_dns() {
 			_no_ipv6_trust=${FILTER_PROXY_IPV6} \
 			_use_direct_list=${USE_DIRECT_LIST} \
 			_use_proxy_list=${USE_PROXY_LIST} \
+			_use_block_list=${USE_BLOCK_LIST} \
 			_gfwlist=${USE_GFW_LIST} \
 			_chnlist=${CHN_LIST} \
 			_default_mode=${TCP_PROXY_MODE} \
@@ -1696,6 +1700,7 @@ acl_app() {
 									_no_ipv6_trust=${filter_proxy_ipv6} \
 									_use_direct_list=${use_direct_list} \
 									_use_proxy_list=${use_proxy_list} \
+									_use_block_list=${use_block_list} \
 									_gfwlist=${use_gfw_list} \
 									_chnlist=${chn_list} \
 									_default_mode=${tcp_proxy_mode} \
