@@ -292,7 +292,7 @@ s:tab("DNS", translate("DNS"))
 
 dns_shunt = s:taboption("DNS", ListValue, "dns_shunt", "DNS " .. translate("Shunt"))
 dns_shunt:value("dnsmasq", "Dnsmasq")
-dns_shunt:value("chinadns-ng", "Dnsmasq + ChinaDNS-NG")
+dns_shunt:value("chinadns-ng", translate("ChinaDNS-NG (recommended)"))
 if api.is_finded("smartdns") then
 	dns_shunt:value("smartdns", "SmartDNS")
 	group_domestic = s:taboption("DNS", Value, "group_domestic", translate("Domestic group name"))
