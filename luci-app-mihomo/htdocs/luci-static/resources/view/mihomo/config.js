@@ -103,22 +103,12 @@ return view.extend({
 
         s = m.section(form.NamedSection, 'config', 'config', _('Basic Config'));
 
-        o = s.option(form.Flag, 'enabled', _('Enable'));
+        s.tab('app', _('App Config'));
+
+        o = s.taboption('app', form.Flag, 'enabled', _('Enable'));
         o.rmempty = false;
 
-        o = s.option(form.Value, 'start_delay', _('Start Delay'));
-        o.datatype = 'uinteger';
-        o.placeholder = '0';
-
-        o = s.option(form.Flag, 'scheduled_restart', _('Scheduled Restart'));
-        o.rmempty = false;
-
-        o = s.option(form.Value, 'cron_expression', _('Cron Expression'));
-        o.retain = true;
-        o.rmempty = false;
-        o.depends('scheduled_restart', '1');
-
-        o = s.option(form.ListValue, 'profile', _('Choose Profile'));
+        o = s.taboption('app', form.ListValue, 'profile', _('Choose Profile'));
         o.optional = true;
 
         for (const profile of profiles) {
@@ -129,16 +119,48 @@ return view.extend({
             o.value('subscription:' + subscription['.name'], _('Subscription:') + subscription.name);
         };
 
-        o = s.option(form.FileUpload, 'upload_profile', _('Upload Profile'));
+        o = s.taboption('app', form.FileUpload, 'upload_profile', _('Upload Profile'));
         o.root_directory = mihomo.profilesDir;
 
-        o = s.option(form.Flag, 'mixin', _('Mixin'));
+        o = s.taboption('app', form.Flag, 'mixin', _('Mixin'));
         o.rmempty = false;
 
-        o = s.option(form.Flag, 'test_profile', _('Test Profile'));
+        s.tab('startup', _('Startup Config'));
+
+        o = s.taboption('startup', form.Value, 'start_delay', _('Start Delay'));
+        o.datatype = 'uinteger';
+        o.placeholder = '0';
+
+        o = s.taboption('startup', form.Flag, 'scheduled_restart', _('Scheduled Restart'));
         o.rmempty = false;
 
-        o = s.option(form.Flag, 'fast_reload', _('Fast Reload'));
+        o = s.taboption('startup', form.Value, 'cron_expression', _('Cron Expression'));
+        o.retain = true;
+        o.rmempty = false;
+        o.depends('scheduled_restart', '1');
+
+        o = s.taboption('startup', form.Flag, 'test_profile', _('Test Profile'));
+        o.rmempty = false;
+
+        o = s.taboption('startup', form.Flag, 'fast_reload', _('Fast Reload'));
+        o.rmempty = false;
+
+        s.tab('core_env', _('Core Environment Variable Config'));
+
+        o = s.taboption('core_env', form.Flag, 'disable_safe_path_check', _('Disable Safe Path Check'));
+        o.ucisection = 'env';
+        o.rmempty = false;
+
+        o = s.taboption('core_env', form.Flag, 'disable_loopback_detector', _('Disable Loopback Detector'));
+        o.ucisection = 'env';
+        o.rmempty = false;
+
+        o = s.taboption('core_env', form.Flag, 'disable_quic_go_gso', _('Disable GSO of quic-go'));
+        o.ucisection = 'env';
+        o.rmempty = false;
+
+        o = s.taboption('core_env', form.Flag, 'disable_quic_go_ecn', _('Disable ECN of quic-go'));
+        o.ucisection = 'env';
         o.rmempty = false;
 
         s = m.section(form.NamedSection, 'proxy', 'proxy', _('Proxy Config'));
@@ -258,37 +280,61 @@ return view.extend({
         o.value('0-65535', _('All Port'));
         o.value('123 443 8443', _('Commonly Used Port'));
 
-        s = m.section(form.TableSection, 'subscription', _('Subscription Config'));
+        s = m.section(form.GridSection, 'subscription', _('Subscription Config'));
         s.addremove = true;
         s.anonymous = true;
         s.sortable = true;
+        s.modaltitle = _('Edit Subscription');
 
         o = s.option(form.Value, 'name', _('Subscription Name'));
         o.rmempty = false;
-        o.width = '15%';
+
+        o = s.option(form.Value, 'used', _('Used'));
+        o.modalonly = false;
+        o.optional = true;
+        o.readonly = true;
+
+        o = s.option(form.Value, 'total', _('Total'));
+        o.modalonly = false;
+        o.optional = true;
+        o.readonly = true;
+
+        o = s.option(form.Value, 'expire', _('Expire At'));
+        o.modalonly = false;
+        o.optional = true;
+        o.readonly = true;
+
+        o = s.option(form.Value, 'update', _('Update At'));
+        o.modalonly = false;
+        o.optional = true;
+        o.readonly = true;
+
+        o = s.option(form.Button, 'update_subscription');
+        o.editable = true;
+        o.inputstyle = 'positive';
+        o.inputtitle = _('Update');
+        o.modalonly = false;
+        o.onclick = function (_, section_id) {
+            return mihomo.updateSubscription(section_id);
+        };
 
         o = s.option(form.Value, 'url', _('Subscription Url'));
+        o.modalonly = true;
         o.rmempty = false;
 
         o = s.option(form.Value, 'user_agent', _('User Agent'));
         o.default = 'clash';
+        o.modalonly = true;
         o.rmempty = false;
-        o.width = '15%';
         o.value('mihomo');
         o.value('clash.meta');
         o.value('clash');
 
         o = s.option(form.ListValue, 'prefer', _('Prefer'));
         o.default = 'remote';
+        o.modalonly = true;
         o.value('remote', _('Remote'));
         o.value('local', _('Local'));
-
-        o = s.option(form.Button, 'update_subscription');
-        o.inputstyle = 'positive';
-        o.inputtitle = _('Update');
-        o.onclick = function (_, section_id) {
-            return mihomo.updateSubscription(section_id);
-        };
 
         s = m.section(form.NamedSection, 'mixin', 'mixin', _('Mixin Config'));
 
@@ -332,9 +378,10 @@ return view.extend({
 
         o = s.taboption('external_control', form.Value, 'ui_url', '*' + ' ' + _('UI Url'));
         o.rmempty = false;
-        o.value('https://mirror.ghproxy.com/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip', 'MetaCubeXD');
-        o.value('https://mirror.ghproxy.com/https://github.com/MetaCubeX/Yacd-meta/archive/refs/heads/gh-pages.zip', 'YACD');
-        o.value('https://mirror.ghproxy.com/https://github.com/MetaCubeX/Razord-meta/archive/refs/heads/gh-pages.zip', 'Razord');
+        o.value('https://ghp.ci/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip', 'MetaCubeXD');
+        o.value('https://ghp.ci/https://github.com/MetaCubeX/Yacd-meta/archive/refs/heads/gh-pages.zip', 'YACD');
+        o.value('https://ghp.ci/https://github.com/MetaCubeX/Razord-meta/archive/refs/heads/gh-pages.zip', 'Razord');
+        o.value('https://ghp.ci/https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip', 'Zashboard');
 
         o = s.taboption('external_control', form.Value, 'api_port', '*' + ' ' + _('API Port'));
         o.datatype = 'port';

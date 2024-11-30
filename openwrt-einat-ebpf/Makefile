@@ -1,25 +1,27 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=einat-ebpf
-PKG_VERSION:=0.1.3
-PKG_RELEASE:=7
+PKG_VERSION:=0.1.4
+PKG_RELEASE:=8
 
-#PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-#PKG_SOURCE_URL:=https://codeload.github.com/EHfive/einat-ebpf/tar.gz/refs/tags/v$(PKG_VERSION)?
-#PKG_HASH:=17bb289475687cb6970415afc35c374ea80cd01e59964f2f9a611f6fe88f4270
-
+ifneq ($(shell echo $(PKG_RELEASE) | grep -E '^[0-9]+$$'),)
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL:=https://codeload.github.com/EHfive/einat-ebpf/tar.gz/refs/tags/v$(PKG_VERSION)?
+PKG_HASH:=skip
+else
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/EHfive/einat-ebpf.git
-PKG_SOURCE_VERSION:=ccb32a353238415f208ca27a988c8a7c4c9d27ee
+PKG_SOURCE_VERSION:=d9ce88093d63fbe22328ee187db3fa4f4c0b594b
 PKG_MIRROR_HASH:=skip
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_SOURCE_VERSION).tar.gz
+endif
 
 PKG_MAINTAINER:=Anya Lin <hukk1996@gmail.com>
 PKG_LICENSE:=GPL-2.0-or-later GPL-2.0-only
 PKG_LICENSE_FILES:=LICENSE
 
-PKG_BUILD_DEPENDS:=rust/host libbpf #install libbpf headers
+PKG_BUILD_DEPENDS:=rust/host libbpf #HAS_BPF_TOOLCHAIN:bpf-headers # requires modified kernel
 PKG_BUILD_PARALLEL:=1
 PKG_BUILD_FLAGS:=no-mips16
 
@@ -29,9 +31,16 @@ PKG_CONFIG_DEPENDS+= \
 	CONFIG_EINAT_EBPF_BINDGEN \
 	CONFIG_EINAT_EBPF_STATIC \
 
-include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/bpf.mk
+include $(INCLUDE_DIR)/package.mk
 include $(TOPDIR)/feeds/packages/lang/rust/rust-package.mk
+
+# The LLVM_PATH var is required so that einat's build script finds llvm-strip
+TARGET_PATH_PKG:=$(LLVM_PATH):$(TARGET_PATH_PKG)
+
+# $(TOPDIR)/feeds/packages/lang/rust/rust-values.mk
+# RUST_ARCH_DEPENDS:=@(aarch64||arm||i386||i686||mips||mipsel||mips64||mips64el||mipsel||powerpc64||riscv64||x86_64)
+EINAT_EBPF_RUST_ARCH_DEPENDS:=@(aarch64||arm||i386||i686||powerpc64||riscv64||x86_64) # Architectures other than x86_64 and aarch64 have not been tested.
 
 define Package/$(PKG_NAME)
   SECTION:=net
@@ -40,8 +49,8 @@ define Package/$(PKG_NAME)
   TITLE:=eBPF-based Endpoint-Independent NAT
   URL:=https://github.com/EHfive/einat-ebpf
   # You need enable KERNEL_DEBUG_INFO_BTF and disable KERNEL_DEBUG_INFO_REDUCED
-  DEPENDS:=$(RUST_ARCH_DEPENDS) $(BPF_DEPENDS) \
-	+kmod-sched-core +kmod-sched-bpf \
+  DEPENDS:=$(EINAT_EBPF_RUST_ARCH_DEPENDS) $(BPF_DEPENDS) \
+    +kmod-sched-core +kmod-sched-bpf \
     +EINAT_EBPF_BACKEND_LIBBPF:libbpf \
     +@KERNEL_DEBUG_FS +@KERNEL_DEBUG_INFO_BTF
   USERID:=einat:einat
