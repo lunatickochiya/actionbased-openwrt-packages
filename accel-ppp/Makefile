@@ -9,12 +9,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=accel-ppp
-PKG_RELEASE:=8
+PKG_RELEASE:=9
 PKG_VERSION:=1.13.0
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL=https://github.com/accel-ppp/accel-ppp.git
-PKG_SOURCE_VERSION:=56f4cdce99599cf87afbf724ff3f14f909da37a0
+PKG_SOURCE_VERSION:=dbffa39b4304f1be5e099f056a9e5001c3100393
 
 PKG_MAINTAINER:=Konstantine Shevlakov <shevlakov@132lan.ru>
 PKG_LICENSE:=GPL-2.0
