@@ -126,7 +126,7 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_SingBox
 config PACKAGE_$(PKG_NAME)_INCLUDE_Trojan_Plus
 	bool "Include Trojan-Plus"
 	select PACKAGE_trojan-plus
-	default n
+	default y
 
 config PACKAGE_$(PKG_NAME)_INCLUDE_tuic_client
 	bool "Include tuic-client"
