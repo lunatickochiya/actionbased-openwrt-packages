@@ -5,11 +5,6 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=The modern ImmortalWrt proxy platform for ARM64/AMD64
-LUCI_DEPENDS:= \
-	+sing-box \
-	+chinadns-ng \
-	+firewall4 \
-	+kmod-nft-tproxy
 
 define Package/luci-app-homeproxy/conffiles
 /etc/config/homeproxy
