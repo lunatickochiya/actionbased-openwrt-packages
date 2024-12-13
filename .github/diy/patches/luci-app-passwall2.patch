@@ -1,9 +1,9 @@
 --- a/luci-app-passwall2/root/etc/uci-defaults/luci-passwall2
 +++ b/luci-app-passwall2/root/etc/uci-defaults/luci-passwall2
 @@ -36,6 +36,11 @@ touch /etc/config/passwall2_show >/dev/null 2>&1
- 
+
  chmod +x /usr/share/passwall2/*.sh
- 
+
 +[ "`which nft`" ] && {
 +uci -q set passwall2.@global_forwarding[0].use_nft=1
 +uci -q commit passwall2
@@ -13,6 +13,85 @@
  rm -rf /tmp/luci-modulecache/
  killall -HUP rpcd 2>/dev/null
 
+--- a/luci-app-passwall2/Makefile
++++ b/luci-app-passwall2/Makefile
+@@ -32,6 +32,21 @@ LUCI_DEPENDS:=+coreutils +coreutils-base64 +coreutils-nohup +curl \
+ 	+ip-full +libuci-lua +lua +luci-compat +luci-lib-jsonc +resolveip +tcping \
+ 	+xray-core +v2ray-geoip +v2ray-geosite \
+ 	+unzip \
++	+PACKAGE_$(PKG_NAME)_INCLUDE_Haproxy:haproxy \
++	+PACKAGE_$(PKG_NAME)_INCLUDE_Hysteria:hysteria \
++	+PACKAGE_$(PKG_NAME)_INCLUDE_NaiveProxy:naiveproxy \
++	+PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Client:shadowsocks-libev-ss-local \
++	+PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Client:shadowsocks-libev-ss-redir \
++	+PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Server:shadowsocks-libev-ss-server \
++	+PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Rust_Client:shadowsocks-rust-sslocal \
++	+PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Rust_Server:shadowsocks-rust-ssserver \
++	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client:shadowsocksr-libev-ssr-local \
++	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client:shadowsocksr-libev-ssr-redir \
++	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Server:shadowsocksr-libev-ssr-server \
++	+PACKAGE_$(PKG_NAME)_INCLUDE_Simple_Obfs:simple-obfs \
++	+PACKAGE_$(PKG_NAME)_INCLUDE_SingBox:sing-box \
++	+PACKAGE_$(PKG_NAME)_INCLUDE_tuic_client:tuic-client \
++	+PACKAGE_$(PKG_NAME)_INCLUDE_V2ray_Plugin:v2ray-plugin \
+ 	+PACKAGE_$(PKG_NAME)_INCLUDE_IPv6_Nat:ip6tables-mod-nat
+
+ define Package/$(PKG_NAME)/config
+@@ -71,7 +86,6 @@ config PACKAGE_$(PKG_NAME)_Nftables_Transparent_Proxy
+
+ config PACKAGE_$(PKG_NAME)_INCLUDE_Haproxy
+ 	bool "Include Haproxy"
+-	select PACKAGE_haproxy
+ 	default y if aarch64||arm||i386||x86_64
+
+ config PACKAGE_$(PKG_NAME)_INCLUDE_Hysteria
+@@ -87,8 +101,6 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_NaiveProxy
+
+ config PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Client
+ 	bool "Include Shadowsocks Libev Client"
+-	select PACKAGE_shadowsocks-libev-ss-local
+-	select PACKAGE_shadowsocks-libev-ss-redir
+ 	default y
+
+ config PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Server
+@@ -99,7 +111,6 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Server
+ config PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Rust_Client
+ 	bool "Include Shadowsocks Rust Client"
+ 	depends on aarch64||arm||i386||mips||mipsel||x86_64
+-	select PACKAGE_shadowsocks-rust-sslocal
+ 	default y if aarch64
+
+ config PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Rust_Server
+@@ -110,8 +121,6 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Rust_Server
+
+ config PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client
+ 	bool "Include ShadowsocksR Libev Client"
+-	select PACKAGE_shadowsocksr-libev-ssr-local
+-	select PACKAGE_shadowsocksr-libev-ssr-redir
+ 	default y
+
+ config PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Server
+@@ -121,12 +130,10 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Server
+
+ config PACKAGE_$(PKG_NAME)_INCLUDE_Simple_Obfs
+ 	bool "Include Simple-Obfs (Shadowsocks Plugin)"
+-	select PACKAGE_simple-obfs
+ 	default y
+
+ config PACKAGE_$(PKG_NAME)_INCLUDE_SingBox
+ 	bool "Include Sing-Box"
+-	select PACKAGE_sing-box
+ 	default y if aarch64||arm||i386||x86_64
+
+ config PACKAGE_$(PKG_NAME)_INCLUDE_tuic_client
+@@ -137,7 +144,6 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_tuic_client
+
+ config PACKAGE_$(PKG_NAME)_INCLUDE_V2ray_Plugin
+ 	bool "Include V2ray-Plugin (Shadowsocks Plugin)"
+-	select PACKAGE_v2ray-plugin
+ 	default y if aarch64||arm||i386||x86_64
+
+ endif
 
 --- a/luci-app-passwall2/luasrc/controller/passwall2.lua
 +++ b/luci-app-passwall2/luasrc/controller/passwall2.lua
@@ -21,13 +100,13 @@
  	entry({"admin", "services", appname, "delete_select_nodes"}, call("delete_select_nodes")).leaf = true
  	entry({"admin", "services", appname, "update_rules"}, call("update_rules")).leaf = true
 +	entry({"admin", "services", appname, "ip"}, call('check_ip')).leaf = true
- 
+
  	--[[Components update]]
  	local coms = require "luci.passwall2.com"
 @@ -89,6 +90,61 @@ local function http_write_json(content)
  	http.write_json(content or {code = 1})
  end
- 
+
 +function check_site(host, port)
 +    local nixio = require "nixio"
 +    local socket = nixio.socket("inet", "stream")
@@ -42,7 +121,7 @@
 +    local result = luci.sys.exec('curl --retry 3 -m 10 -LfsA "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36" http://ip-api.com/json/')
 +    local json = require "luci.jsonc"
 +    local info = json.parse(result)
-+    
++
 +    return {
 +        flag = string.lower(info.countryCode) or "un",
 +        country = get_country_name(info.countryCode) or "Unknown",
@@ -91,10 +170,10 @@
 +++ b/luci-app-passwall2/luasrc/model/cbi/passwall2/client/global.lua
 @@ -411,5 +411,6 @@ for k, v in pairs(nodes_table) do
  end
- 
+
  m:append(Template(appname .. "/global/footer"))
 +m:append(Template(appname .. "/global/status_bottom"))
- 
+
  return m
 
 diff --git a/luci-app-passwall2/luasrc/view/passwall2/global/status_bottom.htm b/luci-app-passwall2/luasrc/view/passwall2/global/status_bottom.htm
@@ -150,7 +229,7 @@ index 000000000000..a00fff9c79b3
 +footer{
 +display:block !important;
 +}
-+    
++
 +@media screen and (max-width: 700px) {
 +.status-bar .icon-con {
 +    height: 2.5em;
