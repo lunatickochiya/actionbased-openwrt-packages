@@ -105,7 +105,7 @@ function get_ip_geo_info()
     local result = luci.sys.exec('curl --retry 3 -m 10 -LfsA "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36" http://ip-api.com/json/')
     local json = require "luci.jsonc"
     local info = json.parse(result)
-    
+
     return {
         flag = string.lower(info.countryCode) or "un",
         country = get_country_name(info.countryCode) or "Unknown",

@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=hickory-dns
 PKG_VERSION:=0.25.0-alpha.4
-PKG_RELEASE:=64
+PKG_RELEASE:=65
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/hickory-dns/hickory-dns.git
@@ -10,7 +10,6 @@ PKG_SOURCE_VERSION:=5da87ac74c618536562910e734ae755a96b6f77c
 PKG_BUILD_DEPENDS:=rust/host
 PKG_BUILD_PARALLEL:=1
 
-PKG_BUILD_FLAGS:=no-lto
 RUST_PKG_FEATURES:=resolver,dns-over-https-rustls,dns-over-quic,dns-over-h3,native-certs,dnssec-ring,recursor
 
 include $(INCLUDE_DIR)/package.mk
