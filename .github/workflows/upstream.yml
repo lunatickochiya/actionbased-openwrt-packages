@@ -538,25 +538,23 @@ jobs:
         sed -i 's/	ip.neighbors/	luci.ip.neighbors/' luci-app-wifidog/luasrc/model/cbi/wifidog/wifidog_cfg.lua
         sed -i 's/ if aarch64||arm||i386||x86_64//' luci-app-ssr-plus/Makefile
         sed -i 's/transmission-daemon$/transmission-daemon +transmission-web-control/' luci-app-transmission/Makefile
-        mkdir -p luci-app-passwall/root/www/luci-static/passwall luci-app-passwall2/root/www/luci-static/passwall2 luci-app-ssr-plus/root/www/luci-static/shadowsocksr
+        mkdir -p luci-app-passwall/root/www/luci-static/passwall
         cp -rf luci-app-bypass/root/www/luci-static/bypass/* luci-app-passwall/root/www/luci-static/passwall/
-        cp -rf luci-app-bypass/root/www/luci-static/bypass/* luci-app-passwall2/root/www/luci-static/passwall2/
-        cp -rf luci-app-bypass/root/www/luci-static/bypass/* luci-app-ssr-plus/root/www/luci-static/shadowsocksr/
+        # cp -rf luci-app-bypass/root/usr/share/bypass/GeoLite2-Country.mmdb luci-app-passwall/root/usr/share/passwall/
+        mkdir -p luci-app-passwall-smartdns-dev/root/www/luci-static/passwall
+        cp -rf luci-app-bypass/root/www/luci-static/bypass/* luci-app-passwall-smartdns-dev/root/www/luci-static/passwall/
+        cp -rf luci-app-bypass/root/usr/share/bypass/GeoLite2-Country.mmdb luci-app-passwall-smartdns-dev/root/usr/share/passwall/
         echo "#page>div[data-v-d324f700]:first-child{display:none}
-        echo "#page>div:first-child{display:none}
-        button.btn_styles.color1:last-child{display:none}" >>luci-app-quickstart/htdocs/luci-static/quickstart/style.css
-        sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' tailscale/Makefile
+        button.btn_styles.color1[data-v-0d223b54]:last-child{display:none}" >>luci-app-quickstart/htdocs/luci-static/quickstart/style.css
 
         sed -i \
           -e 's?include \.\./\.\./\(lang\|devel\)?include $(TOPDIR)/feeds/packages/\1?' \
           -e "s/\(\(^\| \|	\)\(PKG_HASH\|PKG_MD5SUM\|PKG_MIRROR_HASH\|HASH\):=\).*/\1skip/" \
+          -e 's?\.\./\.\./luci.mk?$(TOPDIR)/feeds/luci/luci.mk?' \
+          -e 's/+ca-certificates/+ca-bundle/' \
           -e 's/php7/php8/g' \
-          -e 's/+docker\( \|$\)/+docker +dockerd /g' \
-          -e 's/URL:=@IMMORTALWRT/URL:=https:\/\/mirror2.immortalwrt.org\/sources/g' \
+          -e 's/+docker /+docker +dockerd /g' \
           */Makefile
-        sed -i \
-          -e 's?include .*/luci.mk?include $(TOPDIR)/feeds/luci/luci.mk?' \
-          luci-*/Makefile
         ) &
 
         while [[ ! -f /tmp/ok ||  ! -f /tmp/ok2 ]]; do
