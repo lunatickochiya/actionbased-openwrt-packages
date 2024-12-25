@@ -34,8 +34,7 @@ LUCI_PKGARCH:=all
 LUCI_DEPENDS:=+coreutils +coreutils-base64 +coreutils-nohup +curl \
 	+chinadns-ng +dns2socks +dns2tcp +dnsmasq-full +ip-full \
 	+libuci-lua +lua +luci-compat +luci-lib-jsonc \
-	+microsocks +resolveip +tcping \
-	+lua-maxminddb
+	+microsocks +resolveip +tcping
 
 define Package/$(PKG_NAME)/config
 menu "Configuration"
@@ -66,7 +65,7 @@ config PACKAGE_$(PKG_NAME)_Nftables_Transparent_Proxy
 config PACKAGE_$(PKG_NAME)_INCLUDE_Haproxy
 	bool "Include Haproxy"
 	select PACKAGE_haproxy
-	default n
+	default y if aarch64||arm||i386||x86_64
 
 config PACKAGE_$(PKG_NAME)_INCLUDE_Hysteria
 	bool "Include Hysteria"
@@ -148,13 +147,13 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_V2ray_Geoview
 config PACKAGE_$(PKG_NAME)_INCLUDE_V2ray_Plugin
 	bool "Include V2ray-Plugin (Shadowsocks Plugin)"
 	select PACKAGE_v2ray-plugin
-	default n
+	default y if aarch64||arm||i386||x86_64
 
 config PACKAGE_$(PKG_NAME)_INCLUDE_Xray
 	bool "Include Xray"
 	select PACKAGE_xray-core
 	select PACKAGE_unzip
-	default y
+	default y if aarch64||arm||i386||x86_64
 
 config PACKAGE_$(PKG_NAME)_INCLUDE_Xray_Plugin
 	bool "Include Xray-Plugin (Shadowsocks Plugin)"

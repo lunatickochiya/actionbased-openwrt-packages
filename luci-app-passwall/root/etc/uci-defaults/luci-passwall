@@ -44,7 +44,6 @@ chmod +x /usr/share/passwall/*.sh
 [ "$(uci -q get passwall.@global_xray[0].sniffing)" == "1" ] && [ "$(uci -q get passwall.@global_xray[0].route_only)" != "1" ] && uci -q set passwall.@global_xray[0].sniffing_override_dest=1
 uci -q delete passwall.@global_xray[0].sniffing
 uci -q delete passwall.@global_xray[0].route_only
-[ "`which nft`" ] && uci -q set passwall.@global_forwarding[0].use_nft=1
 uci -q commit passwall
 
 rm -f /tmp/luci-indexcache
