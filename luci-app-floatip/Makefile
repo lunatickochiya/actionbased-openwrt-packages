@@ -8,9 +8,7 @@ include $(TOPDIR)/rules.mk
 LUCI_TITLE:=LuCI support for floatip
 LUCI_DEPENDS:=+floatip
 LUCI_PKGARCH:=all
-PKG_VERSION:=0.1.2-1
 # PKG_RELEASE MUST be empty for luci.mk
-PKG_RELEASE:=9
 
 include $(TOPDIR)/feeds/luci/luci.mk
 
