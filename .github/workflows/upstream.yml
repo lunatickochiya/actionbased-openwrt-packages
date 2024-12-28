@@ -216,7 +216,7 @@ jobs:
         ) &
         (
         git_clone https://github.com/linkease/openwrt-app-actions
-        git_clone https://github.com/xiaorouji/openwrt-passwall-packages && rm -rf openwrt-passwall-packages/naiveproxy && mvdir openwrt-passwall-packages
+        git_clone https://github.com/xiaorouji/openwrt-passwall-packages && rm -rf openwrt-passwall-packages/naiveproxy && rm -rf openwrt-passwall-packages/pdnsd-alt && mvdir openwrt-passwall-packages
         ) &
         (
         git_clone https://github.com/honwen/luci-app-shadowsocks-rust
@@ -377,7 +377,7 @@ jobs:
         net/subconverter net/ngrokc net/oscam net/njitclient net/scutclient net/gost net/ua2f net/dufs net/qBittorrent-Enhanced-Edition \
         net/tinyportmapper net/tinyfecvpn net/nexttrace net/pcap-dnsproxy net/rustdesk-server net/tuic-server net/speedtest-go \
         net/dns-forwarder net/ipset-lists net/ShadowVPN net/cloudflared net/nps net/naiveproxy \
-        lang/lua-maxminddb net/pdnsd-alt \
+        lang/lua-maxminddb \
         libs/jpcre2 libs/wxbase libs/rapidjson libs/libcron libs/libcryptopp libs/quickjspp libs/toml11 libs/libtorrent-rasterbar \
         libs/libdouble-conversion libs/qt6base libs/cxxopts libs/jpcre2 libs/alac sound/spotifyd \
         utils/qt6tools utils/cpulimit utils/filebrowser utils/cups utils/cups-bjnp utils/joker net/udp2raw net/msd_lite \
