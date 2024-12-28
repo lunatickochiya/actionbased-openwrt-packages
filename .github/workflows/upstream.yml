@@ -519,6 +519,7 @@ jobs:
         sed -i '/boot()/,+2d' ddns-scripts/files/etc/init.d/ddns
         sed -i "/DISTRIB_DESCRIPTION/c\DISTRIB_DESCRIPTION=\"%D %C by Kiddin'\"" base-files/files/etc/openwrt_release
         sed -i "s/PKG_VERSION:=2/PKG_VERSION:=3/" mwan3/Makefile
+        rm -f miniupnpd-iptables/patches/106-spam-syslog*
         sed -i "/+uhttpd/d" ariang/Makefile
         sed -i -e '$a /etc/bench.log' \
         -e '/\/etc\/profile/d' \
