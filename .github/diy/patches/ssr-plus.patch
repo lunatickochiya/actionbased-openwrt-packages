@@ -60,10 +60,10 @@
 +    e.youtube = check_site('www.youtube.com', port)
 +    luci.http.prepare_content('application/json')
 +    luci.http.write_json(e)
+ --[[Backup]]
+ 	entry({"admin", "services", "shadowsocksr", "backup"}, call("create_backup")).leaf = true
  end
  
- function subscribe()
-
 --- a/luci-app-ssr-plus/luasrc/model/cbi/shadowsocksr/client.lua
 +++ b/luci-app-ssr-plus/luasrc/model/cbi/shadowsocksr/client.lua
 @@ -168,5 +168,6 @@ if is_finded("chinadns-ng") then
