@@ -426,9 +426,9 @@ int af_register_dev(void)
 	}
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
- 	g_af_dev.c = class_create(THIS_MODULE, AF_DEV_NAME);
+	g_af_dev.c = class_create(THIS_MODULE, AF_DEV_NAME);
 #else
-    g_af_dev.c = class_create(AF_DEV_NAME);
+	g_af_dev.c = class_create(AF_DEV_NAME);
 #endif
 	if (IS_ERR_OR_NULL(g_af_dev.c))
 	{
