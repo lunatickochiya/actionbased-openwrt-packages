@@ -6,7 +6,7 @@ index 98676194..67e12f51 100644
  e:value('2', translate('Auto download unsplash wallpaper'))
  e:value('3', translate('Auto download Bing wallpaper'))
  e:value('4', translate('Auto download Bird 4K wallpaper'))
-+e:value('5', translate('Auto download ACG wallpaper'))
++e:value('6', translate('Auto download ACG wallpaper'))
  e.default = '0'
  e.rmempty = false
  
@@ -14,20 +14,20 @@ diff --git a/luci-theme-kucat/root/usr/libexec/kucat/kucat_wallpaper b/luci-them
 index aecfd072..7b4c6db3 100644
 --- a/luci-theme-kucat/root/usr/libexec/kucat/kucat_wallpaper
 +++ b/luci-theme-kucat/root/usr/libexec/kucat/kucat_wallpaper
-@@ -49,6 +49,9 @@ curl_bgurl() {
- 		local ppath=`curl -s "http://wp.birdpaper.com.cn/intf/search?content=4k&pageno=$j&count=9" | awk -F '\"count\":9' '{print $2}' | awk -F ',\"processTime\"' '{print $1}' | sed 's#,#{#' |  jsonfilter -e "@.list[$i].url"`
- 		[ -n "${ppath}" ] && echo "$ppath"
+@@ -56,6 +56,9 @@ curl_bgurl() {
+             "https://wallhaven.cc/api/v1/search?resolutions=1920x1080&sorting=random" |
+             jsonfilter -qe '@.data[0].path'
  		;;
-+	5)
++	6)
 +		echo "https://api.vvhan.com/api/wallpaper/acg"
 +		;;
+
  	esac
  }
- 
-@@ -80,4 +83,4 @@ else
- 	[ -s "$DFBGURL" ] && echo -ne $DFBGURL
+@@ -98,4 +101,4 @@ else
  fi
  }
+
 -check_url
 \ No newline at end of file
 +check_url
