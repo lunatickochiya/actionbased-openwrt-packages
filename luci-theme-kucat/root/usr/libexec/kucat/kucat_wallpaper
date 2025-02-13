@@ -56,6 +56,9 @@ curl_bgurl() {
             "https://wallhaven.cc/api/v1/search?resolutions=1920x1080&sorting=random" |
             jsonfilter -qe '@.data[0].path'
 		;;
+	6)
+		echo "https://api.vvhan.com/api/wallpaper/acg"
+		;;
 
 	esac
 }
