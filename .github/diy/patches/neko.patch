@@ -1,0 +1,13 @@
+diff --git a/luci-app-neko/Makefile b/luci-app-neko/Makefile
+index 1ec14ed30..973dfc122 100644
+--- a/luci-app-neko/Makefile
++++ b/luci-app-neko/Makefile
+@@ -16,7 +16,7 @@ define Package/$(PKG_NAME)
+ 	SUBMENU:=3. Applications
+ 	TITLE:=LuCI support for mihomo
+ 	PKGARCH:=all
+-	DEPENDS:=+kmod-tun +bash +curl +jq +mihomo +sing-box +php8 +php8-mod-curl
++	DEPENDS:=+kmod-tun +bash +curl +jq +sing-box +php8 +php8-mod-curl
+ endef
+ 
+ define Package/$(PKG_NAME)/description
