@@ -216,15 +216,27 @@ dhcp_domain() {
     fi
 }
 advancedset(){
-    dev=`ifconfig | grep "Point-to-Point" | cut -d " " -f1`
-    [ ! $dev ] && dev=` uci -q get network.wan.device ` || dev=` uci -q get network.wan.device ` 
-    [ ! $dev ] && dev=br-lan
-    setnetwizard
-    set_ttyd
-    set_firewall_wan
-    tsoset
+dev=`ifconfig | grep "Point-to-Point" | cut -d " " -f1`
+[ ! $dev ] && dev=` uci -q get network.wan.device ` || dev=` uci -q get network.wan.device ` 
+[ ! $dev ] && dev=br-lan
+setnetwizard
+sethttps
+dhcp_domain
+set_ttyd
+set_firewall_wan
+tsoset
+    [ "x$(uci -q get advancedplus.@basic[0].qos)" = "x1" ] && \usr\bin\qoshome
+    if [ "x$(uci -q get advancedplus.@basic[0].ttl)" = "x1" ] ; then
+        $ipt -t mangle -A PREROUTING -p tcp --tcp-flags RST RST -i $dev -j DROP
+        $ipt -t mangle -A PREROUTING -i ${dev} -j TTL --ttl-inc 1
+        $ipt -t mangle -A POSTROUTING -o ${dev} -j TTL --ttl-set 64
+    fi
+    #cpumode=`uci -q get advancedplus.@basic[0].cpumode`
+    #[ ! $cpumode ] || cpumodeset $cpumode   /usr/bin/zsh
+if [ "$(which zsh)" ]; then
     sed -i "\/bin\/zsh/d" /etc/profile
     [ "x$(uci -q get advancedplus.@basic[0].usshmenu)" = "x1" ] || echo '/usr/bin/zsh'  >> /etc/profile
+fi
     uci commit netwizard 
 }
 
