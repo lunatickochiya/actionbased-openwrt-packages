@@ -85,12 +85,12 @@ e.rmempty = false
 e = t:option(Value, 'gossr', translate('Services Ssrkey settings'))
 e:value('shadowsocksr', translate('SSR'))
 e:value('bypass', translate('bypass'))
-e:value('nikki', translate('nikki[Mihomo]'))
+e:value('vssr', translate('Hello World'))
 e:value('passwall', translate('passwall'))
 e:value('passwall2', translate('passwall2'))
 e:value('openclash', translate('OpenClash'))
-e:value('homeproxy', translate('HomeProxy'))
-e:value('vssr', translate('Hello World'))
+e:value('chatgpt-web', translate('Chatgpt Web'))
+e:value('ddns-go', translate('DDNS-GO'))
 e.default = 'bypass'
 e.rmempty = false
 

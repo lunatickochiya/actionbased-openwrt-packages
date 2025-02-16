@@ -6,6 +6,9 @@ STOP=15
 EXTRA_COMMANDS='reset'
 EXTRA_HELP="        reset   Reset to default settings"
 
+ipt=$(command -v iptables-legacy || command -v iptables)
+ip6t=$(command -v ip6tables-legacy || command -v ip6tables)
+
 reset() {
 rm -rf /etc/config/advancedplus
 cat <<EOF  >/etc/config/advancedplus
@@ -18,7 +21,7 @@ config basic
 	option font_d '1.1rem'
 	option font_z '0.92rem'
 	option font_x '0.875rem'
-	option bklock '0'
+	option bklock '1'
 	option setbar '1'
 	option dayword '0'
 	option background '0'
@@ -172,9 +175,11 @@ set_firewall_wan() {
     ## 设置防火墙wan 打开
     uci -q set firewall.@zone[1].input='ACCEPT'
     uci commit firewall
+    /etc/init.d/firewall reload
     else
     uci -q set firewall.@zone[1].input='REJECT'
     uci commit firewall
+    /etc/init.d/firewall reload
     fi
 }
 
@@ -182,9 +187,11 @@ set_ttyd() {
     if [ "x$(uci -q get advancedplus.@basic[0].set_ttyd)" = "x1" ] ; then
     uci delete ttyd.@ttyd[0].interface
     uci commit
+    /etc/init.d/firewall reload
     else
     uci -q set ttyd.@ttyd[0].interface='@lan'
     uci commit
+    /etc/init.d/firewall reload
     fi
 }
 
