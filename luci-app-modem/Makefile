@@ -22,7 +22,6 @@ LUCI_DEPENDS:=+luci-compat \
 		+usbutils \
 		+kmod-pcie_mhi \
 		+pciutils \
-		+quectel-CM-5G \
 		+modemmanager \
 		+luci-proto-modemmanager \
 		+sms-tool \
