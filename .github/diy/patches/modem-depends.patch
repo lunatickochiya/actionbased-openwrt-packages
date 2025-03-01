@@ -1,0 +1,24 @@
+diff --git a/luci-app-hypermodem/Makefile b/luci-app-hypermodem/Makefile
+index ed9530974..38d80b582 100644
+--- a/luci-app-hypermodem/Makefile
++++ b/luci-app-hypermodem/Makefile
+@@ -17,7 +17,6 @@ LUCI_DEPENDS:=+luci-compat +kmod-usb-net  +kmod-usb-net-cdc-ether +kmod-usb-acm
+ 		+usbutils \
+ 		+kmod-qmi_wwan_q \
+ 		+kmod-pcie_mhi +pciutils \
+-		+quectel-CM-5G \
+ 		+grep \
+ 
+ include $(TOPDIR)/feeds/luci/luci.mk
+diff --git a/luci-app-modem/Makefile b/luci-app-modem/Makefile
+index 74f6c6742..b0858785b 100644
+--- a/luci-app-modem/Makefile
++++ b/luci-app-modem/Makefile
+@@ -22,7 +22,6 @@ LUCI_DEPENDS:=+luci-compat \
+ 		+usbutils \
+ 		+kmod-pcie_mhi \
+ 		+pciutils \
+-		+quectel-CM-5G \
+ 		+modemmanager \
+ 		+luci-proto-modemmanager \
+ 		+sms-tool \
