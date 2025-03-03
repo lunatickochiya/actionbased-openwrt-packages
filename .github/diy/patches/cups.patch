@@ -9,3 +9,70 @@
  		--enable-shared \
  		--enable-image \
 
+From a10ab72c6bf83629c0f0a0953acd09051b71f0cb Mon Sep 17 00:00:00 2001
+From: lunatickochiya <125438787@qq.com>
+Date: Mon, 3 Mar 2025 19:03:08 +0800
+Subject: [PATCH] Revert "Auxiliary commit to revert individual files from
+ 1b4df44765cad51b7432615dc11c9560bb8bc913"
+
+This reverts commit 990028ef01394e69090504d21442d0845ab3618e.
+---
+ luci-app-cupsd/luasrc/controller/cupsd.lua    |  5 ++--
+ .../luasrc/model/cbi/cupsd/advanced.lua       | 29 +++++++++++++++++++
+ 2 files changed, 32 insertions(+), 2 deletions(-)
+ create mode 100644 luci-app-cupsd/luasrc/model/cbi/cupsd/advanced.lua
+
+diff --git a/luci-app-cupsd/luasrc/controller/cupsd.lua b/luci-app-cupsd/luasrc/controller/cupsd.lua
+index d0e9a0c9d..d4c9a70cf 100644
+--- a/luci-app-cupsd/luasrc/controller/cupsd.lua
++++ b/luci-app-cupsd/luasrc/controller/cupsd.lua
+@@ -8,8 +8,9 @@ function index()
+ 		return
+ 	end
+
+-	entry({"admin", "services", "cupsd"},alias("admin", "services", "cupsd", "basic"), _("CUPS打印服务器"), 60).dependent = true
+-	entry({"admin", "services", "cupsd", "basic"}, cbi("cupsd/basic"), _("设置"), 10).leaf = true
++	entry({"admin", "services", "cupsd"},alias("admin", "services", "cupsd","basic"),_("CUPS打印服务器"),60).dependent = true
++	entry({"admin", "services", "cupsd","basic"}, cbi("cupsd/basic"),_("设置"),10).leaf = true
++	entry({"admin", "services", "cupsd","advanced"}, cbi("cupsd/advanced"),_("高级"),20).leaf = true
+ 	entry({"admin", "services", "cupsd_status"}, call("act_status"))
+ end
+
+diff --git a/luci-app-cupsd/luasrc/model/cbi/cupsd/advanced.lua b/luci-app-cupsd/luasrc/model/cbi/cupsd/advanced.lua
+new file mode 100644
+index 000000000..0863432aa
+--- /dev/null
++++ b/luci-app-cupsd/luasrc/model/cbi/cupsd/advanced.lua
+@@ -0,0 +1,29 @@
++local fs = require "nixio.fs"
++local sys = require "luci.sys"
++
++m = Map("cupsd", translate("<font color=\"green\">CUPS高级配置</font>"), translate("<font color=\"red\">此处修改的是/etc/cups/cupsd.conf文件。</font><input class=\"cbi-button cbi-button-apply\" type=\"submit\" value=\" "..translate("点击此处可下载并浏览添加打印机教程文件").." \" onclick=\"window.open('http://'+window.location.hostname+'/cups.pdf')\"/>"))
++s = m:section(TypedSection, "cupsd")
++s.anonymous=true
++
++o = s:option(TextValue, "/etc/cups/cupsd.conf")
++o.rows = 20
++o.wrap = "off"
++function o.cfgvalue(self, section)
++    return fs.readfile("/etc/cups/cupsd.conf") or ""
++end
++
++function o.write(self, section, value)
++    if value then
++        value = value:gsub("\r\n?", "\n")
++        fs.writefile("/tmp/cupsd.conf", value)
++        if (luci.sys.call("cmp -s /tmp/cupsd.conf /etc/cups/cupsd.conf") == 1) then
++            fs.writefile("/etc/cups/cupsd.conf", value)
++            luci.sys.call("/etc/init.d/cupsd reload >/dev/null")
++        end
++        fs.remove("/tmp/cupsd.conf")
++    end
++end
++
++return m
++
++
+--
+2.34.1
+
