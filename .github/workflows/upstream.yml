@@ -380,7 +380,7 @@ jobs:
         lang/lua-maxminddb net/pdnsd-alt \
         libs/jpcre2 libs/wxbase libs/rapidjson libs/libcron libs/libcryptopp libs/quickjspp libs/toml11 libs/libtorrent-rasterbar \
         libs/libdouble-conversion libs/qt6base libs/cxxopts libs/jpcre2 libs/alac sound/spotifyd \
-        utils/qt6tools utils/cpulimit utils/filebrowser utils/cups utils/cups-bjnp utils/joker net/udp2raw net/msd_lite \
+        utils/qt6tools utils/cpulimit utils/filebrowser utils/cups-bjnp utils/joker net/udp2raw net/msd_lite \
         multimedia/you-get multimedia/lux multimedia/ykdl multimedia/gallery-dl devel/go-rice admin/gotop admin/netdata
         ) &
         (
