@@ -2,15 +2,6 @@ diff --git a/filebrowser/Makefile b/filebrowser/Makefile
 index 7b6612c5..a81352ac 100644
 --- a/filebrowser/Makefile
 +++ b/filebrowser/Makefile
-@@ -5,7 +5,7 @@
- include $(TOPDIR)/rules.mk
-
- PKG_NAME:=filebrowser
--PKG_VERSION:=2.28.0
-+PKG_VERSION:=2.31.1
- PKG_RELEASE:=1
-
- PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 @@ -19,11 +19,12 @@ PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
  PKG_BUILD_DEPENDS:=golang/host node/host
  PKG_BUILD_PARALLEL:=1
