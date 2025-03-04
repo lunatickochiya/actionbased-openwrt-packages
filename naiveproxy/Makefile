@@ -5,12 +5,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=naiveproxy
-PKG_VERSION:=130.0.6723.40-5
-PKG_RELEASE:=12
+PKG_REAL_VERSION:=131.0.6778.86-1
+PKG_VERSION:=$(subst -,.,$(PKG_REAL_VERSION))
+PKG_RELEASE:=13
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/klzgrad/naiveproxy/tar.gz/v$(PKG_VERSION)?
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_REAL_VERSION).tar.gz
+PKG_SOURCE_URL:=https://codeload.github.com/klzgrad/naiveproxy/tar.gz/v$(PKG_REAL_VERSION)?
 PKG_HASH:=skip
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_REAL_VERSION)
 
 PKG_LICENSE:=BSD 3-Clause
 PKG_LICENSE_FILES:=LICENSE
@@ -39,7 +41,7 @@ define Package/naiveproxy
   SUBMENU:=Web Servers/Proxies
   TITLE:=Make a fortune quietly
   URL:=https://github.com/klzgrad/naiveproxy
-  DEPENDS:=@!(arc||mips||mips64||powerpc||TARGET_gemini) +libatomic
+  DEPENDS:=@!(arc||armeb||mips||mips64||powerpc||TARGET_gemini) +libatomic
 endef
 
 define Package/naiveproxy/description
@@ -55,7 +57,7 @@ ifneq ($(CONFIG_CCACHE),)
   export naive_ccache_flags=cc_wrapper="$(CCACHE)"
 endif
 
-CLANG_VER:=20-init-3847-g69c43468-28
+CLANG_VER:=20-init-6794-g3dbd929e-1
 CLANG_FILE:=clang-llvmorg-$(CLANG_VER).tar.xz
 define Download/CLANG
 	URL:=https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64
@@ -64,7 +66,7 @@ define Download/CLANG
 	HASH:=skip
 endef
 
-PGO_VER:=6723-1728387217-9f5646f93bc4ba3a2a9310010e81c26b70db13b1-f044eaa32696eb5c9c4d3ffede525cf50c8cc3e9
+PGO_VER:=6778-1731431875-75e60acd68a20cf9cc2c5d6dfbb65ee7b4e60752-a75a9b0cd4f8d4a3bb5d3446daa63b14105e852e
 PGO_FILE:=chrome-linux-$(PGO_VER).profdata
 define Download/PGO_PROF
 	URL:=https://storage.googleapis.com/chromium-optimization-profiles/pgo_profiles
@@ -90,7 +92,7 @@ endef
 define Build/Configure
 	( \
 		pushd "$(PKG_BUILD_DIR)/src" ; \
-		. ../init_env.sh "$(ARCH)" $(CPU_TYPE) $(CPU_SUBTYPE) "$(TOOLCHAIN_DIR)" ; \
+		. ../init_env.sh "$(ARCH)" $(CPU_TYPE) $(CPU_SUBTYPE) "$(TOOLCHAIN_ROOT_DIR)" ; \
 		export naive_flags+=" $$$${naive_ccache_flags}" ; \
 		mkdir -p "out" ; \
 		gn gen "out/Release" --args="$$$${naive_flags}" --script-executable="$(PYTHON)" ; \
