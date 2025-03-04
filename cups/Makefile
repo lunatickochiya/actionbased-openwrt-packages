@@ -10,7 +10,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=cups
 PKG_VERSION:=2.4.11
-PKG_RELEASE:=4
+PKG_RELEASE:=5
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-source.tar.gz
 PKG_SOURCE_URL:=https://github.com/OpenPrinting/cups/releases/download/v$(PKG_VERSION)
 PKG_MD5SUM:=skip
@@ -166,6 +166,7 @@ define Build/Configure
 		--without-python \
 		--without-php \
 		--without-tls \
+		--without-dnssd \
 		--enable-default-shared \
 		--enable-shared \
 		--enable-image \
