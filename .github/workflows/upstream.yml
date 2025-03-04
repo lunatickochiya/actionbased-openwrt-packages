@@ -371,7 +371,7 @@ jobs:
         ) &
 
         (
-        git_sparse_clone openwrt-23.05 "https://github.com/immortalwrt/packages" "immpkgs" net/mwol net/n2n net/dae \
+        git_sparse_clone openwrt-24.10 "https://github.com/immortalwrt/packages" "immpkgs" net/mwol net/n2n net/dae \
         net/sub-web net/dnsproxy net/haproxy net/v2raya net/cdnspeedtest net/keepalived net/amule libs/antileech \
         net/go-nats net/go-wol net/bitsrunlogin-go net/transfer net/cloudreve net/daed \
         net/subconverter net/ngrokc net/oscam net/njitclient net/scutclient net/gost net/ua2f net/dufs net/qBittorrent-Enhanced-Edition \
