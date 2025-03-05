@@ -217,7 +217,7 @@ jobs:
         ) &
         (
         git_clone https://github.com/linkease/openwrt-app-actions
-        git_clone https://github.com/xiaorouji/openwrt-passwall-packages && rm -rf openwrt-passwall-packages/naiveproxy && rm -rf openwrt-passwall-packages/pdnsd-alt && rm -rf openwrt-passwall-packages/tuic-client && mvdir openwrt-passwall-packages
+        git_clone https://github.com/xiaorouji/openwrt-passwall-packages && rm -rf openwrt-passwall-packages/naiveproxy && rm -rf openwrt-passwall-packages/tuic-client && mvdir openwrt-passwall-packages
         ) &
         (
         git_clone https://github.com/honwen/luci-app-shadowsocks-rust
