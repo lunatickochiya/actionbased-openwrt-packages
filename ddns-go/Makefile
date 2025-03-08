@@ -4,11 +4,12 @@
 # 
 # This is free software, licensed under the Apache License, Version 2.0 .
 #
+
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ddns-go
 PKG_VERSION:=6.8.1
-PKG_RELEASE:=31
+PKG_RELEASE:=32
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
