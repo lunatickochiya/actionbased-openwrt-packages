@@ -313,7 +313,7 @@ jobs:
         ) &
         (
         git_clone https://github.com/jackpang960/luci-app-hypermodem
-        git_clone https://github.com/wangqn/luci-app-nut
+        # git_clone https://github.com/wangqn/luci-app-nut
         git_clone https://github.com/CrazyPegasus/luci-app-accesscontrol-plus
         git_clone https://github.com/4IceG/luci-app-lite-watchdog
         git_clone https://github.com/Mitsuhaxy/luci-app-miniproxy
