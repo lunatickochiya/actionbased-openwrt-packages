@@ -342,6 +342,19 @@ jobs:
         # git_clone https://github.com/0x676e67/luci-app-wireguard-ui wireguardui && mvdir wireguardui
         ) &
         (
+        #git_clone https://github.com/bobbyunknown/luci-app-insomclash
+        git_clone https://github.com/muink/luci-app-ssrust
+        git_clone https://github.com/hudra0/qosmate
+        git_clone https://github.com/muink/luci-app-netdata
+        git_clone https://github.com/xptsp/luci-app-ympd
+        git_clone https://github.com/xptsp/openwrt-ympd
+        git_clone https://github.com/xptsp/openwrt-peanut
+        git_clone https://github.com/calfeche13/luci-app-public-ip-monitor
+        git_clone https://github.com/vison-v/luci-app-nginx-proxy
+        git_clone https://github.com/tty228/luci-app-wechatpush
+        git_clone https://github.com/AngelaCooljx/luci-theme-material3
+        ) &
+        (
         # git_clone https://github.com/Ysurac/openmptcprouter-feeds; mv openmptcprouter-feeds/luci-app-iperf ./;rm -rf openmptcprouter-feeds
         git_clone https://github.com/QiuSimons/OpenWrt-Add; mv OpenWrt-Add/luci-app-irqbalance ./;rm -rf OpenWrt-Add
         git_clone https://github.com/lucikap/Brukamen; mv Brukamen/luci-app-ua2f ./;rm -rf Brukamen
