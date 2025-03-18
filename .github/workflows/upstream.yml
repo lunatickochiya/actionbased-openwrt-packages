@@ -180,7 +180,6 @@ jobs:
         git_clone https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic
         ) &
         (
-        git_clone https://github.com/tty228/luci-app-wechatpush
         git_clone https://github.com/4IceG/luci-app-sms-tool smstool && mvdir smstool
         git_clone https://github.com/4IceG/luci-app-modemband modemb  && mv -n modemb/* ./;rm -rf modemb
         git_clone https://github.com/ZeaKyX/speedtest-web
