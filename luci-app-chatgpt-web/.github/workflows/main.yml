@@ -31,7 +31,7 @@ jobs:
         env:
           ARCH: ${{ matrix.arch }}-openwrt-24.10
           FEEDNAME: packages_ci
-          PACKAGES: luci-app-partexp
+          PACKAGES: luci-app-chatgpt-web
           NO_REFRESH_CHECK: true
 
       - name: Upload artifacts
