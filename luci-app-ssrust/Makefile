@@ -8,7 +8,7 @@ include $(TOPDIR)/rules.mk
 PKG_NAME:=luci-app-shadowsocks-rust
 LUCI_NAME:=luci-app-shadowsocks-rust
 LUCI_TITLE:=LuCI Support for shadowsocks-rust
-LUCI_DEPENDS:=+luci-base +shadowsocks-rust-config
+LUCI_DEPENDS:=+luci-base
 
 PKG_MAINTAINER:=Anya Lin <hukk1996@gmail.com>
 PKG_LICENSE:=Apache-2.0
