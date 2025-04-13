@@ -108,7 +108,7 @@ jobs:
         #git clone https://github.com/xiaorouji/openwrt-passwall -b luci-smartdns-dev openwrt-passwall-smartdns-dev && mv openwrt-passwall-smartdns-dev/luci-app-passwall luci-app-passwall-smartdns-dev && sed -i 's/luci-app-passwall/luci-app-passwall-smartdns-dev/g' luci-app-passwall-smartdns-dev/Makefile && rm -rf openwrt-passwall-smartdns-dev
         #git_sparse_clone main "https://github.com/fw876/helloworld" "helloworld" && rm -rf helloworld/v2raya helloworld/v2ray-core && mvdir helloworld
         #git clone https://github.com/XiaoliChan/helloworld -b mosdns-support && rm -rf helloworld/v2raya helloworld/v2ray-core helloworld/mosdns && mvdir helloworld
-        git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/{luci-app-ssr-plus,tuic-client,shadow-tls,lua-neturl,redsocks2,gn,dns2tcp,trojan} ./ ; rm -rf helloworld
+        git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/{luci-app-ssr-plus,tuic-client,shadow-tls,lua-neturl,redsocks2,gn,dns2tcp,trojan,dns2socks-rust} ./ ; rm -rf helloworld
         git_clone https://github.com/Lienol/openwrt-package liep
         git clone https://github.com/AutoCONFIG/minieap-openwrt -b default
         git_clone https://github.com/rufengsuixing/luci-app-autoipsetadder
