@@ -133,6 +133,7 @@ jobs:
         (
         #git_clone https://github.com/destan19/OpenAppFilter && mvdir OpenAppFilter
         git_clone https://github.com/jjm2473/OpenAppFilter && mvdir OpenAppFilter
+        git_clone https://github.com/lwb1978/openwrt-gecoosac && mvdir openwrt-gecoosac
         git_clone https://github.com/lvqier/luci-app-dnsmasq-ipset
         git_clone https://github.com/walkingsky/luci-wifidog luci-app-wifidog
         git_clone https://github.com/peter-tank/luci-app-autorepeater
