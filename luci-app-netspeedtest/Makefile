@@ -1,8 +1,9 @@
-
-# Copyright (C) 2020-2021 sirpdboy <herboy2008@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-only
 #
-# This is free software, licensed under the GNU General Public License v3.
-# 
+# Copyright (C) 2021-2025  sirpdboy  <herboy2008@gmail.com> 
+# https://github.com/sirpdboy/luci-app-netspeedtest
+# This is free software, licensed under the Apache License, Version 2.0 .
+#
 
 include $(TOPDIR)/rules.mk
 
@@ -10,9 +11,9 @@ PKG_NAME:=luci-app-netspeedtest
 
 
 LUCI_TITLE:=LuCI Support for netspeedtest
-LUCI_DEPENDS:=+python3 +iperf3-ssl +homebox
+LUCI_DEPENDS:=+speedtest-cli +homebox $(if $(find_package iperf3-ssl),+iperf3-ssl,+iperf3)
 LUCI_PKGARCH:=all
-PKG_MAINTAINER:=<https://github.com/sirpdboy/netspeedtest>
+PKG_MAINTAINER:=sirpdboy  <herboy2008@gmail.com>
 
 
 define Package/$(PKG_NAME)/conffiles
@@ -20,8 +21,16 @@ define Package/$(PKG_NAME)/conffiles
 endef
 
 define Package/$(PKG_NAME)/postinst
+#!/bin/sh
+if [ -z "$${IPKG_INSTROOT}" ]; then
+    if ! uci show netspeedtest.config >/dev/null 2>&1; then
+        uci set netspeedtest.config=netspeedtest
+        uci set netspeedtest.config.enabled='1'
+        uci commit netspeedtest
+    fi
+fi
+exit 0
 endef
-
 
 include $(TOPDIR)/feeds/luci/luci.mk
 

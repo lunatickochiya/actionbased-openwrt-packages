@@ -544,6 +544,7 @@ local hysteria2_type = map:get("@global_subscribe[0]", "hysteria2_type") or "sin
 			params += opt.query("sni", dom_prefix + "tls_serverName");
 			params += opt.query("alpn", dom_prefix + "tuic_alpn");
 			params += opt.query("congestion_control", dom_prefix + "tuic_congestion_control");
+			params += opt.query("udp_relay_mode", dom_prefix + "tuic_udp_relay_mode");
 			params += opt.query("allowinsecure", dom_prefix + "tls_allowInsecure");
 
 			params += "#" + encodeURI(v_alias.value);
@@ -1437,6 +1438,7 @@ local hysteria2_type = map:get("@global_subscribe[0]", "hysteria2_type") or "sin
 				}
 			}
 			opt.set(dom_prefix + 'tuic_congestion_control', queryParam.congestion_control || 'cubic');
+			opt.set(dom_prefix + 'tuic_udp_relay_mode', queryParam.udp_relay_mode || 'native');
 			opt.set(dom_prefix + 'tuic_alpn', queryParam.alpn || 'default');
 			opt.set(dom_prefix + 'tls_serverName', queryParam.sni || '');
 			opt.set(dom_prefix + 'tls_allowInsecure', true);
@@ -1520,10 +1522,15 @@ local hysteria2_type = map:get("@global_subscribe[0]", "hysteria2_type") or "sin
 		return false;
 	}
 
+	function exportConfigFile(btn, sid) {
+		window.open('<%=api.url("gen_client_config")%>?id=' + sid, "_blank")
+	}
+
 //]]></script>
 <input type="button" class="btn cbi-button cbi-button-apply" value='<%:From Share URL%>' onclick="return fromUrl(this, '<%=self.option%>', '<%=self.value%>')" />
 <input type="button" class="btn cbi-button cbi-button-apply" value='<%:Build Share URL%>' onclick="return exportUrl(this, '<%=self.option%>', '<%=self.value%>')" />
 <input type="button" class="btn cbi-button cbi-button-apply" value='<%:Generate QRCode%>' onclick="return genQrcode(this, '<%=self.option%>', '<%=self.value%>')" />
+<input type="button" class="btn cbi-button cbi-button-apply" value='<%:Export Config File%>' onclick="return exportConfigFile(this, '<%=self.value%>')" />
 <div id="qrcode_div" style="margin-top: 1rem;display:none">
 	<div id="qrcode"></div>
 </div>

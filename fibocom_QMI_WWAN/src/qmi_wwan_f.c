@@ -715,7 +715,7 @@ static struct rtnl_link_stats64 *_rmnet_vnd_get_stats64(struct net_device *net, 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6,6,0)
             start = u64_stats_fetch_begin_irq(&stats64->syncp);
 #else
-		start = u64_stats_fetch_begin(&stats64->syncp);
+            start = u64_stats_fetch_begin(&stats64->syncp);
 #endif
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,18,0)
             rx_packets = stats64->rx_packets;
@@ -723,15 +723,15 @@ static struct rtnl_link_stats64 *_rmnet_vnd_get_stats64(struct net_device *net, 
             tx_packets = stats64->tx_packets;
             tx_bytes = stats64->tx_bytes;
 #else
-	    rx_packets = u64_stats_read(&stats64->rx_packets);
-	    rx_bytes = u64_stats_read(&stats64->rx_bytes);
-	    tx_packets = u64_stats_read(&stats64->tx_packets);
-	    tx_bytes = u64_stats_read(&stats64->tx_bytes);
+            rx_packets = u64_stats_read(&stats64->rx_packets);
+            rx_bytes = u64_stats_read(&stats64->rx_bytes);
+            tx_packets = u64_stats_read(&stats64->tx_packets);
+            tx_bytes = u64_stats_read(&stats64->tx_bytes);
 #endif
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6,6,0)
         } while (u64_stats_fetch_retry_irq(&stats64->syncp, start));
 #else
-	} while (u64_stats_fetch_retry(&stats64->syncp, start));
+        } while (u64_stats_fetch_retry(&stats64->syncp, start));
 #endif
 
         stats->rx_packets += rx_packets;
@@ -1196,7 +1196,7 @@ static int qmap_register_device(sQmiWwanQmap * pDev, u8 offset_id)
     sprintf(qmap_net->name, "%s.%d", real_dev->name, offset_id + 1);
     qmap_net->netdev_ops = &qmap_netdev_ops;
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,17,0)
-    memcpy (qmap_net->dev_addr, real_dev->dev_addr, ETH_ALEN);
+    memcpy(qmap_net->dev_addr, real_dev->dev_addr, ETH_ALEN);
 #else
     __dev_addr_set(qmap_net, real_dev->dev_addr, ETH_ALEN);
 #endif
@@ -1772,8 +1772,14 @@ static void ql_net_get_drvinfo(struct net_device *net, struct ethtool_drvinfo *i
 {
     /* Inherit standard device info */
     usbnet_get_drvinfo(net, info);
+    /* strlcpy() is deprecated in kernel 6.8.0+, using strscpy instead */
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(6,8,0))
     strlcpy(info->driver, driver_name, sizeof(info->driver));
     strlcpy(info->version, VERSION_NUMBER, sizeof(info->version));
+#else
+    strscpy(info->driver, driver_name, sizeof(info->driver));
+    strscpy(info->version, VERSION_NUMBER, sizeof(info->version));
+#endif
 }
 
 static struct ethtool_ops ql_net_ethtool_ops;

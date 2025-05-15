@@ -5,9 +5,9 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=naiveproxy
-PKG_REAL_VERSION:=135.0.7049.38-2
+PKG_REAL_VERSION:=136.0.7103.44-1
 PKG_VERSION:=$(subst -,.,$(PKG_REAL_VERSION))
-PKG_RELEASE:=15
+PKG_RELEASE:=16
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_REAL_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/klzgrad/naiveproxy/tar.gz/v$(PKG_REAL_VERSION)?
@@ -57,7 +57,7 @@ ifneq ($(CONFIG_CCACHE),)
   export naive_ccache_flags=cc_wrapper="$(CCACHE)"
 endif
 
-CLANG_VER:=21-init-1655-g7b473dfe-1
+CLANG_VER:=21-init-5118-g52cd27e6-5
 CLANG_FILE:=clang-llvmorg-$(CLANG_VER).tar.xz
 define Download/CLANG
 	URL:=https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64
@@ -66,7 +66,7 @@ define Download/CLANG
 	HASH:=skip
 endef
 
-PGO_VER:=7049-1742902334-660df08dc89b79c863466eae026b99254081ab9d-96ef988d106b9eef4526027fbfdd54a082b5d5e2
+PGO_VER:=7103-1745300239-42e5d0fcf92bc94eef0f019d97b90f31fc15ef4e-4c8a59135693081ce71144250c01a6ce41bdf9a4
 PGO_FILE:=chrome-linux-$(PGO_VER).profdata
 define Download/PGO_PROF
 	URL:=https://storage.googleapis.com/chromium-optimization-profiles/pgo_profiles
