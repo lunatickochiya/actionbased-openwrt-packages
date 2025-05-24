@@ -24,7 +24,6 @@
 #include "af_utils.h"
 #include "app_filter.h"
 #include "cJSON.h"
-#include "af_bypass.h"
 
 DEFINE_RWLOCK(af_client_lock);
 
@@ -223,6 +222,7 @@ void flush_expired_visit_info(af_client_info_t *node)
 
 		if (cur_timep - node->visit_info[i].latest_time > timeout)
 		{
+			// 3?��o?��??3y????
 			memset(&node->visit_info[i], 0x0, sizeof(app_visit_info_t));
 			count++;
 		}
@@ -273,7 +273,7 @@ int __af_visit_info_report(af_client_info_t *node)
 	cJSON_Minify(out);
 	if (count > 0 || node->report_count == 0)
 	{
-		AF_INFO("report:%s count=%d\n", out, node->report_count);
+		AF_LMT_INFO("report:%s count=%d\n", out, node->report_count);
 		node->report_count++;
 		af_send_msg_to_user(out, strlen(out));
 	}
@@ -297,6 +297,17 @@ void af_visit_info_report(void)
 	}
 	AF_CLIENT_UNLOCK_W();
 }
+static inline int get_packet_dir(struct net_device *in)
+{
+	if (strstr(in->name, g_lan_ifname))
+	{
+		return PKT_DIR_UP;
+	}
+	else
+	{
+		return PKT_DIR_DOWN;
+	}
+}
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0)
 static u_int32_t af_client_hook(void *priv,
@@ -314,16 +325,36 @@ static u_int32_t af_client_hook(unsigned int hook,
 	struct ethhdr *ethhdr = NULL;
 	unsigned char smac[ETH_ALEN];
 	af_client_info_t *nfc = NULL;
+	int pkt_dir = 0;
 	struct iphdr *iph = NULL;
 	unsigned int ip = 0;
 
-	if (skb->protocol == htons(ETH_P_IP)) {
-		iph = ip_hdr(skb);
-		ip = iph->saddr;
-	} else if (AF_MODE_GATEWAY != af_work_mode)
+// 4.10-->4.11 nfct-->_nfct
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
+	struct nf_conn *ct = (struct nf_conn *)skb->_nfct;
+#else
+	struct nf_conn *ct = (struct nf_conn *)skb->nfct;
+#endif
+	if (ct == NULL)
+	{
+		return NF_ACCEPT;
+	}
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0)
+	if (!skb->dev)
 		return NF_ACCEPT;
 
-	if (BYPASS_PACKET())
+	pkt_dir = get_packet_dir(skb->dev);
+#else
+	if (!in)
+	{
+		AF_ERROR("in is NULL\n");
+		return NF_ACCEPT;
+	}
+	pkt_dir = get_packet_dir(in);
+#endif
+
+	if (PKT_DIR_UP != pkt_dir)
 		return NF_ACCEPT;
 
 	ethhdr = eth_hdr(skb);
@@ -335,6 +366,12 @@ static u_int32_t af_client_hook(unsigned int hook,
 	{
 		memcpy(smac, &skb->cb[40], ETH_ALEN);
 	}
+
+	if (skb->protocol == htons(ETH_P_IP)) {
+		iph = ip_hdr(skb);
+		ip = iph->saddr;
+	} else if (AF_MODE_GATEWAY != af_work_mode)
+		return NF_ACCEPT;
 
 	AF_CLIENT_LOCK_W();
 	nfc = find_af_client(smac);

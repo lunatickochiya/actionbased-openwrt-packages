@@ -1,4 +1,3 @@
-
 #include <linux/init.h>
 #include <linux/module.h>
 #include <net/tcp.h>
@@ -155,28 +154,24 @@ int hash_mac(unsigned char *mac)
 {
 	if (!mac)
 		return 0;
-	else
-		return mac[5] & (MAX_AF_MAC_HASH_SIZE - 1);
+	return ((mac[0] ^ mac[1]) + (mac[2] ^ mac[3]) + (mac[4] ^ mac[5])) % MAX_AF_MAC_HASH_SIZE;
 }
 
-int find_af_mac(unsigned char *mac)
+af_mac_info_t *find_af_mac(unsigned char *mac)
 {
 	af_mac_info_t *node;
 	unsigned int index;
 
 	index = hash_mac(mac);
-	AF_MAC_LOCK_R();
 	list_for_each_entry(node, &af_mac_list_table[index], hlist)
 	{
 		if (0 == memcmp(node->mac, mac, 6))
 		{
 			AF_DEBUG("match mac:" MAC_FMT "\n", MAC_ARRAY(node->mac));
-			AF_MAC_UNLOCK_R();
-			return 1;
+			return node;
 		}
 	}
-	AF_MAC_UNLOCK_R();
-	return 0;
+	return NULL;
 }
 
 static af_mac_info_t *
@@ -198,10 +193,8 @@ af_mac_add(unsigned char *mac)
 	index = hash_mac(mac);
 
 	AF_LMT_INFO("new client mac=" MAC_FMT "\n", MAC_ARRAY(node->mac));
-	AF_MAC_LOCK_W();
 	total_mac++;
 	list_add(&(node->hlist), &af_mac_list_table[index]);
-	AF_MAC_UNLOCK_W();
 	return node;
 }
 
@@ -428,7 +421,7 @@ int af_register_dev(void)
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
 	g_af_dev.c = class_create(THIS_MODULE, AF_DEV_NAME);
 #else
-	g_af_dev.c = class_create(AF_DEV_NAME);
+    g_af_dev.c = class_create(AF_DEV_NAME);
 #endif
 	if (IS_ERR_OR_NULL(g_af_dev.c))
 	{
