@@ -5,7 +5,6 @@ require "nixio.fs"
 require "luci.sys"
 require "luci.http"
 require "luci.jsonc"
-require "luci.model.ipkg"
 require "luci.model.uci"
 local uci = require "luci.model.uci".cursor()
 
@@ -21,6 +20,22 @@ end
 
 local function is_installed(e)
 	return luci.model.ipkg.installed(e)
+end
+
+local function showMsg_Redirect(redirectUrl, delay)
+	local redirectUrl = redirectUrl or ""
+	local delay = delay or 3000
+	luci.http.write([[
+		<script type="text/javascript">
+			document.addEventListener('DOMContentLoaded', function() {
+				setTimeout(function() {
+					if ("]] .. redirectUrl .. [[" !== "") {
+						window.location.href = "]] .. redirectUrl .. [[";
+					}
+				}, ]] .. delay .. [[);
+			});
+		</script>
+	]])
 end
 
 local has_ss_rust = is_finded("sslocal") or is_finded("ssserver")
@@ -137,6 +152,11 @@ m.redirect = luci.dispatcher.build_url("admin/services/shadowsocksr/servers")
 if m.uci:get("shadowsocksr", sid) ~= "servers" then
 	luci.http.redirect(m.redirect)
 	return
+end
+-- 保存&应用成功后跳转到节点列表
+m.apply_on_parse = true
+m.on_after_apply = function(self)
+	showMsg_Redirect(self.redirect, 4500)
 end
 
 -- [[ Servers Setting ]]--
@@ -349,6 +369,9 @@ end
 if is_finded("xray-plugin") then
 	o:value("xray-plugin", translate("xray-plugin"))
 end
+if is_finded("shadow-tls") then
+	o:value("shadow-tls", translate("shadow-tls"))
+end
 o:value("custom", translate("Custom"))
 o.rmempty = true
 o:depends({enable_plugin = true})
@@ -428,12 +451,12 @@ o.default = "0"
 o = s:option(Value, "obfs_type", translate("Obfuscation Type"))
 o:depends({type = "hysteria2", flag_obfs = "1"})
 o.rmempty = true
-o.default = "salamander"
+o.placeholder = "salamander"
 
 o = s:option(Value, "salamander", translate("Obfuscation Password"))
 o:depends({type = "hysteria2", flag_obfs = "1"})
 o.rmempty = true
-o.default = "cry_me_a_r1ver"
+o.placeholder = "cry_me_a_r1ver"
 
 o = s:option(Flag, "flag_quicparam", translate("Hysterir QUIC parameters"))
 o:depends("type", "hysteria2")
@@ -953,14 +976,14 @@ o = s:option(Value, "uplink_capacity", translate("Uplink Capacity(Default:Mbps)"
 o.datatype = "uinteger"
 o:depends("transport", "kcp")
 o:depends("type", "hysteria2")
-o.default = 5
+o.placeholder = 5
 o.rmempty = true
 
 o = s:option(Value, "downlink_capacity", translate("Downlink Capacity(Default:Mbps)"))
 o.datatype = "uinteger"
 o:depends("transport", "kcp")
 o:depends("type", "hysteria2")
-o.default = 20
+o.placeholder = 20
 o.rmempty = true
 
 o = s:option(Value, "read_buffer_size", translate("Read Buffer Size"))

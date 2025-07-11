@@ -1,12 +1,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=hickory-dns
-PKG_VERSION:=0.26.0-alpha.1
-PKG_RELEASE:=80
+PKG_VERSION:=2025.07.10
+PKG_RELEASE:=81
 
-PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/hickory-dns/hickory-dns.git
-PKG_SOURCE_VERSION:=7d6a6072030de31a813c1ac8b8aade152cd2fe3f
+HICKORY_COMMIT:=4daf3cb086cc00f0ae8a6e4040f882e055eeb3d4
+
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL:=https://codeload.github.com/hickory-dns/hickory-dns/tar.gz/4daf3cb086cc00f0ae8a6e4040f882e055eeb3d4?
+PKG_HASH:=skip
+
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-4daf3cb086cc00f0ae8a6e4040f882e055eeb3d4
+
 PKG_BUILD_DEPENDS:=rust/host
 PKG_BUILD_PARALLEL:=1
 
@@ -35,6 +40,7 @@ define Package/hickory-dns/install
 	$(INSTALL_DIR) $(1)/etc/hickory-dns/
 	$(INSTALL_BIN) ./files/etc/init.d/hickory-dns $(1)/etc/init.d/hickory-dns
 	$(INSTALL_BIN) ./files/etc/hickory-dns/forwarder.toml $(1)/etc/hickory-dns/forwarder.toml
+	echo "$(HICKORY_COMMIT)" > $(1)/etc/hickory-dns/commit
 endef
 
 $(eval $(call RustBinPackage,hickory-dns))

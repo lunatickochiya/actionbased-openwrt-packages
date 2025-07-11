@@ -339,6 +339,17 @@ kcp_input = s:taboption("privacy", Flag, "kcp_input", translate("Disable KCP Inp
                 .. "KCP proxy-enabled nodes accessing this node will still use the original method. (--disable-kcp-input parameter)"))
 kcp_input:depends("etcmd", "etcmd")
 
+quic_proxy = s:taboption("privacy", Flag, "quic_proxy", translate("Enable QUIC Proxy"),
+        translate("Proxy tcp streams with QUIC, improving the latency and throughput on the network with udp packet loss.<br>"
+                .. "All nodes in the virtual network must be using EasyTier version v2.3.2 or higher for this feature. "
+                .. "(--enable-quic-proxy parameter)"))
+quic_proxy:depends("etcmd", "etcmd")
+
+quic_input = s:taboption("privacy", Flag, "quic_input", translate("Disable QUIC Input"),
+        translate("Do not allow other nodes to use QUIC to proxy tcp streams to this node. When a node with QUIC proxy enabled  accesses this node, the original tcp connection is preserved.<br>"
+                .. "QUIC proxy-enabled nodes accessing this node will still use the original method. (--disable-quic-input parameter)"))
+quic_input:depends("etcmd", "etcmd")
+
 port_forward = s:taboption("privacy", DynamicList, "port_forward", translate("Port Forwarding"),
         translate("Forward a local port to a remote port within the virtual network.<br>"
                 .. "Example: udp://0.0.0.0:12345/10.126.126.1:23456 means forwarding local UDP port 12345 to 10.126.126.1:23456 "
@@ -715,7 +726,7 @@ api_port.default = "11211"
 html_port = s:option(Value, "html_port", translate("Web Interface Port"),
         translate("Frontend listening port for the web dashboard server. Leave empty to disable. (-l parameter)"))
 html_port.datatype = "range(1,65535)"
-html_port.placeholder = "11210"
+html_port.default = "11211"
 
 local router_ip = luci.sys.exec("uci -q get network.lan.ipaddr"):gsub("\n", "")
 local default_api_port = api_port.default or "11211"

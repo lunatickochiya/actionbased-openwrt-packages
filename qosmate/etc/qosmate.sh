@@ -1,7 +1,12 @@
 #!/bin/sh
-# shellcheck disable=SC2034,SC3043,SC1091,SC2155,SC3020,SC3010,SC2016,SC2317
+# shellcheck disable=SC3043,SC1091,SC2155,SC3020,SC3010,SC2016,SC2317,SC3060,SC3057,SC3003
 
 VERSION="1.2.0" # will become obsolete in future releases as version string is now in the init script
+
+_NL_='
+'
+DEFAULT_IFS=" 	${_NL_}"
+IFS="$DEFAULT_IFS"
 
 . /lib/functions.sh
 config_load 'qosmate'
@@ -12,67 +17,78 @@ DEFAULT_DOWNRATE="90000"
 DEFAULT_UPRATE="45000"
 DEFAULT_OH="44"
 
+: "${VERSION}" "${DEFAULT_WAN}" "${DEFAULT_DOWNRATE}" "${DEFAULT_UPRATE}" "${DEFAULT_OH}" "${nongameqdisc:=}" "${nongameqdiscoptions:=}"
+
+# Trim leading and trailing whitespaces and tabs in variable $1
+trim_spaces() {
+    local tr_in tr_out
+    eval "tr_in=\"\${$1}\""
+    tr_out="${tr_in%"${tr_in##*[! 	]}"}"
+    tr_out="${tr_out#"${tr_out%%[! 	]*}"}"
+    eval "$1=\"\${tr_out}\""
+}
+
 load_config() {
     # Global settings
-    ROOT_QDISC=$(uci -q get qosmate.settings.ROOT_QDISC || echo "hfsc")
-    WAN=$(uci -q get qosmate.settings.WAN || echo "$DEFAULT_WAN")
-    DOWNRATE=$(uci -q get qosmate.settings.DOWNRATE || echo "$DEFAULT_DOWNRATE")
-    UPRATE=$(uci -q get qosmate.settings.UPRATE || echo "$DEFAULT_UPRATE")
-    
+    config_get ROOT_QDISC settings ROOT_QDISC hfsc
+    config_get WAN settings WAN $DEFAULT_WAN
+    config_get DOWNRATE settings DOWNRATE $DEFAULT_DOWNRATE
+    config_get UPRATE settings UPRATE $DEFAULT_UPRATE
+
     # Advanced settings
-    PRESERVE_CONFIG_FILES=$(uci -q get qosmate.advanced.PRESERVE_CONFIG_FILES || echo "0")
-    WASHDSCPUP=$(uci -q get qosmate.advanced.WASHDSCPUP || echo "1")
-    WASHDSCPDOWN=$(uci -q get qosmate.advanced.WASHDSCPDOWN || echo "1")
-    BWMAXRATIO=$(uci -q get qosmate.advanced.BWMAXRATIO || echo "20")
-    ACKRATE=$(uci -q get qosmate.advanced.ACKRATE || echo "$((UPRATE * 5 / 100))")
-    UDP_RATE_LIMIT_ENABLED=$(uci -q get qosmate.advanced.UDP_RATE_LIMIT_ENABLED || echo "0")
-    TCP_UPGRADE_ENABLED=$(uci -q get qosmate.advanced.TCP_UPGRADE_ENABLED || echo "1")
-    UDPBULKPORT=$(uci -q get qosmate.advanced.UDPBULKPORT || echo "")
-    TCPBULKPORT=$(uci -q get qosmate.advanced.TCPBULKPORT || echo "")
-    VIDCONFPORTS=$(uci -q get qosmate.advanced.VIDCONFPORTS || echo "")
-    REALTIME4=$(uci -q get qosmate.advanced.REALTIME4 || echo "")
-    REALTIME6=$(uci -q get qosmate.advanced.REALTIME6 || echo "")
-    LOWPRIOLAN4=$(uci -q get qosmate.advanced.LOWPRIOLAN4 || echo "")
-    LOWPRIOLAN6=$(uci -q get qosmate.advanced.LOWPRIOLAN6 || echo "")
-    MSS=$(uci -q get qosmate.advanced.MSS || echo "536")
-    NFT_HOOK=$(uci -q get qosmate.advanced.NFT_HOOK || echo "forward")
-    NFT_PRIORITY=$(uci -q get qosmate.advanced.NFT_PRIORITY || echo "0")
-    TCP_DOWNPRIO_INITIAL_ENABLED=$(uci -q get qosmate.advanced.TCP_DOWNPRIO_INITIAL_ENABLED || echo "1")
-    TCP_DOWNPRIO_SUSTAINED_ENABLED=$(uci -q get qosmate.advanced.TCP_DOWNPRIO_SUSTAINED_ENABLED || echo "1")
+    config_get PRESERVE_CONFIG_FILES advanced PRESERVE_CONFIG_FILES 0
+    config_get WASHDSCPUP advanced WASHDSCPUP 1
+    config_get WASHDSCPDOWN advanced WASHDSCPDOWN 1
+    config_get BWMAXRATIO advanced BWMAXRATIO 20
+    config_get ACKRATE advanced ACKRATE $((UPRATE * 5 / 100))
+    config_get UDP_RATE_LIMIT_ENABLED advanced UDP_RATE_LIMIT_ENABLED 0
+    config_get TCP_UPGRADE_ENABLED advanced TCP_UPGRADE_ENABLED 1
+    config_get UDPBULKPORT advanced UDPBULKPORT
+    config_get TCPBULKPORT advanced TCPBULKPORT
+    config_get VIDCONFPORTS advanced VIDCONFPORTS
+    config_get REALTIME4 advanced REALTIME4
+    config_get REALTIME6 advanced REALTIME6
+    config_get LOWPRIOLAN4 advanced LOWPRIOLAN4
+    config_get LOWPRIOLAN6 advanced LOWPRIOLAN6
+    config_get MSS advanced MSS 536
+    config_get NFT_HOOK advanced NFT_HOOK forward
+    config_get NFT_PRIORITY advanced NFT_PRIORITY 0
+    config_get TCP_DOWNPRIO_INITIAL_ENABLED advanced TCP_DOWNPRIO_INITIAL_ENABLED 1
+    config_get TCP_DOWNPRIO_SUSTAINED_ENABLED advanced TCP_DOWNPRIO_SUSTAINED_ENABLED 1
 
     # HFSC specific settings
-    LINKTYPE=$(uci -q get qosmate.hfsc.LINKTYPE || echo "ethernet")
-    OH=$(uci -q get qosmate.hfsc.OH || echo "$DEFAULT_OH")
-    gameqdisc=$(uci -q get qosmate.hfsc.gameqdisc || echo "pfifo")
-    GAMEUP=$(uci -q get qosmate.hfsc.GAMEUP || echo "$((UPRATE*15/100+400))")
-    GAMEDOWN=$(uci -q get qosmate.hfsc.GAMEDOWN || echo "$((DOWNRATE*15/100+400))")    
-    nongameqdisc=$(uci -q get qosmate.hfsc.nongameqdisc || echo "fq_codel")
-    nongameqdiscoptions=$(uci -q get qosmate.hfsc.nongameqdiscoptions || echo "besteffort ack-filter")
-    MAXDEL=$(uci -q get qosmate.hfsc.MAXDEL || echo "24")
-    PFIFOMIN=$(uci -q get qosmate.hfsc.PFIFOMIN || echo "5")
-    PACKETSIZE=$(uci -q get qosmate.hfsc.PACKETSIZE || echo "450")
-    netemdelayms=$(uci -q get qosmate.hfsc.netemdelayms || echo "30")
-    netemjitterms=$(uci -q get qosmate.hfsc.netemjitterms || echo "7")
-    netemdist=$(uci -q get qosmate.hfsc.netemdist || echo "normal")
-    NETEM_DIRECTION=$(uci -q get qosmate.hfsc.netem_direction || echo "both")
-    pktlossp=$(uci -q get qosmate.hfsc.pktlossp || echo "none")
+    config_get LINKTYPE hfsc LINKTYPE ethernet
+    config_get OH hfsc OH $DEFAULT_OH
+    config_get gameqdisc hfsc gameqdisc pfifo
+    config_get GAMEUP hfsc GAMEUP $((UPRATE*15/100+400))
+    config_get GAMEDOWN hfsc GAMEDOWN $((DOWNRATE*15/100+400))
+    config_get nongameqdisc hfsc nongameqdisc fq_codel
+    config_get nongameqdiscoptions hfsc nongameqdiscoptions besteffort ack-filter
+    config_get MAXDEL hfsc MAXDEL 24
+    config_get PFIFOMIN hfsc PFIFOMIN 5
+    config_get PACKETSIZE hfsc PACKETSIZE 450
+    config_get netemdelayms hfsc netemdelayms 30
+    config_get netemjitterms hfsc netemjitterms 7
+    config_get netemdist hfsc netemdist normal
+    config_get NETEM_DIRECTION hfsc netem_direction both
+    config_get pktlossp hfsc pktlossp none
 
     # CAKE specific settings
-    COMMON_LINK_PRESETS=$(uci -q get qosmate.cake.COMMON_LINK_PRESETS || echo "ethernet")
-    OVERHEAD=$(uci -q get qosmate.cake.OVERHEAD || echo "")
-    MPU=$(uci -q get qosmate.cake.MPU || echo "")
-    LINK_COMPENSATION=$(uci -q get qosmate.cake.LINK_COMPENSATION || echo "")
-    ETHER_VLAN_KEYWORD=$(uci -q get qosmate.cake.ETHER_VLAN_KEYWORD || echo "")
-    PRIORITY_QUEUE_INGRESS=$(uci -q get qosmate.cake.PRIORITY_QUEUE_INGRESS || echo "diffserv4")
-    PRIORITY_QUEUE_EGRESS=$(uci -q get qosmate.cake.PRIORITY_QUEUE_EGRESS || echo "diffserv4")
-    HOST_ISOLATION=$(uci -q get qosmate.cake.HOST_ISOLATION || echo "1")
-    NAT_INGRESS=$(uci -q get qosmate.cake.NAT_INGRESS || echo "1")
-    NAT_EGRESS=$(uci -q get qosmate.cake.NAT_EGRESS || echo "0")
-    ACK_FILTER_EGRESS=$(uci -q get qosmate.cake.ACK_FILTER_EGRESS || echo "auto")
-    RTT=$(uci -q get qosmate.cake.RTT || echo "")
-    AUTORATE_INGRESS=$(uci -q get qosmate.cake.AUTORATE_INGRESS || echo "0")
-    EXTRA_PARAMETERS_INGRESS=$(uci -q get qosmate.cake.EXTRA_PARAMETERS_INGRESS || echo "")
-    EXTRA_PARAMETERS_EGRESS=$(uci -q get qosmate.cake.EXTRA_PARAMETERS_EGRESS || echo "")
+    config_get COMMON_LINK_PRESETS cake COMMON_LINK_PRESETS ethernet
+    config_get OVERHEAD cake OVERHEAD
+    config_get MPU cake MPU
+    config_get LINK_COMPENSATION cake LINK_COMPENSATION
+    config_get ETHER_VLAN_KEYWORD cake ETHER_VLAN_KEYWORD
+    config_get PRIORITY_QUEUE_INGRESS cake PRIORITY_QUEUE_INGRESS diffserv4
+    config_get PRIORITY_QUEUE_EGRESS cake PRIORITY_QUEUE_EGRESS diffserv4
+    config_get HOST_ISOLATION cake HOST_ISOLATION 1
+    config_get NAT_INGRESS cake NAT_INGRESS 1
+    config_get NAT_EGRESS cake NAT_EGRESS 0
+    config_get ACK_FILTER_EGRESS cake ACK_FILTER_EGRESS auto
+    config_get RTT cake RTT
+    config_get AUTORATE_INGRESS cake AUTORATE_INGRESS 0
+    config_get EXTRA_PARAMETERS_INGRESS cake EXTRA_PARAMETERS_INGRESS
+    config_get EXTRA_PARAMETERS_EGRESS cake EXTRA_PARAMETERS_EGRESS
 
     # Calculated values
     FIRST500MS=$((DOWNRATE * 500 / 8))
@@ -147,12 +163,32 @@ calculate_ack_rates() {
 # Call the function to perform the ACK rates calculations
 calculate_ack_rates
 
-# Function to check if an IP is IPv6
+# Function to check if a single IP address is IPv6
+# Note: This assumes the input is a single IP, not a space-separated list
+# Handles CIDR notation (e.g. ::/0 or 192.168.1.0/24)
 is_ipv6() {
-    case "$1" in
+    local ip="${1%/*}"  # Remove CIDR suffix if present
+    case "$ip" in
         *:*) return 0 ;;
         *) return 1 ;;
     esac
+}
+
+# checks whether string is an ipv6 mask
+is_ipv6_mask() {
+    case "$1" in
+        ::*/::*) ;;
+        *) return 1
+    esac
+    local inp="${1#"::"}"
+    case "${inp%"/::"*}" in *"/"*) return 1; esac
+    return 0
+}
+
+# checks whether string is nft set reference
+is_set_ref() {
+    case "$1" in "@"*) return 0; esac
+    return 1
 }
 
 # Debug function
@@ -166,7 +202,7 @@ create_nft_sets() {
     local sets_created=""
     
     create_set() {
-        local section="$1" name ip_list mode timeout set_flags is_ipv6_set=0
+        local section="$1" name ip_list mode timeout set_flags
 
         config_get name "$section" name
         # Only process if enabled (default: enabled)
@@ -181,7 +217,6 @@ create_nft_sets() {
         # Get the IP list based on family
         if [ "$family" = "ipv6" ]; then
             config_get ip_list "$section" ip6
-            is_ipv6_set=1
             echo "$name ipv6" >> /tmp/qosmate_set_families
         else
             config_get ip_list "$section" ip4
@@ -224,7 +259,6 @@ create_nft_sets() {
     # Clear the temporary file
     rm -f /tmp/qosmate_set_families
     
-    config_load 'qosmate'
     config_foreach create_set ipset
     
     export QOSMATE_SETS="$sets_created"
@@ -271,47 +305,77 @@ create_nft_rule() {
     local has_ipv4=0
     local has_ipv6=0
     
-    # Check source IP version
+    # Variables to store filtered IPs for mixed rules
+    local src_ip_v4=""
+    local src_ip_v6=""
+    local dest_ip_v4=""
+    local dest_ip_v6=""
+    
+    # Function to separate IPs by family
+    separate_ips_by_family() {
+        local ips="$3" \
+            ip prefix setname \
+            ipv4_result="" \
+            ipv6_result=""
+        
+        # Debug log (uncomment for troubleshooting)
+        # debug_log "separate_ips_by_family: Processing IPs: '$ips'"
+        
+        for ip in $ips; do
+            # Preserve != prefix
+            prefix=""
+            case "$ip" in '!='*)
+                prefix="!="
+                ip="${ip#"!="}"
+            esac
+            
+            # debug_log "  Checking IP: '$ip'
+            
+            # Check if it's a set reference
+            if is_set_ref "$ip"; then
+                setname="${ip#"@"}"
+                if [ "$(get_set_family "$setname")" = "ipv6" ]; then
+                    ipv6_result="${ipv6_result}${ipv6_result:+ }${prefix}${ip}"
+                    # debug_log "    -> IPv6 set: $setname"
+                else
+                    ipv4_result="${ipv4_result}${ipv4_result:+ }${prefix}${ip}"
+                    # debug_log "    -> IPv4 set: $setname"
+                fi
+            # Check for IPv6 suffix format
+            elif is_ipv6_mask "$ip"; then
+                ipv6_result="${ipv6_result}${ipv6_result:+ }${prefix}${ip}"
+                # debug_log "    -> IPv6 suffix format"
+            # Regular IP check
+            elif is_ipv6 "$ip"; then
+                ipv6_result="${ipv6_result}${ipv6_result:+ }${prefix}${ip}"
+                # debug_log "    -> IPv6 address"
+            else
+                ipv4_result="${ipv4_result}${ipv4_result:+ }${prefix}${ip}"
+                # debug_log "    -> IPv4 address"
+            fi
+        done
+        
+        # debug_log "  Results: IPv4='$ipv4_result', IPv6='$ipv6_result'"
+        eval "${1}=\"\${ipv4_result}\" ${2}=\"\${ipv6_result}\""
+    }
+    
+    # Check and separate source IPs
     if [ -n "$src_ip" ]; then
-        if echo "$src_ip" | grep -q '^@'; then
-            # Handle IP set
-            local src_set=$(echo "$src_ip" | sed 's/^@//')
-            if [ "$(get_set_family "$src_set")" = "ipv6" ]; then
-                has_ipv6=1
-            else
-                has_ipv4=1
-            fi
-        elif is_ipv6 "$src_ip"; then
-            has_ipv6=1
-        else
-            has_ipv4=1
-        fi
+        separate_ips_by_family src_ip_v4 src_ip_v6 "$src_ip"
+        [ -n "$src_ip_v4" ] && has_ipv4=1
+        [ -n "$src_ip_v6" ] && has_ipv6=1
     fi
     
-    # Check destination IP version
+    # Check and separate destination IPs
     if [ -n "$dest_ip" ]; then
-        if echo "$dest_ip" | grep -q '^@'; then
-            # Handle IP set
-            local dest_set=$(echo "$dest_ip" | sed 's/^@//')
-            if [ "$(get_set_family "$dest_set")" = "ipv6" ]; then
-                has_ipv6=1
-            else
-                has_ipv4=1
-            fi
-        elif is_ipv6 "$dest_ip"; then
-            has_ipv6=1
-        else
-            has_ipv4=1
-        fi
+        separate_ips_by_family dest_ip_v4 dest_ip_v6 "$dest_ip"
+        [ -n "$dest_ip_v4" ] && has_ipv4=1
+        [ -n "$dest_ip_v6" ] && has_ipv6=1
     fi
     
-    # Check for mixed IPv4/IPv6 rule *in the input* and exit early if mixed
-    # This check should only fail if the user explicitly provided both v4 and v6 addresses in src_ip or dest_ip
-    if [ -n "$src_ip" ] || [ -n "$dest_ip" ]; then # Only check if an IP was actually provided in config
-       if [ "$has_ipv4" -eq 1 ] && [ "$has_ipv6" -eq 1 ]; then 
-            logger -t qosmate "Error: Mixed IPv4/IPv6 addresses explicitly specified in rule '$name' ($config). Rule skipped."
-            return 0
-        fi
+    # Log if mixed IPv4/IPv6 addresses are found
+    if [ "$has_ipv4" -eq 1 ] && [ "$has_ipv6" -eq 1 ]; then 
+        logger -t qosmate "Info: Mixed IPv4/IPv6 addresses in rule '$name' ($config). Splitting into separate rules."
     fi
 
     # If no IP address was specified, we assume the rule applies to both IPv4 and IPv6
@@ -325,125 +389,204 @@ create_nft_rule() {
     local rule_cmd=""
 
     # Function to handle multiple values with IP family awareness
-    handle_multiple_values() {
-        local values="$1"
-        local prefix="$2"
-        local result=""
-        local exclude=0
+    gen_rule() {
+        local value setname family suffix mask comp_op negation \
+            result='' res_set_neg='' res_set_pos='' has_ipv4='' has_ipv6='' set_ref_seen='' ipv6_mask_seen='' reg_val_seen='' \
+            values="$1" \
+            prefix="$2"
         
-        # Handle set references (@setname)
-        if echo "$values" | grep -q '^@'; then
-            local setname=$(echo "$values" | sed 's/^@//')
-            local family=$(get_set_family "$setname")
-            debug_log "Set $setname has family: $family"
-            
-            if [ "$family" = "ipv6" ]; then
-                prefix=$(echo "$prefix" | sed 's/ip /ip6 /')
+        for value in $values; do
+            if [ -n "$set_ref_seen" ] || [ -n "$ipv6_mask_seen" ]; then
+                logger -t qosmate "Error: invalid entry '$values'. When using nftables set reference or ipv6 mask, other values are not allowed."
+                return 1
             fi
-            result="$prefix @$setname"
-        else
-            if [ $(echo "$values" | grep -c "!=") -gt 0 ]; then
-                exclude=1
-                values=$(echo "$values" | sed 's/!=//g')
-            fi
-            
-            # Check for mixed IPv4/IPv6 addresses within a set of IP addresses
-            if echo "$prefix" | grep -q "addr" && [ $(echo "$values" | wc -w) -gt 1 ]; then
-                local has_ipv4=0
-                local has_ipv6=0
+
+            # Check if value starts with '!=' and preserve the '!=' prefix
+            negation=
+            comp_op="=="
+            case "$value" in '!='*)
+                negation=" !="
+                comp_op="!="
+                value="${value#"!="}"
+            esac
+
+            # Handle set references (@setname)
+            if is_set_ref "$value"; then
+                if [ -n "$reg_val_seen" ]; then
+                    logger -t qosmate "Error: invalid entry '$values'. When using nftables set reference or ipv6 mask, other values are not allowed."
+                    return 1
+                fi
+                set_ref_seen=1
+                setname="${value#@}"
+                family="$(get_set_family "$setname")"
+                debug_log "Set $setname has family: $family"
                 
-                # Check each address in the set
-                for ip in $values; do
-                    if is_ipv6 "$ip"; then
+                if [ "$family" = "ipv6" ]; then
+                    prefix="${prefix//ip /ip6 }"
+                fi
+                result="${prefix}${negation} @${setname}"
+                continue
+            fi
+
+            # Check for IPv6 suffix format (::suffix/::mask)
+            if is_ipv6_mask "$value"; then
+                if [ -n "$reg_val_seen" ]; then
+                    logger -t qosmate "Error: invalid entry '$values'. When using nftables set reference or ipv6 mask, other values are not allowed."
+                    return 1
+                fi
+                ipv6_mask_seen=1
+                # Extract suffix and mask
+                suffix="${value%%"/::"*}"
+                mask="${value#"${suffix}/"}"
+                
+                # Force IPv6 prefix and create bitwise AND|NOT match
+                result="${prefix//ip /ip6 } & ${mask} ${comp_op} ${suffix}"
+                continue
+            fi
+
+            # Collect values based on prefix type
+            case "$prefix" in 
+                *addr*)
+                    # IP address handling
+                    reg_val_seen=1
+                    if is_ipv6 "$value"; then
                         has_ipv6=1
                     else
                         has_ipv4=1
                     fi
-                done
+                    
+                    if [ -n "$negation" ]; then
+                        res_set_neg="${res_set_neg}${res_set_neg:+,}${value}"
+                    else
+                        res_set_pos="${res_set_pos}${res_set_pos:+,}${value}"
+                    fi
+                    ;;
+                    
+                "th sport"|"th dport")
+                    # Port handling - no IPv4/IPv6 distinction needed
+                    reg_val_seen=1
+                    if [ -n "$negation" ]; then
+                        res_set_neg="${res_set_neg}${res_set_neg:+,}${value}"
+                    else
+                        res_set_pos="${res_set_pos}${res_set_pos:+,}${value}"
+                    fi
+                    ;;
+                    
+                "meta l4proto")
+                    # Protocol handling
+                    reg_val_seen=1
+                    if [ -n "$negation" ]; then
+                        res_set_neg="${res_set_neg}${res_set_neg:+,}${value}"
+                    else
+                        res_set_pos="${res_set_pos}${res_set_pos:+,}${value}"
+                    fi
+                    ;;
+                *)
+                    logger -t qosmate "Error: unexpected data in '$prefix'."
+                    return 1
+                    ;;
+            esac
+        done
+
+        if [ -n "$set_ref_seen" ] || [ -n "$ipv6_mask_seen" ]; then
+            printf '%s\n' "$result"
+            return 0
+        fi
+
+        # If mixed, log and signal error
+        if [ -n "$has_ipv4" ] && [ -n "$has_ipv6" ]; then
+            logger -t qosmate "Error: Mixed IPv4/IPv6 addresses within a set: { $values }. Rule skipped."
+            return 1
+        fi
+
+        # Update prefix based on IP type
+        if [ -n "$has_ipv6" ]; then
+            prefix="${prefix//ip /ip6 }"
+        fi
+
+        # Construct the final rule
+        case "$prefix" in
+            *addr*)
+                # IP address rules
+                if [ -z "$res_set_neg" ] && [ -z "$res_set_pos" ]; then
+                    logger -t qosmate "Error: no valid values found in '$values'. Rule skipped."
+                    return 1
+                fi
+
+                if [ -n "$res_set_neg" ]; then
+                    result="${result}${result:+ }${prefix} != { ${res_set_neg} }"
+                fi
+
+                if [ -n "$res_set_pos" ]; then
+                    result="${result}${result:+ }${prefix} { ${res_set_pos} }"
+                fi 
+                ;;
                 
-                # If mixed, log and signal error
-                if [ "$has_ipv4" -eq 1 ] && [ "$has_ipv6" -eq 1 ]; then
-                    logger -t qosmate "Error: Mixed IPv4/IPv6 addresses within a set: { $values }. Rule skipped."
-                    echo "ERROR_MIXED_IP"
+            "th sport"|"th dport")
+                # Port rules
+                if [ -z "$res_set_neg" ] && [ -z "$res_set_pos" ]; then
+                    logger -t qosmate "Error: no valid ports found in '$values'. Rule skipped."
                     return 1
                 fi
                 
-                # Update prefix based on IP type
-                if [ "$has_ipv6" -eq 1 ]; then
-                    prefix=$(echo "$prefix" | sed 's/ip /ip6 /')
+                if [ -n "$res_set_neg" ]; then
+                    result="${result}${result:+ }${prefix} != { ${res_set_neg} }"
                 fi
-            fi
-            
-            if [ $(echo "$values" | wc -w) -gt 1 ]; then
-                if [ $exclude -eq 1 ]; then
-                    result="$prefix != { $(echo $values | tr ' ' ',') }"
-                else
-                    result="$prefix { $(echo $values | tr ' ' ',') }"
+                
+                if [ -n "$res_set_pos" ]; then
+                    result="${result}${result:+ }${prefix} { ${res_set_pos} }"
                 fi
-            else
-                if [ $exclude -eq 1 ]; then
-                    result="$prefix != $values"
-                else
-                    result="$prefix $values"
+                ;;
+                
+            "meta l4proto")
+                # Protocol rules
+                if [ -z "$res_set_neg" ] && [ -z "$res_set_pos" ]; then
+                    logger -t qosmate "Error: no valid protocols found in '$values'. Rule skipped."
+                    return 1
                 fi
-            fi
-        fi
-        echo "$result"
+                
+                if [ -n "$res_set_neg" ]; then
+                    result="${result}${result:+ }${prefix} != { ${res_set_neg} }"
+                fi
+                
+                if [ -n "$res_set_pos" ]; then
+                    result="${result}${result:+ }${prefix} { ${res_set_pos} }"
+                fi
+                ;;
+        esac
+
+        printf '%s\n' "$result"
     }
 
     # Handle multiple protocols
     if [ -n "$proto" ]; then
-        local proto_result=$(handle_multiple_values "$proto" "meta l4proto")
-        if [ "$proto_result" = "ERROR_MIXED_IP" ]; then
-            # Skip this rule entirely
+        local proto_result
+        if ! proto_result="$(gen_rule "$proto" "meta l4proto")"; then
+            # Skip rule
             return 0
         fi
         rule_cmd="$rule_cmd $proto_result"
     fi
 
-    # Append source IP and port if provided
-    if [ -n "$src_ip" ]; then
-        local ip_cmd="ip saddr"
-        if is_ipv6 "$src_ip"; then
-            ip_cmd="ip6 saddr"
-        fi
-        local src_ip_result=$(handle_multiple_values "$src_ip" "$ip_cmd")
-        if [ "$src_ip_result" = "ERROR_MIXED_IP" ]; then
-            # Skip this rule entirely
-            return 0
-        fi
-        rule_cmd="$rule_cmd $src_ip_result"
-    fi
+    # Note: Source IP handling is now done per-family in the rule generation below
     
     # Use connection tracking for source port
     if [ -n "$src_port" ]; then
-        local src_port_result=$(handle_multiple_values "$src_port" "th sport")
-        if [ "$src_port_result" = "ERROR_MIXED_IP" ]; then
-            # Skip this rule entirely
+        local src_port_result
+        if ! src_port_result="$(gen_rule "$src_port" "th sport")"; then
+            # Skip rule
             return 0
         fi
         rule_cmd="$rule_cmd $src_port_result"
     fi
 
-    # Append destination IP and port if provided
-    if [ -n "$dest_ip" ]; then
-        local ip_cmd="ip daddr"
-        if is_ipv6 "$dest_ip"; then
-            ip_cmd="ip6 daddr"
-        fi
-        local dest_ip_result=$(handle_multiple_values "$dest_ip" "$ip_cmd")
-        if [ "$dest_ip_result" = "ERROR_MIXED_IP" ]; then
-            # Skip this rule entirely
-            return 0
-        fi
-        rule_cmd="$rule_cmd $dest_ip_result"
-    fi
+    # Note: Destination IP handling is now done per-family in the rule generation below
     
     # Use connection tracking for destination port
     if [ -n "$dest_port" ]; then
-        local dest_port_result=$(handle_multiple_values "$dest_port" "th dport")
-        if [ "$dest_port_result" = "ERROR_MIXED_IP" ]; then
-            # Skip this rule entirely
+        local dest_port_result
+        if ! dest_port_result="$(gen_rule "$dest_port" "th dport")"; then
+            # Skip rule
             return 0
         fi
         rule_cmd="$rule_cmd $dest_port_result"
@@ -452,20 +595,40 @@ create_nft_rule() {
     # Build final rule(s) based on has_ipv4 and has_ipv6 flags
     local final_rule_v4=""
     local final_rule_v6=""
-    local common_rule_part=$(echo "$rule_cmd" | sed -e 's/^[ ]*//' -e 's/[ ]*$//') # Trim common parts
+    local common_rule_part="$rule_cmd"
+    trim_spaces common_rule_part # Trim common parts
 
     # Generate IPv4 rule if needed
     if [ "$has_ipv4" -eq 1 ]; then
         local rule_cmd_v4="$common_rule_part"
+        
+        # Add IPv4-specific IP addresses
+        if [ -n "$src_ip_v4" ]; then
+            local src_result
+            if ! src_result="$(gen_rule "$src_ip_v4" "ip saddr")"; then
+                # Skip rule
+                return 0
+            fi
+            rule_cmd_v4="$rule_cmd_v4 $src_result"
+        fi
+        if [ -n "$dest_ip_v4" ]; then
+            local dest_result
+            if ! dest_result="$(gen_rule "$dest_ip_v4" "ip daddr")"; then
+                # Skip rule
+                return 0
+            fi
+            rule_cmd_v4="$rule_cmd_v4 $dest_result"
+        fi
+        
         # Ensure we only add parts if there's something to match on (IP/Port/Proto)
-        if [ -n "$proto" ] || [ -n "$src_ip" ] || [ -n "$dest_ip" ] || [ -n "$src_port" ] || [ -n "$dest_port" ]; then
+        if [ -n "$proto" ] || [ -n "$src_ip_v4" ] || [ -n "$dest_ip_v4" ] || [ -n "$src_port" ] || [ -n "$dest_port" ]; then
             rule_cmd_v4="$rule_cmd_v4 ip dscp set $class"
         fi
         [ "$counter" -eq 1 ] && rule_cmd_v4="$rule_cmd_v4 counter"
         [ "$trace" -eq 1 ] && rule_cmd_v4="$rule_cmd_v4 meta nftrace set 1"
         [ -n "$name" ] && rule_cmd_v4="$rule_cmd_v4 comment \"ipv4_$name\""
             
-        rule_cmd_v4=$(echo "$rule_cmd_v4" | sed 's/[ ]*$//') # Trim final rule
+        trim_spaces rule_cmd_v4 # Trim final rule
         # Ensure the rule is not just a semicolon
         if [ -n "$rule_cmd_v4" ] && [ "$rule_cmd_v4" != ";" ]; then
             final_rule_v4="$rule_cmd_v4;"
@@ -475,15 +638,34 @@ create_nft_rule() {
     # Generate IPv6 rule if needed
     if [ "$has_ipv6" -eq 1 ]; then
         local rule_cmd_v6="$common_rule_part"
-         # Ensure we only add parts if there's something to match on (IP/Port/Proto)
-        if [ -n "$proto" ] || [ -n "$src_ip" ] || [ -n "$dest_ip" ] || [ -n "$src_port" ] || [ -n "$dest_port" ]; then
+        
+        # Add IPv6-specific IP addresses
+        if [ -n "$src_ip_v6" ]; then
+            local src_result
+            if ! src_result="$(gen_rule "$src_ip_v6" "ip6 saddr")"; then
+                # Skip rule
+                return 0
+            fi
+            rule_cmd_v6="$rule_cmd_v6 $src_result"
+        fi
+        if [ -n "$dest_ip_v6" ]; then
+            local dest_result
+            if ! dest_result="$(gen_rule "$dest_ip_v6" "ip6 daddr")"; then
+                # Skip rule
+                return 0
+            fi
+            rule_cmd_v6="$rule_cmd_v6 $dest_result"
+        fi
+        
+        # Ensure we only add parts if there's something to match on (IP/Port/Proto)
+        if [ -n "$proto" ] || [ -n "$src_ip_v6" ] || [ -n "$dest_ip_v6" ] || [ -n "$src_port" ] || [ -n "$dest_port" ]; then
             rule_cmd_v6="$rule_cmd_v6 ip6 dscp set $class"
         fi
         [ "$counter" -eq 1 ] && rule_cmd_v6="$rule_cmd_v6 counter"
         [ "$trace" -eq 1 ] && rule_cmd_v6="$rule_cmd_v6 meta nftrace set 1"
         [ -n "$name" ] && rule_cmd_v6="$rule_cmd_v6 comment \"ipv6_$name\""
 
-        rule_cmd_v6=$(echo "$rule_cmd_v6" | sed 's/[ ]*$//') # Trim final rule
+        trim_spaces rule_cmd_v6 # Trim final rule
         # Ensure the rule is not just a semicolon
         if [ -n "$rule_cmd_v6" ] && [ "$rule_cmd_v6" != ";" ]; then
              final_rule_v6="$rule_cmd_v6;"
@@ -497,9 +679,6 @@ create_nft_rule() {
 }
 
 generate_dynamic_nft_rules() {
-    . /lib/functions.sh
-    config_load 'qosmate'
-    
     # Check global enable setting
     local global_enabled
     config_get_bool global_enabled global enabled 1  # Default to enabled if not set
@@ -861,23 +1040,40 @@ EOF
 #       QoS Setup Functions
 ##############################
 
-# Calculates hex value for tc u32 IPv6 DSCP matching.
-# Arg1: DSCP value (0-63), e.g., 46. Output: 4-digit hex, e.g., "0B80".
-# Used for 'match u16 0x<VAL> 0x0FC0 at 0'.
-get_ipv6_dscp_hex_match_val() {
-    local dscp_input_val
-    dscp_input_val="$1"
+# 1 - device
+# 2 - class enum
+# 3 - family (ipv4|ipv6)
+add_tc_filter() {
+    local class_id dsfield hex_match proto prio match_str \
+        dev="$1" \
+        class_enum="$2" \
+        family="$3"
 
-    local six_bit_dscp_val
-    local result_val
+    case "$class_enum" in
+        cs0|CS0) class_id=1:13 dsfield=0x00 hex_match=0x0000 ;; # 0 -> Default
+        ef|EF) class_id=1:11 dsfield=0xb8 hex_match=0x0B80 ;; # 46
+        cs1|CS1) class_id=1:15 dsfield=0x20 hex_match=0x0200 ;; # 8
+        cs2|CS2) class_id=1:14 dsfield=0x40 hex_match=0x0400 ;; # 16
+        cs4|CS4) class_id=1:12 dsfield=0x80 hex_match=0x0800 ;; # 32
+        cs5|CS5) class_id=1:11 dsfield=0xa0 hex_match=0x0A00 ;; # 40
+        cs6|CS6) class_id=1:11 dsfield=0xc0 hex_match=0x0C00 ;; # 48
+        cs7|CS7) class_id=1:11 dsfield=0xe0 hex_match=0x0E00 ;; # 56
+        af11|AF11) class_id=1:14 dsfield=0x28 hex_match=0x0280 ;; # 10
+        af41|AF41) class_id=1:12 dsfield=0x88 hex_match=0x0880 ;; # 34
+        af42|AF42) class_id=1:12 dsfield=0x90 hex_match=0x0900 ;; # 36
+        *) # TODO: throw an error
+    esac
 
-    # Get lower 6 bits of DSCP input (0-63).
-    six_bit_dscp_val=$(( (dscp_input_val + 0) & 0x3f ))
+    case "$family" in
+        ipv4)
+            proto=ip prio=1 match_str="ip dsfield $dsfield 0xfc"
+            ;;
+        ipv6)
+            proto=ipv6 prio=2 match_str="u16 $hex_match 0x0FC0 at 0"
+            ;;
+    esac
 
-    # Shift DSCP bits for tc u32 mask.
-    result_val=$(( six_bit_dscp_val * 64 ))
-
-    printf "%04X" "$result_val"
+    tc filter add dev "$dev" parent 1: protocol "$proto" prio "$prio" u32 match $match_str classid "$class_id"
 }
 
 # Function to setup the specific game qdisc (pfifo, red, fq_codel, netem, etc.)
@@ -941,8 +1137,8 @@ setup_game_qdisc() {
         "netem")
             # Only apply NETEM if this direction is enabled
             if [ "$NETEM_DIRECTION" = "both" ] || \
-               ([ "$NETEM_DIRECTION" = "egress" ] && [ "$DIR" = "wan" ]) || \
-               ([ "$NETEM_DIRECTION" = "ingress" ] && [ "$DIR" = "lan" ]); then
+               { [ "$NETEM_DIRECTION" = "egress" ] && [ "$DIR" = "wan" ]; } || \
+               { [ "$NETEM_DIRECTION" = "ingress" ] && [ "$DIR" = "lan" ]; }; then
                 
                 NETEM_CMD="tc qdisc add dev \"$DEV\" parent 1:11 handle 10: netem limit $((4+9*RATE/8/500))"
                 
@@ -1050,32 +1246,12 @@ setup_hfsc() {
         tc filter del dev "$DEV" parent 1: prio 1 > /dev/null 2>&1
         tc filter del dev "$DEV" parent 1: prio 2 > /dev/null 2>&1 # Also delete prio 2
 
-        # IPv4 Filters (prio 1)
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0xb8 0xfc classid 1:11 # ef (46)
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0xa0 0xfc classid 1:11 # cs5 (40)
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0xc0 0xfc classid 1:11 # cs6 (48)
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0xe0 0xfc classid 1:11 # cs7 (56)
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0x80 0xfc classid 1:12 # cs4 (32)
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0x88 0xfc classid 1:12 # af41 (34)
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0x90 0xfc classid 1:12 # af42 (36)
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0x40 0xfc classid 1:14 # cs2 (16)
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0x28 0xfc classid 1:14 # af11 (10)
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0x20 0xfc classid 1:15 # cs1 (8)
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0x00 0xfc classid 1:13 # none (0) -> Default
-
-        # IPv6 Filters (prio 2)
-        # IPv6 Traffic Class is shifted 4 bits to the left
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 46) 0x0FC0 at 0 classid 1:11 # EF (46)
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 40) 0x0FC0 at 0 classid 1:11 # CS5 (40)
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 48) 0x0FC0 at 0 classid 1:11 # CS6 (48)
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 56) 0x0FC0 at 0 classid 1:11 # CS7 (56)
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 32) 0x0FC0 at 0 classid 1:12 # CS4 (32)
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 34) 0x0FC0 at 0 classid 1:12 # AF41 (34)
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 36) 0x0FC0 at 0 classid 1:12 # AF42 (36)
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 16) 0x0FC0 at 0 classid 1:14 # CS2 (16)
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 10) 0x0FC0 at 0 classid 1:14 # AF11 (10)
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 8) 0x0FC0 at 0 classid 1:15 # CS1 (8)
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 0) 0x0FC0 at 0 classid 1:13 # CS0/BE (0)
+        local family class_enum
+        for family in ipv4 ipv6; do
+            for class_enum in ef cs5 cs6 cs7 cs4 af41 af42 cs2 af11 cs1 cs0; do
+                add_tc_filter "$DEV" "$class_enum" "$family"
+            done
+        done
     fi
 }
 
@@ -1217,21 +1393,20 @@ setup_hybrid() {
         tc filter del dev "$DEV" parent 1: prio 1 > /dev/null 2>&1
         tc filter del dev "$DEV" parent 1: prio 2 > /dev/null 2>&1
 
+        local class_enum
+
         # IPv4 Filters (prio 1)
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0xb8 0xfc classid 1:11 # EF -> Realtime
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0xa0 0xfc classid 1:11 # CS5 -> Realtime
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0xc0 0xfc classid 1:11 # CS6 -> Realtime
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0xe0 0xfc classid 1:11 # CS7 -> Realtime
-        tc filter add dev "$DEV" parent 1: protocol ip prio 1 u32 match ip dsfield 0x20 0xfc classid 1:15 # CS1 -> Bulk
+        # EF, CS5, CS6, CS7 -> Realtime
+        # CS1 -> Bulk
+        for class_enum in ef cs5 cs6 cs7 cs1; do
+            add_tc_filter "$DEV" "$class_enum" "ipv4"
+        done
         # Default rule sends to 1:13 (CAKE)
 
         # IPv6 Filters (prio 2)
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 46) 0x0FC0 at 0 classid 1:11 # EF (46)
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 40) 0x0FC0 at 0 classid 1:11 # CS5 (40)
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 48) 0x0FC0 at 0 classid 1:11 # CS6 (48)
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 56) 0x0FC0 at 0 classid 1:11 # CS7 (56)
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 8) 0x0FC0 at 0 classid 1:15 # CS1 (8)     
-        tc filter add dev "$DEV" parent 1: protocol ipv6 prio 2 u32 match u16 0x$(get_ipv6_dscp_hex_match_val 0) 0x0FC0 at 0 classid 1:13 # CS0/BE (0)
+        for class_enum in ef cs5 cs6 cs7 cs1 cs0; do
+            add_tc_filter "$DEV" "$class_enum" "ipv6"
+        done
     fi
 }
 

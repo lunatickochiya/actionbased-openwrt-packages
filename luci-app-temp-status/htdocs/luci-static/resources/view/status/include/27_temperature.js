@@ -6,13 +6,13 @@ document.head.append(E('style', {'type': 'text/css'},
 `
 :root {
 	--app-temp-status-font-color: #2e2e2e;
-	--app-temp-status-hot-color: #fff6d9;
-	--app-temp-status-crit-color: #fcc3bf;
+	--app-temp-status-hot-color: #fff7e2;
+	--app-temp-status-overheat-color: #ffe9e8;
 }
 :root[data-darkmode="true"] {
 	--app-temp-status-font-color: #fff;
 	--app-temp-status-hot-color: #8d7000;
-	--app-temp-status-crit-color: #a93734;
+	--app-temp-status-overheat-color: #a93734;
 }
 .temp-status-hot {
 	background-color: var(--app-temp-status-hot-color) !important;
@@ -24,14 +24,14 @@ document.head.append(E('style', {'type': 'text/css'},
 .temp-status-hot td {
 	color: var(--app-temp-status-font-color) !important;
 }
-.temp-status-crit {
-	background-color: var(--app-temp-status-crit-color) !important;
+.temp-status-overheat {
+	background-color: var(--app-temp-status-overheat-color) !important;
 	color: var(--app-temp-status-font-color) !important;
 }
-.temp-status-crit .td {
+.temp-status-overheat .td {
 	color: var(--app-temp-status-font-color) !important;
 }
-.temp-status-crit td {
+.temp-status-overheat td {
 	color: var(--app-temp-status-font-color) !important;
 }
 .temp-status-unhide-all {
@@ -65,24 +65,35 @@ document.head.append(E('style', {'type': 'text/css'},
 `));
 
 return baseclass.extend({
-	title         : _('Temperature'),
+	title       : _('Temperature'),
 
-	viewName      : 'temp_status',
+	viewName    : 'temp_status',
 
-	tempHot       : 95,
+	tempHot     : 95,
 
-	tempCritical  : 105,
+	tempOverheat: 105,
 
-	tempData      : {},
+	sensorsData : null,
 
-	hiddenItems   : new Set(),
+	tempData    : null,
 
-	tempTable     : E('table', { 'class': 'table' }),
+	sensorsPath : [],
 
-	callTempStatus: rpc.declare({
+	hiddenItems : new Set(),
+
+	tempTable   : E('table', { 'class': 'table' }),
+
+	callSensors : rpc.declare({
 		object: 'luci.temp-status',
-		method: 'getTempStatus',
-		expect: { '': {} }
+		method: 'getSensors',
+		expect: { '': {} },
+	}),
+
+	callTempData: rpc.declare({
+		object: 'luci.temp-status',
+		method: 'getTempData',
+		params: [ 'tpaths' ],
+		expect: { '': {} },
 	}),
 
 	formatTemp(mc) {
@@ -115,7 +126,7 @@ return baseclass.extend({
 			])
 		);
 
-		for(let [k, v] of Object.entries(this.tempData)) {
+		for(let [k, v] of Object.entries(this.sensorsData)) {
 			v.sort(this.sortFunc);
 
 			for(let i of Object.values(v)) {
@@ -132,16 +143,16 @@ return baseclass.extend({
 						continue;
 					};
 
-					let temp = j.temp;
+					let temp = this.tempData[j.path];
 					let name = (j.label !== undefined) ? sensor + " / " + j.label :
 						(j.item !== undefined) ? sensor + " / " + j.item.replace(/_input$/, "") : sensor
 
-					if(temp !== undefined) {
+					if(temp !== undefined && temp !== null) {
 						temp = this.formatTemp(temp);
 					};
 
-					let tempHot       = this.tempHot;
-					let tempCritical  = this.tempCritical;
+					let tempHot       = NaN;
+					let tempOverheat  = NaN;
 					let tpoints       = j.tpoints;
 					let tpointsString = '';
 
@@ -150,16 +161,23 @@ return baseclass.extend({
 							let t = this.formatTemp(i.temp);
 							tpointsString += `&#10;${i.type}: ${t} °C`;
 
-							if(i.type == 'critical' || i.type == 'emergency') {
-								tempCritical = t;
+							if(i.type == 'max' || i.type == 'critical' || i.type == 'emergency') {
+								if(!(tempOverheat <= t)) {
+									tempOverheat = t;
+								};
 							}
-							else if(i.type == 'hot' || i.type == 'max') {
+							else if(i.type == 'hot') {
 								tempHot = t;
 							};
 						};
 					};
 
-					let rowStyle = (temp >= tempCritical) ? ' temp-status-crit':
+					if(isNaN(tempHot) && isNaN(tempOverheat)) {
+						tempHot      = this.tempHot;
+						tempOverheat = this.tempOverheat;
+					};
+
+					let rowStyle = (temp >= tempOverheat) ? ' temp-status-overheat':
 						(temp >= tempHot) ? ' temp-status-hot' : '';
 
 					this.tempTable.append(
@@ -179,7 +197,7 @@ return baseclass.extend({
 									'class'     : 'td left',
 									'data-title': _('Temperature')
 								},
-								(temp === undefined) ? '-' : temp + ' °C'
+								(temp === undefined || temp === null) ? '-' : temp + ' °C'
 							),
 							E('td', {
 									'class'     : 'td right',
@@ -225,15 +243,28 @@ return baseclass.extend({
 
 	load() {
 		this.restoreSettingsFromLocalStorage();
-		return L.resolveDefault(this.callTempStatus(), null);
+		if(this.sensorsData) {
+			return L.resolveDefault(this.callTempData(this.sensorsPath), null);
+		} else {
+			return L.resolveDefault(this.callSensors(), null);
+		};
 	},
 
-	render(tempData) {
-		if(!tempData) {
+	render(data) {
+		if(!data) {
 			return;
 		};
 
-		this.tempData = tempData;
+		if(!this.sensorsData) {
+			this.sensorsData = data.sensors;
+			this.sensorsPath = new Array(...Object.keys(data.temp));
+		};
+		this.tempData = data.temp;
+
+		if(!this.sensorsData || !this.tempData) {
+			return;
+		};
+
 		this.makeTempTableContent();
 
 		return E('div', { 'class': 'cbi-section' }, [

@@ -9,6 +9,7 @@ local Module = {
 	runPrio                 = 40,
 	config                  = {},
 	syslog                  = function(level, msg) return true end,
+	debugOutput             = function(msg) return true end,
 	writeValue              = function(filePath, str) return false end,
 	readValue               = function(filePath) return nil end,
 	mmcli                   = "/usr/bin/mmcli",
@@ -71,7 +72,7 @@ function Module:init(t)
 		self._enabled = true
 	else
 		self._enabled = false
-		self.syslog("warning", string.format(
+		self.syslog("err", string.format(
 			"%s: modemmanager service is not available", self.name))
 	end
 end
