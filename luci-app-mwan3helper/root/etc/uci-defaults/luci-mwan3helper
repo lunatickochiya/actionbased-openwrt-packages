@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-mwan3helper.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-mwan3helper.json << EEOF
+{
+    "config": "mwan3helper",
+    "init": "mwan3helper"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@mwan3helper[-1]

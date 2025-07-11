@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-baidupcs-web.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-baidupcs-web.json << EEOF
+{
+    "config": "baidupcs-web",
+    "init": "baidupcs-web"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@baidupcs-web[-1]

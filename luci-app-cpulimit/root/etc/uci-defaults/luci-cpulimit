@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-cpulimit.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-cpulimit.json << EEOF
+{
+    "config": "cpulimit",
+    "init": "cpulimit"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
           delete ucitrack.@cpulimit[-1]

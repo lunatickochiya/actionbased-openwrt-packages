@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-ngrokc.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-ngrokc.json << EEOF
+{
+    "config": "ngrokc",
+    "init": "ngrokc"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@ngrokc[-1]

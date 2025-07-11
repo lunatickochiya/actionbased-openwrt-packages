@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-weburl.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-weburl.json << EEOF
+{
+    "config": "weburl",
+    "init": "weburl"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@weburl[-1]

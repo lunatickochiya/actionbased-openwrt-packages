@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=hickory-dns
 PKG_VERSION:=2025.07.10
-PKG_RELEASE:=81
+PKG_RELEASE:=82
 
 HICKORY_COMMIT:=4daf3cb086cc00f0ae8a6e4040f882e055eeb3d4
 

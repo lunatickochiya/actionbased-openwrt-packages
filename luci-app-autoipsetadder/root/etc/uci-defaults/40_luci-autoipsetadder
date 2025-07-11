@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-autoipsetadder.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-autoipsetadder.json << EEOF
+{
+    "config": "autoipsetadder",
+    "init": "autoipsetadder"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@autoipsetadder[-1]

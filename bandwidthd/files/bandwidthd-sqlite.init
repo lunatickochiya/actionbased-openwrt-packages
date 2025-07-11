@@ -131,3 +131,7 @@ start_service() {
 stop_service() {
 	service_stop /usr/sbin/bandwidthd
 }
+
+reload_service() {
+	restart
+}

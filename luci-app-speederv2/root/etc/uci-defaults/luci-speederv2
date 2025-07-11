@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-speederv2.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-speederv2.json << EEOF
+{
+    "config": "speederv2",
+    "init": "speederv2"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
     delete ucitrack.@speederv2[-1]

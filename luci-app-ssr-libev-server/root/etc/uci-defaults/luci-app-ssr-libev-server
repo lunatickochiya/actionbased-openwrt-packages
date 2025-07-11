@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-ssr_libev_server.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-ssr_libev_server.json << EEOF
+{
+    "config": "ssr_libev_server",
+    "init": "ssr_libev_server"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
 	delete firewall.ssr_libev_server

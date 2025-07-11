@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-oled.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-oled.json << EEOF
+{
+    "config": "oled",
+    "init": "oled"
+}
+EEOF
+}
 
 uci_write_config() {
 	[[ `uci -q get oled.@oled[0].showmenu` -eq 1 ]] && return

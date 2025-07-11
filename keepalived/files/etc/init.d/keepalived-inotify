@@ -63,3 +63,7 @@ start_service() {
 	config_load keepalived
 	config_foreach process_vrrp_instance vrrp_instance "$peer_instance"
 }
+
+service_triggers() {
+	procd_add_reload_trigger "keepalived"
+}

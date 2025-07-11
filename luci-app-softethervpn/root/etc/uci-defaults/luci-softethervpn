@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-softethervpn.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-softethervpn.json << EEOF
+{
+    "config": "softethervpn",
+    "init": "softethervpn"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
 	delete firewall.softethervpn

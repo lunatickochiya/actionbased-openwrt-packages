@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-dockerd.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-dockerd.json << EEOF
+{
+    "config": "dockerd",
+    "init": "dockerd"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@dockerd[-1]

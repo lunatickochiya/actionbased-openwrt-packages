@@ -1,4 +1,12 @@
 #!/bin/sh /etc/rc.common
+[ ! -f "/usr/share/ucitrack/luci-app-ucitrack.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-ucitrack.json << EEOF
+{
+    "config": "ucitrack",
+    "init": "ucitrack"
+}
+EEOF
+}
 
 START=99
 STOP=15

@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-luci-fan.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-luci-fan.json << EEOF
+{
+    "config": "luci-fan",
+    "init": "luci-fan"
+}
+EEOF
+}
 
 /usr/libexec/fan-control init
 

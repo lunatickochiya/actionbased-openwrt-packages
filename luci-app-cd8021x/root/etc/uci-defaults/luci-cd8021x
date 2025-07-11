@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-cd8021x.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-cd8021x.json << EEOF
+{
+    "config": "cd8021x",
+    "init": "cd8021x"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@cd8021x[-1]

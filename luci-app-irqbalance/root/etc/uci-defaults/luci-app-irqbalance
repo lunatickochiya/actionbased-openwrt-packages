@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-irqbalance.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-irqbalance.json << EEOF
+{
+    "config": "irqbalance",
+    "init": "irqbalance"
+}
+EEOF
+}
 
 [ -f "/etc/config/ucitrack" ] && {
 uci -q batch <<-EOF >/dev/null

@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-dump1090.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-dump1090.json << EEOF
+{
+    "config": "dump1090",
+    "init": "dump1090"
+}
+EEOF
+}
 
 # needed for "Save and Apply" to restart dump1090
 uci -q batch <<-EOF >/dev/null

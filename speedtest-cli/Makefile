@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=speedtest-cli
 PKG_VERSION:=2.1.3
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PYPI_NAME:=speedtest-cli
 PKG_HASH:=skip

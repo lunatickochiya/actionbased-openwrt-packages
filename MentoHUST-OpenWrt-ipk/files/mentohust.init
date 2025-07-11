@@ -18,3 +18,7 @@ start_service() {
 stop_service() {
 	"$PROG" -k
 }
+
+reload_service() {
+	restart
+}

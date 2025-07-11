@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-taskplan.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-taskplan.json << EEOF
+{
+    "config": "taskplan",
+    "init": "taskplan"
+}
+EEOF
+}
 chmod +x  /etc/init.d/taskplan /usr/bin/taskplanhandler /etc/init.d/taskplanrun
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@taskplan[-1]

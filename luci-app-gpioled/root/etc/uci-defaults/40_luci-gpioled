@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-gpioled.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-gpioled.json << EEOF
+{
+    "config": "gpioled",
+    "init": "gpioled"
+}
+EEOF
+}
 uci -q batch <<-EOF >/dev/null
         delete ucitrack.@gpioled[-1]
         add ucitrack gpioled

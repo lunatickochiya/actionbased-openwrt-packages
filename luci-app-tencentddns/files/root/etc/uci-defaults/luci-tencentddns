@@ -1,4 +1,12 @@
 #!/bin/sh 
+[ ! -f "/usr/share/ucitrack/luci-app-tencentddns.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-tencentddns.json << EEOF
+{
+    "config": "tencentddns",
+    "init": "tencentddns"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@tencentddns[-1]

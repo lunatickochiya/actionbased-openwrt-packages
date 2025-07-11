@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-autoupdate.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-autoupdate.json << EEOF
+{
+    "config": "autoupdate",
+    "init": "autoupdate"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@autoupdate[-1]

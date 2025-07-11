@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-advancedplus.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-advancedplus.json << EEOF
+{
+    "config": "advancedplus",
+    "init": "advancedplus"
+}
+EEOF
+}
 chmod +x /etc/init.d/advancedplus
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@advancedplus[-1]

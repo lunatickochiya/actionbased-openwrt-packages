@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-cloudreve.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-cloudreve.json << EEOF
+{
+    "config": "cloudreve",
+    "init": "cloudreve"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@cloudreve[-1]

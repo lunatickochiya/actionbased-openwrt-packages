@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-modem.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-modem.json << EEOF
+{
+    "config": "modem",
+    "init": "modem"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@modem[-1]

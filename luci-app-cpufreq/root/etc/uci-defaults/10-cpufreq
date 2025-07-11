@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-cpufreq.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-cpufreq.json << EEOF
+{
+    "config": "cpufreq",
+    "init": "cpufreq"
+}
+EEOF
+}
 
 uci_write_config() {
 	uci -q set "cpufreq.cpufreq.governor$1"="$2"

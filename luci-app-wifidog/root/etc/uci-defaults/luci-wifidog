@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-wifidog.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-wifidog.json << EEOF
+{
+    "config": "wifidog",
+    "init": "wifidog"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@wifidog[-1]

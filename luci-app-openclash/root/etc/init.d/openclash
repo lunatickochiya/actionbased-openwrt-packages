@@ -1,4 +1,12 @@
 #!/bin/sh /etc/rc.common
+[ ! -f "/usr/share/ucitrack/luci-app-add.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-add.json << EEOF
+{
+    "config": "add",
+    "init": "add"
+}
+EEOF
+}
 # Copyright (c) 2019-2024 vernesong
 
 START=99

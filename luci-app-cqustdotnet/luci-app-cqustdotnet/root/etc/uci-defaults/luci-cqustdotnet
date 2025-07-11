@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-cqustdotnet.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-cqustdotnet.json << EEOF
+{
+    "config": "cqustdotnet",
+    "init": "cqustdotnet"
+}
+EEOF
+}
 
 uci -q batch <<-EOF >/dev/null
   delete ucitrack.@cqustdotnet[-1]

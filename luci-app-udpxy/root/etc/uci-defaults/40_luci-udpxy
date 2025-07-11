@@ -1,4 +1,12 @@
 #!/bin/sh
+[ ! -f "/usr/share/ucitrack/luci-app-udpxy.json" ] && {
+    cat > /usr/share/ucitrack/luci-app-udpxy.json << EEOF
+{
+    "config": "udpxy",
+    "init": "udpxy"
+}
+EEOF
+}
 
 # needed for "Save and Apply" to restart udpxy
 uci -q batch <<-EOF >/dev/null
