@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-mentohust.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-mentohust.json << EEOF
-{
-    "config": "mentohust",
-    "init": "mentohust"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@mentohust[-1]

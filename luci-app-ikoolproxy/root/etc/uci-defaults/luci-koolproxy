@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-koolproxy.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-koolproxy.json << EEOF
-{
-    "config": "koolproxy",
-    "init": "koolproxy"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	[ -e "/etc/config/ucitrack" ] && {

@@ -1,12 +1,4 @@
 #!/bin/sh 
-[ ! -f "/usr/share/ucitrack/luci-app-guest-wifi.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-guest-wifi.json << EEOF
-{
-    "config": "guest-wifi",
-    "init": "guest-wifi"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@guest-wifi[-1]

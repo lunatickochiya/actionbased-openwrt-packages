@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-my-dnshelper.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-my-dnshelper.json << EEOF
-{
-    "config": "my-dnshelper",
-    "init": "my-dnshelper"
-}
-EEOF
-}
 uci -q batch <<-EOF >/dev/null 2>&1
 	delete ucitrack.@my-dnshelper[-1]
 	add ucitrack my-dnshelper

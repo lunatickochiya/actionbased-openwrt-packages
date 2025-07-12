@@ -30,11 +30,3 @@ stop_service() {
 	echo "gpoint not running"
    fi
 }
-
-reload_service() {
-	restart
-}
-
-service_triggers() {
-	procd_add_reload_trigger "${CONFIGURATION}"
-}

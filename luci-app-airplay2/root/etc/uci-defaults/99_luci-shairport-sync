@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-shairport-sync.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-shairport-sync.json << EEOF
-{
-    "config": "shairport-sync",
-    "init": "shairport-sync"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@shairport-sync[-1]

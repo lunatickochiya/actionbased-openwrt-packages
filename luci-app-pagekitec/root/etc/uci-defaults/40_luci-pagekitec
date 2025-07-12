@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-pagekitec.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-pagekitec.json << EEOF
-{
-    "config": "pagekitec",
-    "init": "pagekitec"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@pagekitec[-1]

@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-openvpn.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-openvpn.json << EEOF
-{
-    "config": "openvpn",
-    "init": "openvpn"
-}
-EEOF
-}
 
 if [ ! "$(grep "myvpn" /etc/config/openvpn)" ]; then
 rm -f /etc/config/openvpn

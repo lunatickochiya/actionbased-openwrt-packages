@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-watchcat.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-watchcat.json << EEOF
-{
-    "config": "watchcat",
-    "init": "watchcat"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@watchcat[-1]

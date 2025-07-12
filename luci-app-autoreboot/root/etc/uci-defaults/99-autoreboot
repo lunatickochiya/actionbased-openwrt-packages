@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-autoreboot.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-autoreboot.json << EEOF
-{
-    "config": "autoreboot",
-    "init": "autoreboot"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@autoreboot[-1]

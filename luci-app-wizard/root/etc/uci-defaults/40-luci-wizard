@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-wizard.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-wizard.json << EEOF
-{
-    "config": "wizard",
-    "init": "wizard"
-}
-EEOF
-}
 
 touch /etc/config/wizard
 

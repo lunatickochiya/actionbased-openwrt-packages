@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-ssrs.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-ssrs.json << EEOF
-{
-    "config": "ssrs",
-    "init": "ssrs"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@ssrs[-1]

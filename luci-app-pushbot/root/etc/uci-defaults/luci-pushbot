@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-pushbot.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-pushbot.json << EEOF
-{
-    "config": "pushbot",
-    "init": "pushbot"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@pushbot[-1]

@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-pppoe-relay.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-pppoe-relay.json << EEOF
-{
-    "config": "pppoe-relay",
-    "init": "pppoe-relay"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@pppoe-relay[-1]

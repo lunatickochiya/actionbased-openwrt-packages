@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-uuplugin.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-uuplugin.json << EEOF
-{
-    "config": "uuplugin",
-    "init": "uuplugin"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@uuplugin[-1]

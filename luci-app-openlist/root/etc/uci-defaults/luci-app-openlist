@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-openlist.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-openlist.json << EEOF
-{
-    "config": "openlist",
-    "init": "openlist"
-}
-EEOF
-}
 
 [ -f "/etc/config/ucitrack" ] && {
 uci -q batch <<-EOF >/dev/null

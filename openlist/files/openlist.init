@@ -274,7 +274,3 @@ stop_service() {
 	external_access="deny"
 	set_firewall
 }
-
-reload_service() {
-	restart
-}

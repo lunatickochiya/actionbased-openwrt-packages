@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-kodexplorer.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-kodexplorer.json << EEOF
-{
-    "config": "kodexplorer",
-    "init": "kodexplorer"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@kodexplorer[-1]

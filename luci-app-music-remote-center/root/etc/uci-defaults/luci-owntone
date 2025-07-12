@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-owntone.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-owntone.json << EEOF
-{
-    "config": "owntone",
-    "init": "owntone"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@owntone[-1]

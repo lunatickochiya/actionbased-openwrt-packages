@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-amule.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-amule.json << EEOF
-{
-    "config": "amule",
-    "init": "amule"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@amule[-1]

@@ -26,11 +26,3 @@ stop_service(){
 	killall 3proxy
 }
 
-
-reload_service() {
-	restart
-}
-
-service_triggers() {
-	procd_add_reload_trigger "3proxy"
-}

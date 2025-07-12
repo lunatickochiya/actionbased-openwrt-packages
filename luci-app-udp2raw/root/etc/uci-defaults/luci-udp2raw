@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-udp2raw.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-udp2raw.json << EEOF
-{
-    "config": "udp2raw",
-    "init": "udp2raw"
-}
-EEOF
-}
 
 uci -q batch <<-EOF > /dev/null
 	delete ucitrack.@udp2raw[-1]

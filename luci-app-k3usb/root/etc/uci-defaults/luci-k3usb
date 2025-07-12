@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-k3usb.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-k3usb.json << EEOF
-{
-    "config": "k3usb",
-    "init": "k3usb"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@k3usb[-1]

@@ -840,7 +840,3 @@ stop_service()
 		esac
 	done
 }
-
-reload_service() {
-	restart
-}

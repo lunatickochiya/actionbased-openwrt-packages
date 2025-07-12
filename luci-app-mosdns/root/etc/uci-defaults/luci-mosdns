@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-mosdns.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-mosdns.json << EEOF
-{
-    "config": "mosdns",
-    "init": "mosdns"
-}
-EEOF
-}
 
 [ -f "/etc/config/ucitrack" ] && {
 uci -q batch <<-EOF >/dev/null

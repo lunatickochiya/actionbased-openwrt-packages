@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-homebox.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-homebox.json << EEOF
-{
-    "config": "homebox",
-    "init": "homebox"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@homebox[-1]

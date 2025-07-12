@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-smartvpn.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-smartvpn.json << EEOF
-{
-    "config": "smartvpn",
-    "init": "smartvpn"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@smartvpn[-1]

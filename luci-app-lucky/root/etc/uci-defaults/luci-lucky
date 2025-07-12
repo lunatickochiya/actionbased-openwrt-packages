@@ -1,12 +1,4 @@
 #!/bin/sh
-[ ! -f "/usr/share/ucitrack/luci-app-lucky.json" ] && {
-    cat > /usr/share/ucitrack/luci-app-lucky.json << EEOF
-{
-    "config": "lucky",
-    "init": "lucky"
-}
-EEOF
-}
 
 uci -q batch <<-EOF >/dev/null
         delete ucitrack.@lucky[-1]

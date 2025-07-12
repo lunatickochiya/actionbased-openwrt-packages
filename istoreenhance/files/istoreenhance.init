@@ -45,7 +45,3 @@ disabled_mirrors() {
 service_stopped() {
 	disabled_mirrors
 }
-
-reload_service() {
-	restart
-}
