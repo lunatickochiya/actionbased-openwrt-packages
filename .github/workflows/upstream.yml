@@ -128,7 +128,7 @@ jobs:
         git_clone https://github.com/sirpdboy/luci-app-lucky oplucky && mv -f oplucky/*/ ./ && rm -rf oplucky
         git_clone https://github.com/sirpdboy/luci-app-partexp
         git_clone https://github.com/sirpdboy/luci-app-ddns-go ddns-go1 && mvdir ddns-go1
-        git_clone https://github.com/sirpdboy/netspeedtest && mv -n netspeedtest/luci-app-netspeedtest ./ ; rm -rf netspeedtest
+        git_clone https://github.com/sirpdboy/luci-app-netspeedtest speedtest && rm -rf speedtest/{iperf*,演示.gif};mvdir speedtest
         git_clone https://github.com/sirpdboy/luci-app-parentcontrol
         git_clone https://github.com/sirpdboy/luci-app-poweroffdevice
         ) &
@@ -206,7 +206,7 @@ jobs:
         (
         git_clone https://github.com/mchome/openwrt-dogcom
         git_clone https://github.com/mchome/luci-app-dogcom
-        git_clone https://github.com/koshev-msk/modemfeed && mv -n modemfeed/*/*/* ./ && rm -rf modemfeed
+        git_clone https://github.com/koshev-msk/modemfeed && mv -n modemfeed/*/!(telephony)/* ./ && rm -rf modemfeed 3proxy
         git_clone https://github.com/zzsj0928/luci-app-pushbot
         git_clone https://github.com/shanglanxin/luci-app-homebridge
         git_clone https://github.com/ykxVK8yL5L/luci-app-synology synology && mv -n synology/luci-app-synology ./ && rm -rf synology
