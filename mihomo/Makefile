@@ -26,7 +26,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mihomo
-PKG_RELEASE:=18
+PKG_RELEASE:=19
 PKG_VERSION:=1.19.11
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz

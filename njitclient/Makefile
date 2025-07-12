@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=njit8021xclient
-PKG_RELEASE:=10
+PKG_RELEASE:=11
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/bitdust/njit8021xclient.git

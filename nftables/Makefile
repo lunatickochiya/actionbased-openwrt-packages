@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=nftables
 PKG_VERSION:=1.1.3
-PKG_RELEASE:=7
+PKG_RELEASE:=8
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=https://netfilter.org/projects/$(PKG_NAME)/files

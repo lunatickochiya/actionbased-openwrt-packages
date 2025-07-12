@@ -6,7 +6,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=cloudreve
 PKG_VERSION:=4.2.0
-PKG_RELEASE:=33
+PKG_RELEASE:=34
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/cloudreve/Cloudreve.git
