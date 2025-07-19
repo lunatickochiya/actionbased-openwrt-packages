@@ -198,6 +198,8 @@ static atomic_t done_fail_msgs = ATOMIC_INIT(0);
  */
 static bool skip_to_bridge_ingress;
 
+int fast_classifier_recv(struct sk_buff *skb);
+
 /*
  * fast_classifier_incr_exceptions()
  *	increase an exception counter.
