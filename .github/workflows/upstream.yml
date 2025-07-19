@@ -439,7 +439,8 @@ jobs:
         mv -n lean/* ./ ; rm -Rf lean
         mv -n liep/* ./ ; rm -Rf liep
         mv -n wwan/*/* ./; rm -rf wwan
-        mv -n shortcut-fe/* ./
+        mv shortcut-fe shortcut-fe-mod
+        mv -n shortcut-fe-mod/* ./; rm -rf shortcut-fe-mod
         [ -d op-luci1 ] && rm -rf op-luci1
         mv -n openwrt-app-actions/applications/* ./;rm -rf openwrt-app-actions
         rm -Rf */.git */.svn
