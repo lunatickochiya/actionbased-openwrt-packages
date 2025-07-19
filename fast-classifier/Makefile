@@ -16,7 +16,7 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
 PKG_NAME:=fast-classifier
-PKG_RELEASE:=6
+PKG_RELEASE:=1
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -32,6 +32,7 @@ define KernelPackage/fast-classifier/Default
 	   CONFIG_NF_CONNTRACK_CHAIN_EVENTS=y \
 	   CONFIG_NF_CONNTRACK_MARK=y \
 	   CONFIG_XFRM=y
+  CONFLICTS:=kmod-shortcut-fe-drv kmod-shortcut-fe-cm
 endef
 
 define KernelPackage/fast-classifier
