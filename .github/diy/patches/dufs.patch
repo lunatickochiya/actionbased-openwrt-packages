@@ -23,8 +23,8 @@ Signed-off-by: Tianling Shen <cnsztl@immortalwrt.org>
  1 file changed, 5 insertions(+), 1 deletion(-)
 diff --git a/net/dufs/Makefile b/net/dufs/Makefile
 index c22a5179dcd36c..476efc0aeff0d4 100644
---- a/net/dufs/Makefile
-+++ b/net/dufs/Makefile
+--- a/dufs/Makefile
++++ b/dufs/Makefile
 @@ -40,6 +40,10 @@ define Package/dufs/conffiles
  /etc/config/dufs
  endef
