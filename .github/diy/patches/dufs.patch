@@ -1,0 +1,35 @@
+From 1716415018d67a4e0038639a87d7f484d73f89b1 Mon Sep 17 00:00:00 2001
+From: Tianling Shen <cnsztl@immortalwrt.org>
+Date: Wed, 23 Jul 2025 14:45:56 +0800
+Subject: [PATCH] dufs: lock cargo dependencies
+
+The new version of tokio is not compatible with musl:
+
+error[E0432]: unresolved import `tokio::net::TcpListener`
+  --> src/main.rs:34:13
+   |
+34 | use tokio::{net::TcpListener, task::JoinHandle};
+   |             ^^^^^^^^^^^^^^^^ no `TcpListener` in `net`
+
+error[E0433]: failed to resolve: could not find `UnixListener` in `net`
+   --> src/main.rs:156:44
+    |
+156 |                 let listener = tokio::net::UnixListener::bind(socket_path)
+    |                                            ^^^^^^^^^^^^ could not find `UnixListener` in `net`
+
+Signed-off-by: Tianling Shen <cnsztl@immortalwrt.org>
+---
+ net/dufs/Makefile | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+@@ -40,6 +40,10 @@ define Package/dufs/conffiles
+ /etc/config/dufs
+ endef
+ 
++define Build/Compile
++	$(call Build/Compile/Cargo,,--locked)
++endef
++
+ define Package/dufs/install
+ 	$(INSTALL_DIR) $(1)/usr/bin
+ 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/bin/dufs $(1)/usr/bin/
