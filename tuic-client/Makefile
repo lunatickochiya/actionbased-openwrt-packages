@@ -1,75 +1,39 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Copyright (C) 2017-2020 Yousong Zhou <yszhou4tech@gmail.com>
-# Copyright (C) 2021 ImmortalWrt.org
+# Copyright (C) 2023 ImmortalWrt.org
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=tuic-client
-PKG_VERSION:=1.0.0
-PKG_RELEASE:=27
+PKG_VERSION:=tuic-server-1.0.0
+PKG_RELEASE:=28
 
-PKG_LICENSE_FILES:=LICENSE
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL:=https://codeload.github.com/EAimTY/tuic/tar.gz/tuic-client-$(PKG_VERSION)?
+PKG_HASH:=skip
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)/$(PKG_NAME)
+
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
+PKG_LICENSE:=GPL-3.0-only
+PKG_LICENSE_FILES:=LICENSE
+
+PKG_BUILD_DEPENDS:=rust/host
+PKG_BUILD_PARALLEL:=1
 
 include $(INCLUDE_DIR)/package.mk
+include $(TOPDIR)/feeds/packages/lang/rust/rust-package.mk
 
-TUIC_TYPE:=tuic-client-$(PKG_VERSION)
-TUIC_FOOT:=unknown-linux-musl
-ifeq ($(ARCH),aarch64)
-	TUIC_ARCH:=$(TUIC_TYPE)-aarch64-$(TUIC_FOOT)
-	PKG_HASH:=skip
-else ifeq ($(ARCH),arm)
-# Referred to golang/golang-values.mk
-	ARM_CPU_FEATURES:=$(word 2,$(subst +,$(space),$(call qstrip,$(CONFIG_CPU_TYPE))))
-	ifeq ($(ARM_CPU_FEATURES),)
-		TUIC_ARCH:=$(TUIC_TYPE)-armv7-$(TUIC_FOOT)eabi
-		PKG_HASH:=skip
-	else
-		TUIC_ARCH:=$(TUIC_TYPE)-armv7-$(TUIC_FOOT)eabihf
-		PKG_HASH:=skip
-	endif
-else ifeq ($(ARCH),i386)
-	TUIC_ARCH:=$(TUIC_TYPE)-i686-$(TUIC_FOOT)
-	PKG_HASH:=skip
-else ifeq ($(ARCH),x86_64)
-	TUIC_ARCH:=$(TUIC_TYPE)-x86_64-$(TUIC_FOOT)
-	PKG_HASH:=skip
-# Set the default value to make OpenWrt Package Checker happy
-else
-  PKG_SOURCE:=dummy
-  PKG_HASH:=skip
-endif
-
-define Download/tuic-client
-	URL:=https://github.com/EAimTY/tuic/releases/download/$(TUIC_TYPE)/
-	URL_FILE:=$(TUIC_ARCH)
-	FILE:=$(TUIC_ARCH)
-	HASH:=skip
-endef
+TAR_OPTIONS+= --strip-components 1
+TAR_CMD=$(HOST_TAR) -C $(1)/.. $(TAR_OPTIONS)
 
 define Package/tuic-client
-	SECTION:=net
-	CATEGORY:=Network
-	SUBMENU:=Web Servers/Proxies
-	TITLE:=Delicately-TUICed 0-RTT proxy protocol
-	URL:=https://github.com/EAimTY/tuic/
-	DEPENDS:=@USE_MUSL @(aarch64||arm||i386||x86_64) @!(TARGET_x86_geode||TARGET_x86_legacy)
+  SECTION:=net
+  CATEGORY:=Network
+  SUBMENU:=Web Servers/Proxies
+  TITLE:=Delicately-TUICed 0-RTT proxy protocol (client)
+  URL:=https://github.com/EAimTY/tuic
+  DEPENDS:=@(aarch64||arm||x86_64)
 endef
 
-define Build/Prepare
-	$(call Build/Prepare/Default)
-ifneq ($(CONFIG_PACKAGE_tuic-client),)
-	$(call Download,tuic-client)
-endif
-endef
-
-define Build/Compile
-endef
-
-define Package/tuic-client/install
-	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) $(DL_DIR)/$(TUIC_ARCH) $(1)/usr/bin/tuic-client
-endef
-
+$(eval $(call RustBinPackage,tuic-client))
 $(eval $(call BuildPackage,tuic-client))
