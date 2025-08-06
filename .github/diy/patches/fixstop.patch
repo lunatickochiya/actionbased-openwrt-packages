@@ -62,16 +62,6 @@
 +	killall -q -9 `which pppoe-server`
  }
 
---- a/sysuh3c/files/sysuh3c.init
-+++ b/sysuh3c/files/sysuh3c.init
-@@ -39,5 +39,5 @@ start()
- 
- stop()
- {
--	killall sysuh3c >/dev/null 2>&1
-+	killall -q `which sysuh3c`
- }
-
 --- a/luci-app-speedtest-web/root/etc/init.d/speedtest-web
 +++ b/luci-app-speedtest-web/root/etc/init.d/speedtest-web
 @@ -15,5 +15,5 @@ start() {
