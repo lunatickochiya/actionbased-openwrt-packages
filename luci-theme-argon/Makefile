@@ -7,14 +7,9 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=Argon Theme
-LUCI_DEPENDS:=+wget +jsonfilter
-
+LUCI_DEPENDS:=+curl +jsonfilter
 
 LUCI_MINIFY_CSS:=0
-
-define Package/luci-theme-argon/conffiles
-/www/luci-static/argon/background/
-endef
 
 include $(TOPDIR)/feeds/luci/luci.mk
 

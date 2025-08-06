@@ -28,7 +28,6 @@
 @import url("pure-min.less");
 @import url("fonts.less");
 
-
 :root {
   --primary: #5e72e4;
   --dark-primary: #483d8b;
@@ -282,7 +281,6 @@ h6 {
   line-height: 1.1 !important;
   color: inherit;
 }
-
 
 select {
   padding: .36rem .8rem;
@@ -542,7 +540,8 @@ h5 {
           font-size: 1.25rem;
           font-weight: 700;
           font-family: "TypoGraphica";
-
+          margin-right: 45px;
+          word-break: break-word;
         }
 
         &:hover {
@@ -747,7 +746,7 @@ small {
   box-shadow: rgba(0, 0, 0, 0.75) 0px 0px 15px -5px;
   overflow-x: auto;
   z-index: 100;
-
+  word-break: break-word;
 
   .sidenav-header {
     padding: 1.5rem .5rem;
@@ -1403,6 +1402,11 @@ body[class*="node-"] > .main > .main-left > .nav > .slide > .menu.active::before
   display: none;
 }
 
+[data-page="admin-system-autoreboot"] {
+  #cbi-autoreboot {
+    margin-top: 0;
+  }
+}
 
 .cbi-section,
 .cbi-section-error,
@@ -1589,6 +1593,13 @@ tr > th,
   line-height: 1.3rem;
 }
 
+[data-page="admin-services-ddns"] {
+  #syslog {
+    overflow: auto;
+    font-size: 12px!important;
+  }
+}
+
 [data-page="admin-network-network"] {
   .cbi-value-field {
     .cbi-dynlist {
@@ -1606,15 +1617,15 @@ tr > th,
 
   div[data-name="_gen_server_keypair"],
   div[data-name="_gen_peer_keypair"],
-  div[data-name="_gen_psk"]{
+  div[data-name="_gen_psk"] {
     .cbi-value-title {
       height: 2.4rem;
     }
   }
 
   #modal_overlay > .modal.cbi-modal > div > p > textarea {
-    height: 20em!important;
-    border: 1px solid #dee2e6!important;
+    height: 20em !important;
+    border: 1px solid #dee2e6 !important;
     border-radius: 4px;
   }
 }
@@ -2350,6 +2361,7 @@ body:not(.Interfaces) .cbi-rowstyle-2:first-child {
       transition: box-shadow 0.15s ease;
       overflow: hidden;
       text-overflow: ellipsis;
+      user-select: text;
 
       white-space: nowrap;
       word-break: break-word;
@@ -2445,6 +2457,10 @@ body:not(.Interfaces) .cbi-rowstyle-2:first-child {
   }
 }
 
+.cbi-dynlist>.item.drag-over, .cbi-dynlist>.add-item:has(.drag-over) {
+	border-top: 1px solid var(--red);
+	margin-top: -1px;
+}
 
 .cbi-dynlist[name="sshkeys"] > .item {
   max-width: none;
@@ -2463,8 +2479,8 @@ body:not(.Interfaces) .cbi-rowstyle-2:first-child {
   min-height: 2.1875rem;
 }
 
-.cbi-dropdown.btn > ul:not(.dropdown), .cbi-dropdown.cbi-button > ul:not(.dropdown){
-  margin: 0 0 0 0.75rem!important;
+.cbi-dropdown.btn > ul:not(.dropdown), .cbi-dropdown.cbi-button > ul:not(.dropdown) {
+  margin: 0 0 0 0.75rem !important;
 }
 
 .cbi-dropdown[placeholder*="select"] {
@@ -2491,7 +2507,7 @@ body:not(.Interfaces) .cbi-rowstyle-2:first-child {
 }
 
 .cbi-dropdown.cbi-button-apply,
-.cbi-dropdown.cbi-button-action{
+.cbi-dropdown.cbi-button-action {
   padding: 0;
 }
 
@@ -2885,6 +2901,7 @@ body.modal-overlay-active #modal_overlay {
   text-align: left !important;
 }
 
+.button-row,
 .right,
 .right::before {
   text-align: right !important;
@@ -3032,6 +3049,10 @@ td > .ifacebadge,
 
 #syslog:focus {
   outline: 0;
+}
+
+#cbi-ddns #syslog {
+  overflow: auto;
 }
 
 /* config changes */
@@ -3303,7 +3324,7 @@ span[data-tooltip] .label {
 }
 
 .cbi-tooltip {
-  position: absolute; 
+  position: absolute;
   z-index: 1000;
   left: -10000px;
   box-shadow: 0 0 2px #8b8b8b;
@@ -3523,6 +3544,23 @@ div[style*="display:grid;grid-template-columns:repeat"] {
     h2 + br + p {
       margin-bottom: 1rem;
       padding-left: 1.5rem;
+    }
+  }
+}
+
+[data-page="admin-system-poweroffdevice"] {
+  .container {
+    h2 {
+      margin: 0 0 1rem 0;
+    }
+
+    h2 + p {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+    }
+
+    button + div {
+      display: none;
     }
   }
 }
@@ -3884,7 +3922,7 @@ div[style*="display:grid;grid-template-columns:repeat"] {
 /* custom commands */
 .commands {
   display: grid !important;
-  grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 10px;
 }
 
@@ -4020,20 +4058,165 @@ pre.command-output {
 }
 
 [data-page="admin-system-fileassistant"] {
+  #upload-toggle {
+    display: none !important;
+  }
+
   .fb-container .panel-title {
     padding: .5rem .75rem !important;
   }
 
   .cbi-section.fb-container {
     padding: 0.5rem;
+
+    label.cbi-value-title {
+      line-height: 1.5rem;
+      padding: 0.5rem 0.75rem;
+      width: 60px;
+      text-align: left;
+    }
+
+    div.cbi-value-field {
+      width: 100%;
+      display: block;
+      padding-left: 60px;
+    }
+
+    div#list-content {
+      table.cbi-section-table {
+        thead, tbody {
+          td.cbi-section-table-cell {
+            width: 232px;
+          }
+        }
+      }
+
+      tbody {
+        tr:nth-child(1) {
+          td.parent-icon {
+            strong {
+              margin-left: 0 !important;
+            }
+          }
+        }
+
+        td.cbi-value-field.file-icon,
+        td.cbi-value-field.folder-icon {
+          strong {
+            vertical-align: middle;
+            margin-left: 5px;
+          }
+        }
+      }
+    }
   }
 
   .fb-container .panel-container {
     border-bottom-color: #dee2e6;
+    display: flex;
+
+    .panel-title {
+      flex: 1;
+    }
+  }
+
+  .fb-container .upload-container {
+    display: flex !important;
+
+    .upload-file {
+      flex: 1;
+      margin-right: 0 !important;
+    }
   }
 }
 
 [data-page^="admin-services-openclash"] {
+  .oc {
+    --bg-light: #fff;
+    --bg-gray: #fff;
+    border-radius: 8px;
+
+    .developer-container {
+      background: transparent;
+    }
+  }
+
+  #cbi-openclash > fieldset {
+    background: none;
+    padding: 0;
+
+    > table > tbody > tr > td {
+      border: none;
+      padding: 0;
+    }
+
+    .main-card {
+      border: none;
+      box-shadow: none;
+      padding: 0 10px 10px 10px;
+      background: transparent;
+    }
+
+    .myip-main-card {
+      margin: 0;
+      padding: 10px;
+      border: none;
+      background: transparent;
+
+      .myip-section-title {
+        margin: 0;
+        border-width: 1px;
+      }
+    }
+  }
+
+  .sub-card .card-title {
+    margin-top: 5px;
+  }
+
+  .oc .main-cards-container {
+    margin: 0 !important;
+    gap: 0 !important;
+  }
+
+  .oc .config-file-bottom {
+    margin-bottom: 5px;
+
+    .card-actions {
+      margin-bottom: 2px !important;
+    }
+  }
+
+  .oc .card-content {
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .oc .card-controls {
+    align-self: center;
+  }
+
+  .oc .core-main-controls {
+    justify-content: center !important;
+  }
+
+  .oc .plugin-toggle-container {
+    margin-left: inherit !important;
+  }
+
+  .oc .core-status-toggle {
+    flex: 0 !important;
+    min-width: auto !important;
+  }
+
+  .oc .config-upload-content {
+    background: #fff !important;
+  }
+
+  .oc .subscription-info-container {
+    background: transparent !important;
+  }
+
   .cbi-tabmenu > li {
     border-right: none !important;
     margin: 0 0.4rem 0 0 !important;
@@ -4088,12 +4271,6 @@ pre.command-output {
   select#RELEASE_BRANCH {
     width: auto;
   }
-
-  [id="container.openclash.config.version_update"] {
-    table tr:nth-of-type(n+1) {
-
-    }
-  }
 }
 
 [data-page="admin-services-npc"] {
@@ -4110,8 +4287,64 @@ pre.command-output {
       border: none;
     }
   }
+
+  div[id^="cbid.npc."][id$=".server_addr"]:not([id="cbid.npc.config.server_addr"]),
+  div[id^="cbid.npc."][id$=".vkey"]:not([id="cbid.npc.config.vkey"]),
+  div[id^="cbid.npc."][id$=".protocol"]:not([id="cbid.npc.config.protocol"]),
+  div[id^="cbid.npc."][id$=".dns"]:not([id="cbid.npc.config.dns"]) {
+    + br {
+      display: none;
+    }
+  }
+
+  div.cbi-value.nowrap {
+    white-space: normal;
+  }
 }
 
+/* luci-app-dockerman */
+#cbi-dockerd {
+  .cbi-section {
+    box-sizing: border-box;
+    padding: 16px;
+  }
+  .cbi-section.cbi-tblsection {
+    padding: 0;
+  }
+
+}
+
+
+#cbi-docker {
+  .cbi-section {
+    .cbi-section-node {
+      box-sizing: border-box;
+      padding: 16px;
+    }
+  }
+}
+
+[data-page="admin-system-package-manager"] {
+  .controls {
+    div:nth-child(5) {
+      > label {
+        margin-bottom: 5px;
+      }
+
+      > div {
+        label {
+          margin-top: 1rem;
+
+          input {
+            top: -2px;
+            right: 0;
+            vertical-align: middle;
+          }
+        }
+      }
+    }
+  }
+}
 
 /* IE hacks */
 @media all and (-ms-high-contrast: none) {
@@ -4564,6 +4797,8 @@ pre.command-output {
     display: table-cell !important;
   }
 
+
+
   .modal.cbi-modal {
     max-width: 100%;
     max-height: none;
@@ -4653,20 +4888,20 @@ pre.command-output {
 }
 
 .cbi-tab-disabled[data-errors]::after {
-    content: attr(data-errors);
-    background-color: #f5365c;
-    background-color: var(--red);
-    color: #fff;
-    height: 1em;
-    min-width: 1em;
-    border-radius: 1em;
-    text-align: center;
-    display: inline-flex;
-    flex-direction: column;
-    justify-content: center;
-    font-size: .8em;
-    padding: 2px;
-    position: absolute;
-    top: 0;
-    right: 0;
+  content: attr(data-errors);
+  background-color: #f5365c;
+  background-color: var(--red);
+  color: #fff;
+  height: 1em;
+  min-width: 1em;
+  border-radius: 1em;
+  text-align: center;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: .8em;
+  padding: 2px;
+  position: absolute;
+  top: 0;
+  right: 0;
 }

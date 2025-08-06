@@ -1,8 +1,16 @@
 include $(TOPDIR)/rules.mk
 
-LUCI_TITLE:=LuCI for Argon theme configuration
+PKG_NAME:=luci-app-argon-config
+
+PKG_MAINTAINER:=jerrykuku <jerrykuku@qq.com>
+
+LUCI_TITLE:=LuCI app for Argon theme configuration
 LUCI_PKGARCH:=all
 LUCI_DEPENDS:=+luci-theme-argon
+
+define Package/$(PKG_NAME)/conffiles
+/etc/config/argon
+endef
 
 include $(TOPDIR)/feeds/luci/luci.mk
 

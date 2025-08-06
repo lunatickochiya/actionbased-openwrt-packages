@@ -6,41 +6,41 @@
 'require ui';
 'require view';
 
-const callSystemInfo = rpc.declare({
-	object: 'system',
-	method: 'info'
+var callAvailSpace = rpc.declare({
+	object: 'luci.argon',
+	method: 'avail'
 });
 
-const callRemoveArgon = rpc.declare({
+var callRemoveArgon = rpc.declare({
 	object: 'luci.argon',
 	method: 'remove',
 	params: ['filename'],
 	expect: { '': {} }
 });
 
-const callRenameArgon = rpc.declare({
+var callRenameArgon = rpc.declare({
 	object: 'luci.argon',
 	method: 'rename',
 	params: ['newname'],
 	expect: { '': {} }
 });
 
-const bg_path = '/www/luci-static/argon/background/';
+var bg_path = '/www/luci-static/argon/background/';
 
-const trans_set = [0, 0.1, 0.2, 0.3, 0.4,
+var trans_set = [0, 0.1, 0.2, 0.3, 0.4,
 	0.5, 0.6, 0.7, 0.8, 0.9, 1 ];
 
 return view.extend({
-	load() {
+	load: function() {
 		return Promise.all([
 			uci.load('argon'),
-			L.resolveDefault(callSystemInfo(), {}),
+			L.resolveDefault(callAvailSpace(), {}),
 			L.resolveDefault(fs.list(bg_path), {})
 		]);
 	},
 
-	render(data) {
-		let m, s, o;
+	render: function(data) {
+		var m, s, o;
 
 		m = new form.Map('argon', _('Argon theme configuration'),
 			_('Here you can set the blur and transparency of the login page of argon theme, and manage the background pictures and videos. Chrome is recommended.'));
@@ -52,7 +52,7 @@ return view.extend({
 		o = s.option(form.ListValue, 'online_wallpaper', _('Wallpaper source'));
 		o.value('none', _('Built-in'));
 		o.value('bing', _('Bing'));
-		o.value('ghser', _('GHSer'));
+		o.value('ghser', _('ACG'));
 		o.value('unsplash', _('Unsplash'));
 		o.value('wallhaven', _('Wallhaven'));
 		o.default = 'bing';
@@ -73,11 +73,36 @@ return view.extend({
 				return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(value) ||
 					_('Expecting: %s').format(_('valid HEX color value'));
 			return true;
-		}
+		};
+		o.render = function(section_id, option_index, cfgvalue) {
+			var el = form.Value.prototype.render.apply(this, arguments);
+			setTimeout(function() {
+				const textInput = document.querySelector('[id^="widget.cbid.argon."][id$=".primary"]');
+				const colorPicker = document.createElement('input');
+				colorPicker.type = 'color';
+				colorPicker.value = textInput.value;
+				colorPicker.style.width = '24px';
+				colorPicker.style.height = '24px';
+				colorPicker.style.padding = '0px';
+				colorPicker.style.marginLeft = '5px';
+				colorPicker.style.borderRadius = '4px';
+				colorPicker.style.border = '1px solid #d9d9d9';
+				colorPicker.style.justifyContent = 'center';
+				colorPicker.style.transition = 'all 0.2s';
+				textInput.parentNode.insertBefore(colorPicker, textInput.nextSibling);
+				colorPicker.addEventListener('input', function() {
+					textInput.value = colorPicker.value;
+				});
+				textInput.addEventListener('input', function() {
+					colorPicker.value = textInput.value;
+				});
+			}, 0);
+			return el;
+		};
 
 		o = s.option(form.ListValue, 'transparency', _('[Light mode] Transparency'),
 			_('0 transparent - 1 opaque (suggest: transparent: 0 or translucent preset: 0.5).'));
-		for (let i of trans_set)
+		for (var i of trans_set)
 			o.value(i);
 		o.default = '0.5';
 		o.rmempty = false;
@@ -97,11 +122,36 @@ return view.extend({
 				return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(value) ||
 					_('Expecting: %s').format(_('valid HEX color value'));
 			return true;
-		}
+		};
+		o.render = function(section_id, option_index, cfgvalue) {
+			var el = form.Value.prototype.render.apply(this, arguments);
+			setTimeout(function() {
+				const textInput = document.querySelector('[id^="widget.cbid.argon."][id$=".dark_primary"]');
+				const colorPicker = document.createElement('input');
+				colorPicker.type = 'color';
+				colorPicker.value = textInput.value;
+				colorPicker.style.width = '24px';
+				colorPicker.style.height = '24px';
+				colorPicker.style.padding = '0px';
+				colorPicker.style.marginLeft = '5px';
+				colorPicker.style.borderRadius = '4px';
+				colorPicker.style.border = '1px solid #d9d9d9';
+				colorPicker.style.justifyContent = 'center';
+				colorPicker.style.transition = 'all 0.2s';
+				textInput.parentNode.insertBefore(colorPicker, textInput.nextSibling);
+				colorPicker.addEventListener('input', function() {
+					textInput.value = colorPicker.value;
+				});
+				textInput.addEventListener('input', function() {
+					colorPicker.value = textInput.value;
+				});
+			}, 0);
+			return el;
+		};
 
 		o = s.option(form.ListValue, 'transparency_dark', _('[Dark mode] Transparency'),
 			_('0 transparent - 1 opaque (suggest: black translucent preset: 0.5).'));
-		for (let i of trans_set)
+		for (var i of trans_set)
 			o.value(i);
 		o.default = '0.5';
 		o.rmempty = false;
@@ -121,7 +171,7 @@ return view.extend({
 		}
 
 		s = m.section(form.TypedSection, null, _('Upload background (available space: %1024.2mB)')
-			.format(data[1].root.avail * 1024),
+			.format(data[1].avail * 1024),
 			_('You can upload files such as gif/jpg/mp4/png/webm/webp files, to change the login page background.'));
 		s.addremove = false;
 		s.anonymous = true;
@@ -131,7 +181,7 @@ return view.extend({
 		o.inputstyle = 'action';
 		o.inputtitle = _('Upload...');
 		o.onclick = function(ev, section_id) {
-			let file = '/tmp/argon_background.tmp';
+			var file = '/tmp/argon_background.tmp';
 			return ui.uploadFile(file, ev.target).then(function(res) {
 				return L.resolveDefault(callRenameArgon(res.name), {}).then(function(ret) {
 					if (ret.result === 0)
@@ -148,7 +198,7 @@ return view.extend({
 
 		s = m.section(form.TableSection);
 		s.render = function() {
-			let tbl = E('table', { 'class': 'table cbi-section-table' },
+			var tbl = E('table', { 'class': 'table cbi-section-table' },
 				E('tr', { 'class': 'tr table-titles' }, [
 					E('th', { 'class': 'th' }, [ _('Filename') ]),
 					E('th', { 'class': 'th' }, [ _('Modified date') ]),
