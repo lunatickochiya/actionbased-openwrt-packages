@@ -417,7 +417,8 @@ jobs:
         git_sparse_clone master "https://github.com/immortalwrt/luci" "immluci1" applications/luci-app-dufs applications/luci-app-libreswan applications/luci-app-strongswan-swanctl
         git_sparse_clone master "https://github.com/immortalwrt/packages" "immpkgs1" utils/swanmon libs/davici
         #git_sparse_clone master "https://github.com/immortalwrt/wwan-packages" "wwan-immpkgs1" applications/luci-app-3ginfo-lite applications/luci-app-modemband applications/luci-app-sms-tool-js applications/luci-proto-quectel drivers/fibocom-qmi-wwan drivers/quectel-gobinet drivers/quectel-mhi-pcie drivers/quectel-qmi-wwan drivers/quectel-sprd-pcie utils/fibocom-dial utils/modemband utils/quectel-cm
-        git_sparse_clone openwrt-24.10 "https://github.com/immortalwrt/luci" "immluci2410" applications/luci-app-argon-config themes/luci-theme-argon
+        #git_sparse_clone openwrt-24.10 "https://github.com/immortalwrt/luci" "immluci2410" applications/luci-app-argon-config themes/luci-theme-argon
+        git_sparse_clone fb8f021f5ad7ddaad1d40510b0ed1f7372fc3ede "https://github.com/jerrykuku/luci-theme-argon" "luci-theme-argon"
         git_sparse_clone master "https://github.com/coolsnowwolf/lede" "leanlede" package/lean package/qca/shortcut-fe package/wwan package/network/services/shellsync package/network/services/e2guardian package/network/services/noddos
         ) &
         git_sparse_clone master "https://github.com/coolsnowwolf/luci" "leluci" applications libs/luci-lib-fs
