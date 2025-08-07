@@ -386,13 +386,13 @@ jobs:
         modules/luci-mod-status modules/luci-mod-system
         ) &
         (
-        git_sparse_clone openwrt-23.05 "https://github.com/immortalwrt/packages" "immpkgs-pdnsd-alt" net/pdnsd-alt net/dufs
+        git_sparse_clone openwrt-23.05 "https://github.com/immortalwrt/packages" "immpkgs-pdnsd-alt" net/pdnsd-alt net/dufs net/mwol
         ) &
         (
-        git_sparse_clone openwrt-24.10 "https://github.com/immortalwrt/packages" "immpkgs" net/mwol net/n2n net/dae \
+        git_sparse_clone openwrt-24.10 "https://github.com/immortalwrt/packages" "immpkgs" net/n2n net/dae \
         net/sub-web net/dnsproxy net/haproxy net/v2raya net/cdnspeedtest net/keepalived net/amule libs/antileech \
         net/go-nats net/go-wol net/bitsrunlogin-go net/transfer net/sysuh3c net/3proxy net/cloudreve net/daed \
-        net/subconverter net/ngrokc net/oscam net/njitclient net/scutclient net/gost net/ua2f net/qBittorrent-Enhanced-Edition \
+        net/subconverter net/ngrokc net/oscam net/njit8021xclient net/scutclient net/gost net/ua2f net/qBittorrent-Enhanced-Edition \
         net/tinyportmapper net/tinyfecvpn net/nexttrace net/pcap-dnsproxy net/rustdesk-server net/tuic-server net/speedtest-go net/speedtest-cli \
         net/dns-forwarder net/ipset-lists net/ShadowVPN net/cloudflared net/nps net/naiveproxy \
         lang/lua-maxminddb net/pdnsd-alt \
