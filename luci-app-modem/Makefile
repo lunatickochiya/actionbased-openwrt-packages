@@ -22,8 +22,6 @@ LUCI_DEPENDS:=+luci-compat \
 		+usbutils \
 		+kmod-pcie_mhi \
 		+pciutils \
-		+modemmanager \
-		+luci-proto-modemmanager \
 		+sms-tool \
 		+ndisc6 +rdisc6 \
 		+bc +jq
