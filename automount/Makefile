@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=automount
 PKG_FLAGS:=nonshared
-PKG_RELEASE:=5
+PKG_RELEASE:=6
 
 PKG_CONFIG_DEPENDS:= \
 	CONFIG_TARGET_ramips \
@@ -41,7 +41,6 @@ define Package/ntfs3-mount
   SUBMENU:=Filesystem
   TITLE:=NTFS mount script for Paragon NTFS3 driver
   DEPENDS:=+kmod-fs-ntfs3
-  CONFLICTS:=ntfs-3g
   VARIANT:=ntfs3-mount
   PKGARCH:=all
 endef
