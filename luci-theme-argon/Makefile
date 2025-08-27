@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 LUCI_TITLE:=Argon Theme
 LUCI_DEPENDS:=+wget +jsonfilter
 
-CONFIG_LUCI_CSSTIDY:=
+LUCI_MINIFY_CSS:=0
 
 include $(TOPDIR)/feeds/luci/luci.mk
 

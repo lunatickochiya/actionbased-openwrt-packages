@@ -52,10 +52,15 @@ return view.extend({
 		o = s.option(form.ListValue, 'online_wallpaper', _('Wallpaper source'));
 		o.value('none', _('Built-in'));
 		o.value('bing', _('Bing'));
+		o.value('ghser', _('ACG'));
 		o.value('unsplash', _('Unsplash'));
 		o.value('wallhaven', _('Wallhaven'));
 		o.default = 'bing';
 		o.rmempty = false;
+
+		o = s.option(form.Value, 'use_api_key', _('API key'), _('Specify API key for Unsplash or Wallhaven.'));
+		o.depends('online_wallpaper', 'unsplash');
+		o.depends('online_wallpaper', 'wallhaven');
 
 		o = s.option(form.ListValue, 'mode', _('Theme mode'));
 		o.value('normal', _('Follow system'));
@@ -72,7 +77,32 @@ return view.extend({
 				return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(value) ||
 					_('Expecting: %s').format(_('valid HEX color value'));
 			return true;
-		}
+		};
+		o.render = function(section_id, option_index, cfgvalue) {
+			var el = form.Value.prototype.render.apply(this, arguments);
+			setTimeout(function() {
+				const textInput = document.querySelector('[id^="widget.cbid.argon."][id$=".primary"]');
+				const colorPicker = document.createElement('input');
+				colorPicker.type = 'color';
+				colorPicker.value = textInput.value;
+				colorPicker.style.width = '24px';
+				colorPicker.style.height = '24px';
+				colorPicker.style.padding = '0px';
+				colorPicker.style.marginLeft = '5px';
+				colorPicker.style.borderRadius = '4px';
+				colorPicker.style.border = '1px solid #d9d9d9';
+				colorPicker.style.justifyContent = 'center';
+				colorPicker.style.transition = 'all 0.2s';
+				textInput.parentNode.insertBefore(colorPicker, textInput.nextSibling);
+				colorPicker.addEventListener('input', function() {
+					textInput.value = colorPicker.value;
+				});
+				textInput.addEventListener('input', function() {
+					colorPicker.value = textInput.value;
+				});
+			}, 0);
+			return el;
+		};
 
 		o = s.option(form.ListValue, 'transparency', _('[Light mode] Transparency'),
 			_('0 transparent - 1 opaque (suggest: transparent: 0 or translucent preset: 0.5).'));
@@ -96,7 +126,32 @@ return view.extend({
 				return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(value) ||
 					_('Expecting: %s').format(_('valid HEX color value'));
 			return true;
-		}
+		};
+		o.render = function(section_id, option_index, cfgvalue) {
+			var el = form.Value.prototype.render.apply(this, arguments);
+			setTimeout(function() {
+				const textInput = document.querySelector('[id^="widget.cbid.argon."][id$=".dark_primary"]');
+				const colorPicker = document.createElement('input');
+				colorPicker.type = 'color';
+				colorPicker.value = textInput.value;
+				colorPicker.style.width = '24px';
+				colorPicker.style.height = '24px';
+				colorPicker.style.padding = '0px';
+				colorPicker.style.marginLeft = '5px';
+				colorPicker.style.borderRadius = '4px';
+				colorPicker.style.border = '1px solid #d9d9d9';
+				colorPicker.style.justifyContent = 'center';
+				colorPicker.style.transition = 'all 0.2s';
+				textInput.parentNode.insertBefore(colorPicker, textInput.nextSibling);
+				colorPicker.addEventListener('input', function() {
+					textInput.value = colorPicker.value;
+				});
+				textInput.addEventListener('input', function() {
+					colorPicker.value = textInput.value;
+				});
+			}, 0);
+			return el;
+		};
 
 		o = s.option(form.ListValue, 'transparency_dark', _('[Dark mode] Transparency'),
 			_('0 transparent - 1 opaque (suggest: black translucent preset: 0.5).'));
