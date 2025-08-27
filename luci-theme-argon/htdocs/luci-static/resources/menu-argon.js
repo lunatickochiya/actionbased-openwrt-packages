@@ -186,21 +186,6 @@ const SlideAnimations = {
 	}
 };
 
-var currentUrl = window.location.href;
-var pattern = /\/cgi-bin\/luci\/admin\/status\/logs.*/;
-if (pattern.test(currentUrl)) {
-	var mainElement = document.querySelector(".main");
-	mainElement.style.overflowY = "visible";
-	var mainRightElement = document.querySelector(".main-right");
-	mainRightElement.style.overflowX = "visible";
-	mainRightElement.style.overflowY = "visible";
-	setTimeout(function() {
-		var pageHeight = document.body.scrollHeight;
-		var mainLeftElement = document.querySelector(".main-left");
-		mainLeftElement.style.height = pageHeight + "px";
-	}, 500);
-}
-
 /**
  * Argon Theme Menu Module
  * Handles rendering and interaction of the main navigation menu and sidebar
