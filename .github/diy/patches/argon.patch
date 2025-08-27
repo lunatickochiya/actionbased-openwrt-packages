@@ -1,0 +1,135 @@
+From 226f15cc03b16f1afe6fb3d88fb2e71e46e25595 Mon Sep 17 00:00:00 2001
+From: lunatickochiya <125438787@qq.com>
+Date: Wed, 27 Aug 2025 21:41:07 +0800
+Subject: [PATCH] Revert "Auxiliary commit to revert individual files from
+ d5380015fd1660ebb555dc1c975be7d8d96432f6"
+
+This reverts commit 8f8e046aaee9039e31a30d14b38c11bef4b97435.
+Revert "Auxiliary commit to revert individual files from d5380015fd1660ebb555dc1c975be7d8d96432f6"
+
+This reverts commit 9c367c7662d63797c73359d9ca111019c6e63dec.
+---
+ .../resources/view/argon-config.js            | 59 ++++++++++++++++++-
+ luci-theme-argon/Makefile                     |  2 +-
+ .../usr/libexec/rpcd/luci.argon_wallpaper     |  3 +
+ 3 files changed, 61 insertions(+), 3 deletions(-)
+
+diff --git a/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js b/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js
+index e5c2d2016..a14783b3b 100644
+--- a/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js
++++ b/luci-app-argon-config/htdocs/luci-static/resources/view/argon-config.js
+@@ -52,11 +52,16 @@ return view.extend({
+ 		o = s.option(form.ListValue, 'online_wallpaper', _('Wallpaper source'));
+ 		o.value('none', _('Built-in'));
+ 		o.value('bing', _('Bing'));
++		o.value('ghser', _('ACG'));
+ 		o.value('unsplash', _('Unsplash'));
+ 		o.value('wallhaven', _('Wallhaven'));
+ 		o.default = 'bing';
+ 		o.rmempty = false;
+ 
++		o = s.option(form.Value, 'use_api_key', _('API key'), _('Specify API key for Unsplash or Wallhaven.'));
++		o.depends('online_wallpaper', 'unsplash');
++		o.depends('online_wallpaper', 'wallhaven');
++
+ 		o = s.option(form.ListValue, 'mode', _('Theme mode'));
+ 		o.value('normal', _('Follow system'));
+ 		o.value('light', _('Light mode'));
+@@ -72,7 +77,32 @@ return view.extend({
+ 				return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(value) ||
+ 					_('Expecting: %s').format(_('valid HEX color value'));
+ 			return true;
+-		}
++		};
++		o.render = function(section_id, option_index, cfgvalue) {
++			var el = form.Value.prototype.render.apply(this, arguments);
++			setTimeout(function() {
++				const textInput = document.querySelector('[id^="widget.cbid.argon."][id$=".primary"]');
++				const colorPicker = document.createElement('input');
++				colorPicker.type = 'color';
++				colorPicker.value = textInput.value;
++				colorPicker.style.width = '24px';
++				colorPicker.style.height = '24px';
++				colorPicker.style.padding = '0px';
++				colorPicker.style.marginLeft = '5px';
++				colorPicker.style.borderRadius = '4px';
++				colorPicker.style.border = '1px solid #d9d9d9';
++				colorPicker.style.justifyContent = 'center';
++				colorPicker.style.transition = 'all 0.2s';
++				textInput.parentNode.insertBefore(colorPicker, textInput.nextSibling);
++				colorPicker.addEventListener('input', function() {
++					textInput.value = colorPicker.value;
++				});
++				textInput.addEventListener('input', function() {
++					colorPicker.value = textInput.value;
++				});
++			}, 0);
++			return el;
++		};
+ 
+ 		o = s.option(form.ListValue, 'transparency', _('[Light mode] Transparency'),
+ 			_('0 transparent - 1 opaque (suggest: transparent: 0 or translucent preset: 0.5).'));
+@@ -96,7 +126,32 @@ return view.extend({
+ 				return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(value) ||
+ 					_('Expecting: %s').format(_('valid HEX color value'));
+ 			return true;
+-		}
++		};
++		o.render = function(section_id, option_index, cfgvalue) {
++			var el = form.Value.prototype.render.apply(this, arguments);
++			setTimeout(function() {
++				const textInput = document.querySelector('[id^="widget.cbid.argon."][id$=".dark_primary"]');
++				const colorPicker = document.createElement('input');
++				colorPicker.type = 'color';
++				colorPicker.value = textInput.value;
++				colorPicker.style.width = '24px';
++				colorPicker.style.height = '24px';
++				colorPicker.style.padding = '0px';
++				colorPicker.style.marginLeft = '5px';
++				colorPicker.style.borderRadius = '4px';
++				colorPicker.style.border = '1px solid #d9d9d9';
++				colorPicker.style.justifyContent = 'center';
++				colorPicker.style.transition = 'all 0.2s';
++				textInput.parentNode.insertBefore(colorPicker, textInput.nextSibling);
++				colorPicker.addEventListener('input', function() {
++					textInput.value = colorPicker.value;
++				});
++				textInput.addEventListener('input', function() {
++					colorPicker.value = textInput.value;
++				});
++			}, 0);
++			return el;
++		};
+ 
+ 		o = s.option(form.ListValue, 'transparency_dark', _('[Dark mode] Transparency'),
+ 			_('0 transparent - 1 opaque (suggest: black translucent preset: 0.5).'));
+diff --git a/luci-theme-argon/Makefile b/luci-theme-argon/Makefile
+index 6608b33c8..66f72fe8d 100644
+--- a/luci-theme-argon/Makefile
++++ b/luci-theme-argon/Makefile
+@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
+ LUCI_TITLE:=Argon Theme
+ LUCI_DEPENDS:=+wget +jsonfilter
+ 
+-CONFIG_LUCI_CSSTIDY:=
++LUCI_MINIFY_CSS:=0
+ 
+ include $(TOPDIR)/feeds/luci/luci.mk
+ 
+diff --git a/luci-theme-argon/root/usr/libexec/rpcd/luci.argon_wallpaper b/luci-theme-argon/root/usr/libexec/rpcd/luci.argon_wallpaper
+index 530121f5e..640f06640 100755
+--- a/luci-theme-argon/root/usr/libexec/rpcd/luci.argon_wallpaper
++++ b/luci-theme-argon/root/usr/libexec/rpcd/luci.argon_wallpaper
+@@ -26,6 +26,9 @@ fetch_pic_url() {
+ 			sed 's/1920x1080/UHD/g')"
+ 		[ -n "${picpath}" ] && echo "//www.bing.com${picpath}"
+ 		;;
++	ghser)
++		echo "https://api.vvhan.com/api/wallpaper/acg"
++		;;
+ 	unsplash)
+ 		if [ -z "$API_KEY" ]; then
+ 			local pic_id="$(wget -T3 --spider \
+-- 
+2.43.0
+
