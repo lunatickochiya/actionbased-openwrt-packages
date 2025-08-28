@@ -192,6 +192,7 @@ jobs:
         git_clone https://github.com/rafmilecki/luci-app-xjay
         git_clone https://github.com/jhonathanc/ps3netsrv-openwrt && mv -n ps3netsrv-openwrt/* ./;rm -rf ps3netsrv-openwrt
         #git_clone https://github.com/kiddin9/openwrt-thunder && mvdir openwrt-thunder
+        git_clone https://github.com/Internet1235/qy-openwrt && mvdir qy-openwrt
         ) &
         (
         git_clone https://github.com/honwen/luci-app-aliddns
