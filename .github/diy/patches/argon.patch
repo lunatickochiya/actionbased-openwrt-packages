@@ -133,3 +133,31 @@ index 530121f5e..640f06640 100755
 -- 
 2.43.0
 
+
+diff --git a/luci-theme-argon/htdocs/luci-static/resources/menu-argon.js b/luci-theme-argon/htdocs/luci-static/resources/menu-argon.js
+index 3f4dd67f0..a959748b5 100644
+--- a/luci-theme-argon/htdocs/luci-static/resources/menu-argon.js
++++ b/luci-theme-argon/htdocs/luci-static/resources/menu-argon.js
+@@ -186,6 +186,21 @@ const SlideAnimations = {
+ 	}
+ };
+
++var currentUrl = window.location.href;
++var pattern = /\/cgi-bin\/luci\/admin\/status\/logs.*/;
++if (pattern.test(currentUrl)) {
++	var mainElement = document.querySelector(".main");
++	mainElement.style.overflowY = "visible";
++	var mainRightElement = document.querySelector(".main-right");
++	mainRightElement.style.overflowX = "visible";
++	mainRightElement.style.overflowY = "visible";
++	setTimeout(function() {
++		var pageHeight = document.body.scrollHeight;
++		var mainLeftElement = document.querySelector(".main-left");
++		mainLeftElement.style.height = pageHeight + "px";
++	}, 500);
++}
++
+ /**
+  * Argon Theme Menu Module
+  * Handles rendering and interaction of the main navigation menu and sidebar
+
