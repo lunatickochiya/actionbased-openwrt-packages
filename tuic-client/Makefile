@@ -5,8 +5,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=tuic-client
-PKG_VERSION:=1.0.0
-PKG_RELEASE:=29
+PKG_VERSION:=tuic-server-1.0.0
+PKG_RELEASE:=30
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/EAimTY/tuic/tar.gz/tuic-client-$(PKG_VERSION)?
