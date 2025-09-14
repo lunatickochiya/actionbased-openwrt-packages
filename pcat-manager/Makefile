@@ -6,12 +6,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=pcat-manager
-PKG_RELEASE:=14
+PKG_RELEASE:=15
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_DATE:=2023-03-17
 PKG_SOURCE_URL:=https://github.com/photonicat/rockchip_rk3568_pcat_manager
-PKG_SOURCE_VERSION:=62e5a1ca0d676994ad55926e1f9c76fe9ef1e204
+PKG_SOURCE_VERSION:=null
 PKG_MIRROR_HASH:=skip
 
 PKG_LICENSE:=GPL-3.0
