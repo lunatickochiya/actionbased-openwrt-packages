@@ -1,0 +1,88 @@
+diff --git a/luci-theme-argon/htdocs/luci-static/argon/css/cascade.css b/luci-theme-argon/htdocs/luci-static/argon/css/cascade.css
+index 29681b1fb..10917465c 100644
+--- a/luci-theme-argon/htdocs/luci-static/argon/css/cascade.css
++++ b/luci-theme-argon/htdocs/luci-static/argon/css/cascade.css
+@@ -1415,15 +1415,12 @@ footer > a {
+   margin-left: 0;
+   margin-right: 0;
+   margin-top: 0rem;
+-}
+-
+-.container .alert,
+-.container .alert-message.error {
+   position: relative;
+   top: 0;
+   transform:translate(-50%, 0);
+   width: 100%;
+ }
++
+ .lg {
+   margin: 0;
+   padding: 0 !important;
+@@ -2574,7 +2571,7 @@ body:not(.Interfaces) .cbi-rowstyle-2:first-child {
+   padding: 0.5rem;
+   cursor: auto;
+   white-space: pre-wrap;
+-  color: var(--gray-dark);
++  color: var(--dark-primary);
+   outline: 0;
+   border-radius: 0.25rem;
+   border: 1px solid var(--lighter);
+@@ -3467,6 +3464,7 @@ pre.command-output {
+   background: #fb6340 !important;
+   border-color: #fb6340 !important;
+   margin-left: 0 !important;
++  width: 82px !important;
+ }
+ /* applyreboot fix */
+ #applyreboot-container {
+diff --git a/luci-theme-argon/less/cascade.less b/luci-theme-argon/less/cascade.less
+index cec6a7a17..94fbe4978 100644
+--- a/luci-theme-argon/less/cascade.less
++++ b/luci-theme-argon/less/cascade.less
+@@ -275,16 +275,12 @@ select[multiple="multiple"] {
+   margin-left: 0;
+   margin-right: 0;
+   margin-top: 0rem;
+-}
+-
+-
+-.container .alert,
+-.container .alert-message.error {
+   position: relative;
+   top: 0;
+   transform:translate(-50%, 0);
+   width: 100%;
+ }
++
+ .lg {
+   margin: 0;
+   padding: 0 !important;
+@@ -1671,7 +1667,7 @@ body:not(.Interfaces) .cbi-rowstyle-2:first-child {
+     padding: 0.5rem;
+     cursor: auto;
+     white-space: pre-wrap;
+-    color: var(--gray-dark);
++    color: var(--dark-primary);
+     outline: 0;
+     border-radius: 0.25rem;
+     border: 1px solid var(--lighter);
+diff --git a/luci-theme-argon/less/page-fix.less b/luci-theme-argon/less/page-fix.less
+index 383f11608..623f0468d 100644
+--- a/luci-theme-argon/less/page-fix.less
++++ b/luci-theme-argon/less/page-fix.less
+@@ -362,6 +362,7 @@
+         background: #fb6340 !important;
+         border-color: #fb6340 !important;
+         margin-left: 0 !important;
++        width: 82px !important;
+     }
+ }
+ 
+@@ -948,4 +949,4 @@ div[style*="display:grid;grid-template-columns:repeat"] {
+ [data-page^="command-cfg"] .mobile-hide,
+ [data-page^="command-cfg"] .showSide {
+     display: none;
+-}
+\ No newline at end of file
++}
