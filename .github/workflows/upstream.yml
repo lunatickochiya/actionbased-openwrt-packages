@@ -202,6 +202,7 @@ jobs:
         git_clone https://github.com/sundaqiang/openwrt-packages sundaqiang && mv -n sundaqiang/luci-* ./; rm -rf sundaqiang
         git_clone https://github.com/vernesong/OpenClash && mv -n OpenClash/luci-app-openclash ./; rm -rf OpenClash
         git_clone https://github.com/pymumu/luci-app-smartdns
+        git_clone https://github.com/pymumu/openwrt-smartdns
         git_clone https://github.com/CHN-beta/rkp-ipid
         git_clone https://github.com/Erope/openwrt_nezha nezha && mvdir nezha
         ) &
@@ -392,7 +393,7 @@ jobs:
         (
         git_sparse_clone openwrt-24.10 "https://github.com/immortalwrt/packages" "immpkgs" net/n2n net/dae \
         net/sub-web net/dnsproxy net/haproxy net/v2raya net/cdnspeedtest net/keepalived net/amule libs/antileech \
-        net/go-nats net/go-wol net/bitsrunlogin-go net/transfer net/sysuh3c net/3proxy net/cloudreve net/daed lang/node-pnpm net/smartdns \
+        net/go-nats net/go-wol net/bitsrunlogin-go net/transfer net/sysuh3c net/3proxy net/cloudreve net/daed lang/node-pnpm \
         net/subconverter net/ngrokc net/oscam net/njit8021xclient net/scutclient net/gost net/ua2f net/qBittorrent-Enhanced-Edition \
         net/tinyportmapper net/tinyfecvpn net/nexttrace net/pcap-dnsproxy net/rustdesk-server net/tuic-server net/speedtest-go net/speedtest-cli \
         net/dns-forwarder net/ipset-lists net/ShadowVPN net/cloudflared net/nps net/naiveproxy \
