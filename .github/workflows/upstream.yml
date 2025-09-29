@@ -419,6 +419,7 @@ jobs:
         git_sparse_clone master "https://github.com/x-wrt/com.x-wrt" "x-wrt" luci-app-macvlan luci-app-xwan
         git_sparse_clone master "https://github.com/sbwml/openwrt_pkgs" "openwrt_pkgs" luci-app-socat
         git_sparse_clone master "https://github.com/immortalwrt/luci" "immluci1" applications/luci-app-dufs applications/luci-app-libreswan applications/luci-app-strongswan-swanctl
+        git_sparse_clone openwrt-24.10 "https://github.com/immortalwrt/luci" "immluci2" applications/luci-app-homeproxy
         git_sparse_clone master "https://github.com/immortalwrt/packages" "immpkgs1" utils/swanmon libs/davici
         #git_sparse_clone master "https://github.com/immortalwrt/wwan-packages" "wwan-immpkgs1" applications/luci-app-3ginfo-lite applications/luci-app-modemband applications/luci-app-sms-tool-js applications/luci-proto-quectel drivers/fibocom-qmi-wwan drivers/quectel-gobinet drivers/quectel-mhi-pcie drivers/quectel-qmi-wwan drivers/quectel-sprd-pcie utils/fibocom-dial utils/modemband utils/quectel-cm
         # git_sparse_clone openwrt-24.10 "https://github.com/immortalwrt/luci" "immluci2410" applications/luci-app-argon-config themes/luci-theme-argon
@@ -429,7 +430,7 @@ jobs:
         rm -rf luciapp/{luci-app-qbittorrent,luci-app-cpufreq,luci-app-zerotier,luci-app-ipsec-server,luci-app-ipsec-vpnd,luci-app-e2guardian,luci-app-webdav,luci-app-aliyundrive-fuse}
         git_sparse_clone openwrt-23.05 "https://github.com/immortalwrt/luci" "immluci" applications protocols/luci-proto-minieap
         mv -n applications/* luciapp/; rm -rf applications
-        rm -rf luciapp/{luci-app-ipsec-vpnd,luci-app-ipsec-vpnserver-manyusers}
+        rm -rf luciapp/{luci-app-ipsec-vpnd,luci-app-ipsec-vpnserver-manyusers,luci-app-homeproxy}
 
         for ipk in $(ls -d luciapp/!(luci-app-rclone|luci-app-mwan3)/); do
         	if [[ $(ls $ipk/po | wc -l) -gt 3 ]]; then
