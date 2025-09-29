@@ -299,5 +299,30 @@ index f236f33..1b76704 100644
  endef
 
 
+diff --git a/luci-app-homeproxy/Makefile b/luci-app-homeproxy/Makefile
+index 2f34e39f6..f678dae8b 100644
+--- a/luci-app-homeproxy/Makefile
++++ b/luci-app-homeproxy/Makefile
+@@ -6,7 +6,6 @@ include $(TOPDIR)/rules.mk
+
+ LUCI_TITLE:=The modern ImmortalWrt proxy platform for ARM64/AMD64
+ LUCI_DEPENDS:= \
+-	+sing-box \
+ 	+firewall4 \
+ 	+kmod-nft-tproxy \
+ 	+ucode-mod-digest
+diff --git a/luci-app-kucat-config/Makefile b/luci-app-kucat-config/Makefile
+index fd49dd893..3439cdc2b 100644
+--- a/luci-app-kucat-config/Makefile
++++ b/luci-app-kucat-config/Makefile
+@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
+ NAME:=kucat
+ PKG_NAME:=luci-app-$(NAME)
+ LUCI_TITLE:=LuCI support for Kucat theme setting by sirpdboy
+-LUCI_DEPENDS:=+curl
++LUCI_DEPENDS:=+curl +luci-theme-kucat
+ LUCI_PKGARCH:=all
+
+
 
 
