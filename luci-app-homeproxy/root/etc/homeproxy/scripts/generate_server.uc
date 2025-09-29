@@ -23,12 +23,15 @@ uci.load(uciconfig);
 
 const uciserver = 'server';
 
+const log_level = uci.get(uciconfig, uciserver, 'log_level') || 'warn';
+/* UCI config end */
+
 const config = {};
 
 /* Log */
 config.log = {
 	disabled: false,
-	level: 'warn',
+	level: log_level,
 	output: RUN_DIR + '/sing-box-s.log',
 	timestamp: true
 };
@@ -45,11 +48,16 @@ uci.foreach(uciconfig, uciserver, (cfg) => {
 
 		listen: cfg.address || '::',
 		listen_port: strToInt(cfg.port),
+		bind_interface: cfg.bind_interface,
+		reuse_addr: strToBool(cfg.reuse_addr),
 		tcp_fast_open: strToBool(cfg.tcp_fast_open),
 		tcp_multi_path: strToBool(cfg.tcp_multi_path),
 		udp_fragment: strToBool(cfg.udp_fragment),
 		udp_timeout: strToTime(cfg.udp_timeout),
 		network: cfg.network,
+
+		/* AnyTLS */
+		padding_scheme: cfg.anytls_padding_scheme,
 
 		/* Hysteria */
 		up_mbps: strToInt(cfg.hysteria_up_mbps),
@@ -75,7 +83,7 @@ uci.foreach(uciconfig, uciserver, (cfg) => {
 		zero_rtt_handshake: strToBool(cfg.tuic_enable_zero_rtt),
 		heartbeat: strToTime(cfg.tuic_heartbeat),
 
-		/* HTTP / Hysteria (2) / Mixed / Socks / Trojan / Tuic / VLESS / VMess */
+		/* AnyTLS / HTTP / Hysteria (2) / Mixed / Socks / Trojan / Tuic / VLESS / VMess */
 		users: (cfg.type !== 'shadowsocks') ? [
 			{
 				name: !(cfg.type in ['http', 'mixed', 'naive', 'socks']) ? 'cfg-' + cfg['.name'] + '-server' : null,
