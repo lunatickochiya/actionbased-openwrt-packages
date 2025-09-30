@@ -4,7 +4,7 @@
 #
 
 include $(TOPDIR)/rules.mk
-NAME:=kucat
+NAME:=kucat-config
 PKG_NAME:=luci-app-$(NAME)
 LUCI_TITLE:=LuCI support for Kucat theme setting by sirpdboy
 LUCI_DEPENDS:=+curl +luci-theme-kucat
