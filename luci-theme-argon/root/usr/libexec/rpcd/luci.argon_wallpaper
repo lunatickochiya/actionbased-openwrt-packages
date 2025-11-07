@@ -27,7 +27,7 @@ fetch_pic_url() {
 		[ -n "${picpath}" ] && echo "//www.bing.com${picpath}"
 		;;
 	ghser)
-		echo "https://api.vvhan.com/api/wallpaper/acg"
+		echo "http://www.98qy.com/sjbz/api.php"
 		;;
 	unsplash)
 		if [ -z "$API_KEY" ]; then
