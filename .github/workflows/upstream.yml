@@ -244,7 +244,7 @@ jobs:
         git_clone https://github.com/sbwml/luci-app-airconnect airconnect1 && mv airconnect1/* ./ && rm -rf airconnect1
         ) &
         (
-        git clone https://github.com/sirpdboy/luci-theme-kucat -b js --depth 1
+        git clone https://github.com/sirpdboy/luci-theme-kucat -b master --depth 1
         git clone https://github.com/sirpdboy/luci-app-kucat-config --depth 1
         git_clone https://github.com/blueberry-pie-11/luci-app-natmap
         git_clone https://github.com/QiuSimons/luci-app-daed-next daed1 && mvdir daed1
