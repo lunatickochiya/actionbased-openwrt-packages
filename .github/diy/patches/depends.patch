@@ -324,18 +324,4 @@ index fd49dd893..3439cdc2b 100644
  LUCI_PKGARCH:=all
 
 
-diff --git a/luci-app-kucat-config/Makefile b/luci-app-kucat-config/Makefile
-index 3439cdc2b..0aaed5db6 100644
---- a/luci-app-kucat-config/Makefile
-+++ b/luci-app-kucat-config/Makefile
-@@ -4,7 +4,7 @@
- #
-
- include $(TOPDIR)/rules.mk
--NAME:=kucat
-+NAME:=kucat-config
- PKG_NAME:=luci-app-$(NAME)
- LUCI_TITLE:=LuCI support for Kucat theme setting by sirpdboy
- LUCI_DEPENDS:=+curl +luci-theme-kucat
-
 
