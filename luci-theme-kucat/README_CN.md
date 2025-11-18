@@ -17,12 +17,13 @@
 
 
 # 酷猫主题链接： https://github.com/sirpdboy/luci-theme-kucat  
-# 进队设置-酷猫主题设置下载链接： [https://github.com/sirpdboy/luci-app-advancedplus](https://github.com/sirpdboy/luci-app-advancedplus/releases)
+# 进队设置-酷猫主题设置下载链接： [https://github.com/sirpdboy/luci-app-kucat-config](https://github.com/sirpdboy/luci-app-kucat-config/releases)
 - 开发时间：2021年12月
 - 发布时间：2023年2月
 - 开源时间：2023年4月 
 - main 支持LEDE18.06和官方18.06分支  开源时间：2023年4月   版本：1.2.6
 - JS 支持官网19.07-24.10分支 最新版本：2025年5月 版本：2.5.9 适配OPENWRT 24.10分支。
+- ucode版支持官网19.07-24.10分支 最新版本：2025年11月 版本：3.1.2 适配OPENWRT 最新版本。 新版本不再支持advancedplus插件，请用配套luci-app-kucat-config 专用JS版插件。
 
 # 功能介绍
 
@@ -39,7 +40,7 @@
 # 特殊说明
 - 当系统中 有进阶设置又有 KUCAT主题设置工具时， 以进阶设置中的设置为准。
 - 如果设置上有问题，可以在SSH登陆后，用4号功能恢复设置。
-- 如果是进阶设置，恢复默认设置，可以用：/etc/init.d/advancedplus reset
+- 如果是进阶设置，恢复默认设置，可以用：/etc/init.d/kucat reset
 - 
 
 # 为什么叫酷猫 ？ 
@@ -63,23 +64,60 @@
 
 在此要特别感谢VIP群里以及不在群里的所有为爱发电的好朋友们！是你们给本人无尽的力量！！谢谢！！
 
+
+
+| 分支 | 版本 | 目标                        | 源码                                          |
+| ------ | ------- | ---------------------------------- | --------------------------------------------------------- |
+| master | v3.x.x  | Support the latest version of LuCI | [Official OpenWrt][official] • [ImmortalWrt][immortalwrt] |
+| 23.05  | v2.x.x  | Support the 23.05 version of LuCI  | [Official OpenWrt][official] • [ImmortalWrt][immortalwrt] |
+| 18.06  | v1.x.x  | Support the 18.06 version of LuCI  | [Lean's LEDE][lede]                                         |
+
+
+### 建立 Lean's LEDE 项目
+
+```bash
+rm -rf luci-app-kucat-config # if have
+git clone -b 18.06 https://github.com/sirpdboy/luci-theme-kucat.git luci-theme-kucat
+make menuconfig #choose LUCI->Theme->luci-theme-kucat
+make -j1 V=s
+```
+### 建立官方 OpenWrt 和ImmortalWrt
+
+```bash
+cd openwrt/package
+git clone https://github.com/sirpdboy/luci-theme-kucat.git
+make menuconfig #choose LUCI->Theme->Luci-theme-kucat
+make -j1 V=s
+```bash
+
+
+### 安装 LuCI 18.06 ( Lean's LEDE )
+
+```bash
+wget --no-check-certificate https://github.com/sirpdboy/luci-theme-kucat/releases/download/v1.5.6/luci-theme-kucat_1.5.6-20240302_all.ipk
+opkg install luci-theme-kucat*.ipk
+```
+
+### 安装 官方openwrt和ImmortalWrt
+
+```bash
+wget --no-check-certificate https://github.com/sirpdboy/luci-theme-kucat/releases/download/v2.6.18/luci-theme-kucat_2.6.18-r20251018_all.ipk
+opkg install luci-theme-kucat*.ipk
+```
+
+### 安装 luci-app-kucat-config
+
+```bash
+wget --no-check-certificate -O luci-theme-kucat_2.6.10-r20250720_all.ipk https://github.com/sirpdboy/luci-app-kucat-config/releases/download/v1.1.0/luci-theme-kucat_2.6.10-r20250720_all.ipk
+opkg install luci-app-kucat-config*.ipk
+```
+
+
 ## 界面
 
-![screenshots](./doc/kucat1.png)
+![screenshots](./doc/pc.jpg)
 
-![screenshots](./doc/kucat2.png)
-
-![screenshots](./doc/kucat3.png)
-
-![screenshots](./doc/kucat4.png)
-
-![screenshots](./doc/kucat5.png)
-
-![screenshots](./doc/kucat6.png)
-
-![screenshots](./doc/kucatz1.png)
-
-![screenshots](./doc/kucatz2.png)
+![screenshots](./doc/mob.jpg)
 
 
 
