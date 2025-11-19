@@ -201,14 +201,14 @@
 @layer components {
   @layer layout {
     header {
-      @apply sticky top-0 z-50 mb-2 transition-all duration-300 before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-white/10 before:backdrop-blur-xl before:backdrop-saturate-150 before:transition-all before:duration-300 dark:before:bg-gray-900/90;
+      @apply sticky top-0 z-60 mb-2 transition-all duration-300 before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-white/10 before:backdrop-blur-xl before:backdrop-saturate-150 before:transition-all before:duration-300 dark:before:bg-gray-900/90;
 
       & .header-content {
         @apply relative flex h-14 items-center justify-between px-6 py-3 max-md:px-4 max-md:py-2;
       }
 
       & .desktop-menu-container {
-        @apply pointer-events-none absolute inset-x-0 top-0 z-30 h-0 w-full overflow-hidden opacity-0 transition-all duration-150 ease-in-out before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-full before:min-h-full before:bg-white/10 before:backdrop-blur-xl before:backdrop-saturate-150 max-md:hidden dark:before:bg-gray-900/90;
+        @apply pointer-events-none absolute inset-x-0 top-0 z-30 h-0 w-full overflow-hidden opacity-0 transition-all duration-150 ease-in-out before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-full before:min-h-full before:bg-white/40 before:backdrop-blur-xl before:backdrop-saturate-150 max-md:hidden dark:before:bg-gray-900/90;
 
         &.active {
           @apply pointer-events-auto opacity-100;
@@ -226,7 +226,7 @@
       }
 
       .nav {
-        @apply absolute left-1/2 z-50 m-0 flex -translate-x-1/2 transform list-none items-center gap-1 p-0 max-md:hidden;
+        @apply absolute left-1/2 z-60 m-0 flex -translate-x-1/2 transform list-none items-center gap-1 p-0 max-md:hidden;
 
         & > li {
           @apply relative;
@@ -343,8 +343,14 @@
           }
         }
 
-        & div[style*="background:#fff"] {
-          @apply dark:border-slate-600 dark:!bg-slate-900;
+        & div[style] {
+          & > svg {
+            @apply dark:!bg-slate-900;
+
+            & line[style] {
+              @apply dark:!stroke-slate-100;
+            }
+          }
         }
       }
 
@@ -621,7 +627,7 @@
         }
 
         &.dropdown {
-          @apply absolute left-0 z-50 w-fit min-w-full overflow-y-auto rounded-lg border border-slate-200/60 bg-white/95 shadow-xl backdrop-blur-sm dark:border-slate-600/40 dark:bg-slate-800/95;
+          @apply absolute left-0 z-60 w-fit min-w-full overflow-y-auto rounded-lg border border-slate-200/60 bg-white/95 shadow-xl backdrop-blur-sm dark:border-slate-600/40 dark:bg-slate-800/95;
 
           & > li {
             @apply hover:bg-aurora-sky/8 dark:hover:bg-aurora-teal-600/15 min-h-9 w-full cursor-pointer px-3 py-1.5 font-medium text-slate-600 dark:text-slate-300;
@@ -821,12 +827,12 @@
     .zonebadge {
       @apply inline-flex items-center gap-1.5 overflow-visible rounded-full border border-black/8 bg-white px-1 py-1.5 text-sm font-medium text-slate-800 shadow-sm transition-all duration-200 hover:shadow-md max-md:gap-1 max-md:text-xs dark:border-white/12 dark:bg-slate-800 dark:text-slate-200 dark:shadow-black/25;
 
+      &[style*="--zone-color-rgb"] {
+        @apply dark:!bg-[rgb(var(--zone-color-rgb),.6)];
+      }
+
       .cbi-dropdown & {
         @apply rounded-xl px-1 py-0.5;
-
-        &[style*="--zone-color-rgb:238, 238, 238"] {
-          @apply dark:!bg-slate-700/60;
-        }
       }
     }
 
@@ -938,6 +944,10 @@
       & .ifacebox-head {
         @apply w-full rounded-t-2xl border-b border-slate-200/50 bg-slate-50/80 px-4 py-3 text-center font-semibold tracking-tight text-slate-800 transition-all duration-200 max-md:rounded-t-3xl max-md:border-slate-200/30 max-md:bg-slate-50/90 max-md:px-3 max-md:py-2.5 max-md:text-sm max-md:leading-5 max-md:font-medium dark:border-slate-600/40 dark:bg-slate-700/60 dark:text-slate-200 max-md:dark:border-slate-700/25 max-md:dark:bg-slate-700/70;
 
+        &[style*="--zone-color-rgb"] {
+          @apply dark:!bg-[rgb(var(--zone-color-rgb),.6)];
+        }
+
         td & {
           @apply max-md:flex max-md:w-auto max-md:flex-shrink-0 max-md:items-center max-md:justify-center max-md:rounded-l-3xl max-md:rounded-tr-none max-md:border-r max-md:border-b-0;
         }
@@ -951,10 +961,6 @@
 
         &.active {
           @apply border-aurora-sky bg-aurora-sky dark:border-aurora-teal-600 dark:bg-aurora-teal-600 text-white;
-        }
-
-        &[style*="background-color: rgb(238, 238, 238)"] {
-          @apply dark:!bg-slate-700/60;
         }
       }
 
@@ -1281,7 +1287,7 @@
     }
 
     .desktop-menu-overlay {
-      @apply pointer-events-none fixed inset-0 z-20 bg-black/20 opacity-0 transition-all duration-300 max-md:hidden;
+      @apply pointer-events-none fixed inset-0 z-50 bg-black/20 opacity-0 transition-all duration-300 max-md:hidden;
 
       &.active {
         @apply pointer-events-auto opacity-100 backdrop-blur-sm;
