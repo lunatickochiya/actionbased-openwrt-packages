@@ -748,8 +748,16 @@
     .alert-message {
       @apply sticky top-14 z-40 mb-4 rounded-4xl border border-slate-200/30 bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 p-6 shadow-sm max-md:mx-0 max-md:mb-3 max-md:rounded-3xl max-md:p-4 dark:border-slate-600/20 dark:from-slate-800/80 dark:via-slate-800/60 dark:to-slate-800/80;
 
+      &.modal {
+        @apply static top-auto;
+      }
+
       .modal & {
-        @apply relative top-auto;
+        @apply mb-0;
+      }
+
+      .modal.login & {
+        @apply mt-6 rounded-2xl px-2 py-2.5 text-center text-sm max-md:px-0.5;
       }
 
       &.success {
@@ -1078,10 +1086,6 @@
           @apply mt-3;
         }
 
-        & .alert-message {
-          @apply mb-0;
-        }
-
         & .button-row,
         & div.left,
         & div.right {
@@ -1111,10 +1115,6 @@
               @apply m-0 px-0 pb-0;
 
               & .cbi-section-node {
-                & .alert-message {
-                  @apply mt-6 rounded-2xl px-2 py-2.5 text-center text-sm max-md:px-0.5;
-                }
-
                 & .cbi-value {
                   @apply flex-col gap-3 text-sm font-medium max-md:text-xs;
 
