@@ -9,3 +9,5 @@
 # Env files
 .env
 
+# Build artifacts
+.DS_Store

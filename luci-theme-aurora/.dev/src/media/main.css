@@ -11,12 +11,72 @@
   nocompatible: true;
 }
 
-@theme {
-  --font-sans:
-    "Lato", "Inter", "SF Pro Text", "SF Pro Icons", "Helvetica Neue",
-    "Helvetica", "Arial", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+:root {
+  --primary: #499ecb;
+  --secondary: #0f2e5d;
+  --start: #e2e8f0;
+  --mid: #f1f5f9;
+  --end: #f8fafc;
 
+  --font-sans: "Lato", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  --radius: 0.625rem;
+  --shadow-x: 0;
+  --shadow-y: 1px;
+  --shadow-blur: 3px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0.1;
+  --shadow-color: oklch(0 0 0);
+  --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow-md:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --shadow-lg:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --shadow-xl:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
+}
+
+[data-darkmode="true"] {
+  --primary: #00817d;
+  --secondary: #00a199;
+
+  --start: #0f172a;
+  --mid: #134e4a;
+  --end: #065f46;
+
+  --font-sans: "Lato", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  --radius: 0.625rem;
+  --shadow-x: 0;
+  --shadow-y: 1px;
+  --shadow-blur: 3px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0.1;
+  --shadow-color: oklch(0 0 0);
+  --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow-md:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --shadow-lg:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --shadow-xl:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
+}
+
+@theme {
   --color-aurora-green: #6ee7b7;
   --color-aurora-green-50: oklch(97.2% 0.019 158.743);
   --color-aurora-green-100: oklch(94.8% 0.045 159.652);
@@ -96,6 +156,32 @@
   --color-aurora-night-emerald-950: oklch(22.1% 0.089 164.833);
 }
 
+@theme inline {
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-aurora-start: var(--start);
+  --color-aurora-mid: var(--mid);
+  --color-aurora-end: var(--end);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-2xs: var(--shadow-2xs);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow: var(--shadow);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
+}
+
 @layer base {
   @font-face {
     font-display: swap;
@@ -113,8 +199,7 @@
     @apply scrollbar-thumb-rounded-full scrollbar-thin scrollbar-track-slate-100 scrollbar-thumb-slate-500/70 dark:scrollbar-track-slate-900 dark:scrollbar-thumb-slate-300/65;
     @apply max-md:dark:bg-aurora-night-teal relative h-full font-sans max-md:bg-slate-100;
     @apply md:before:pointer-events-none md:before:fixed md:before:inset-0 md:before:-z-10;
-    @apply md:before:bg-gradient-to-br md:before:from-slate-50 md:before:via-slate-100 md:before:to-slate-200;
-    @apply md:dark:before:from-aurora-night-slate md:dark:before:via-aurora-night-teal md:dark:before:to-aurora-night-emerald;
+    @apply md:before:from-aurora-start md:before:via-aurora-mid md:before:to-aurora-end md:before:bg-gradient-to-br;
 
     body {
       @apply flex flex-col bg-transparent text-sm leading-relaxed font-normal text-slate-900 transition-all duration-300 dark:text-slate-100;
@@ -1452,6 +1537,10 @@
 
         #cbi-samba4 & {
           @apply px-0.5 py-1.5;
+        }
+
+        [data-page="admin-system-mounts"] & {
+          @apply max-w-104 max-md:max-w-full;
         }
 
         #wifi_assoclist_table & {
