@@ -12,11 +12,61 @@
 }
 
 :root {
-  --primary: #499ecb;
+  --background: oklch(0.9824 0.0013 286.3757);
+  --text: oklch(0.3211 0 0);
+  --background-start: oklch(0.984 0.003 247.858);
+  --background-mid: oklch(0.984 0.003 247.858);
+  --background-end: oklch(0.984 0.003 247.858);
+
+  --primary: oklch(0.6656 0.1055 234.61);
+  --primary-text: #499ecb;
   --secondary: #0f2e5d;
-  --start: #e2e8f0;
-  --mid: #f1f5f9;
-  --end: #f8fafc;
+  --secondary-text: #0f2e5d;
+  --accent: oklch(0.62 0.22 25);
+  --accent-text: oklch(0.97 0.02 25);
+  --muted: #0f2e5d;
+  --muted-text: #0f2e5d;
+  --destructive: #0f2e5d;
+  --destructive-text: #0f2e5d;
+  --ring: #0f2e5d;
+
+  --success: oklch(0.94 0.05 160);
+  --success-text: oklch(0.32 0.09 165);
+  --success-border: oklch(0.65 0.17 165/0.4);
+  --success-shadow: oklch(0.65 0.17 165/0.1);
+  --success-start: oklch(0.97 0.02 160);
+  --success-mid: oklch(0.94 0.05 160);
+  --success-end: oklch(0.97 0.02 160);
+  --info: oklch(0.94 0.05 230);
+  --info-text: oklch(0.35 0.08 240);
+  --info-border: oklch(0.62 0.19 240/0.4);
+  --info-shadow: oklch(0.62 0.19 240/0.1);
+  --info-start: oklch(0.97 0.02 230);
+  --info-mid: oklch(0.94 0.05 230);
+  --info-end: oklch(0.97 0.02 230);
+  --warning: oklch(0.95 0.05 90);
+  --warning-text: oklch(0.35 0.08 60);
+  --warning-border: oklch(0.68 0.18 75/0.4);
+  --warning-shadow: oklch(0.68 0.18 75/0.1);
+  --warning-start: oklch(0.98 0.02 90);
+  --warning-mid: oklch(0.95 0.05 90);
+  --warning-end: oklch(0.98 0.02 90);
+  --error: oklch(0.94 0.05 25);
+  --error-text: oklch(0.35 0.12 25);
+  --error-border: oklch(0.62 0.22 25/0.3);
+  --error-ring: oklch(0.62 0.22 25/0.4);
+  --error-shadow: oklch(0.62 0.22 25/0.1);
+  --error-start: oklch(0.97 0.02 25);
+  --error-mid: oklch(0.94 0.05 25);
+  --error-end: oklch(0.97 0.02 25);
+
+  --default: oklch(0.97 0 0);
+  --default-text: oklch(0.205 0 0);
+  --default-border: oklch(0.922 0 0/0.3);
+  --default-shadow: oklch(0 0 0/0.1);
+  --default-start: oklch(0.98 0 0);
+  --default-mid: oklch(0.96 0 0);
+  --default-end: oklch(0.98 0 0);
 
   --font-sans: "Lato", ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
@@ -44,12 +94,61 @@
 }
 
 [data-darkmode="true"] {
-  --primary: #00817d;
-  --secondary: #00a199;
+  --background: oklch(0.9824 0.0013 286.3757);
+  --text: oklch(0.3211 0 0);
+  --background-start: oklch(0.2077 0.0398 265.75);
+  --background-mid: oklch(0.3861 0.059 188.42);
+  --background-end: oklch(0.4318 0.0865 166.91);
+  --primary: oklch(77.9% 0.168 188.745);
+  --primary-text: #499ecb;
+  --secondary: #0f2e5d;
+  --secondary-text: #0f2e5d;
+  --muted: #0f2e5d;
+  --muted-text: #0f2e5d;
+  --accent: oklch(0.35 0.12 25);
+  --accent-text: oklch(0.88 0.14 25);
+  --destructive: #0f2e5d;
+  --destructive-text: #0f2e5d;
+  --ring: #0f2e5d;
+  --border: oklch(0.8699 0 0);
 
-  --start: #0f172a;
-  --mid: #134e4a;
-  --end: #065f46;
+  --success: oklch(0.28 0.09 165/0.3);
+  --success-text: oklch(0.92 0.09 160);
+  --success-border: oklch(0.65 0.17 165/0.3);
+  --success-shadow: oklch(0.65 0.17 165/0.1);
+  --success-start: oklch(0.32 0.09 165/0.4);
+  --success-mid: oklch(0.28 0.09 165/0.3);
+  --success-end: oklch(0.32 0.09 165/0.4);
+  --info: oklch(0.28 0.08 240/0.3);
+  --info-text: oklch(0.88 0.06 230);
+  --info-border: oklch(0.62 0.19 240/0.3);
+  --info-shadow: oklch(0.62 0.19 240/0.1);
+  --info-start: oklch(0.35 0.08 240/0.4);
+  --info-mid: oklch(0.28 0.08 240/0.3);
+  --info-end: oklch(0.35 0.08 240/0.4);
+  --warning: oklch(0.28 0.08 60/0.3);
+  --warning-text: oklch(0.9 0.12 90);
+  --warning-border: oklch(0.68 0.18 75/0.3);
+  --warning-shadow: oklch(0.68 0.18 75/0.1);
+  --warning-start: oklch(0.35 0.08 60/0.4);
+  --warning-mid: oklch(0.28 0.08 60/0.3);
+  --warning-end: oklch(0.35 0.08 60/0.4);
+  --error: oklch(0.28 0.12 25/0.3);
+  --error-text: oklch(0.88 0.14 25);
+  --error-border: oklch(0.62 0.22 25/0.3);
+  --error-ring: oklch(0.62 0.22 25/0.4);
+  --error-shadow: oklch(0.62 0.22 25/0.1);
+  --error-start: oklch(0.35 0.12 25/0.4);
+  --error-mid: oklch(0.28 0.12 25/0.3);
+  --error-end: oklch(0.35 0.12 25/0.4);
+
+  --default: oklch(0.269 0 0);
+  --default-text: oklch(0.985 0 0);
+  --default-border: oklch(0.275 0 0/0.3);
+  --default-shadow: oklch(0 0 0/0.3);
+  --default-start: oklch(0.28 0 0/0.8);
+  --default-mid: oklch(0.26 0 0/0.6);
+  --default-end: oklch(0.28 0 0/0.8);
 
   --font-sans: "Lato", ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
@@ -95,7 +194,6 @@
   --color-aurora-teal-100: oklch(95.1% 0.041 186.152);
   --color-aurora-teal-200: oklch(90.8% 0.079 187.063);
   --color-aurora-teal-300: oklch(85.2% 0.128 187.894);
-  --color-aurora-teal-400: oklch(77.9% 0.168 188.745);
   --color-aurora-teal-500: oklch(75.8% 0.145 188.2);
   --color-aurora-teal-600: oklch(62.1% 0.145 189.632);
   --color-aurora-teal-700: oklch(53.4% 0.118 190.485);
@@ -157,11 +255,62 @@
 }
 
 @theme inline {
+  --color-background: var(--background);
+  --color-text: var(--text);
+  --color-aurora-start: var(--background-start);
+  --color-aurora-mid: var(--background-mid);
+  --color-aurora-end: var(--background-end);
+
   --color-primary: var(--primary);
+  --color-primary-text: var(--primary-text);
   --color-secondary: var(--secondary);
-  --color-aurora-start: var(--start);
-  --color-aurora-mid: var(--mid);
-  --color-aurora-end: var(--end);
+  --color-secondary-text: var(--secondary-text);
+
+  --color-muted: var(--muted);
+  --color-muted-text: var(--muted-text);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-destructive: var(--destructive);
+  --color-destructive-text: var(--destructive-text);
+  --color-ring: var(--ring);
+  --color-border: var(--border);
+
+  --color-success: var(--success);
+  --color-success-text: var(--success-text);
+  --color-success-border: var(--success-border);
+  --color-success-shadow: var(--success-shadow);
+  --color-success-start: var(--success-start);
+  --color-success-mid: var(--success-mid);
+  --color-success-end: var(--success-end);
+  --color-info: var(--info);
+  --color-info-text: var(--info-text);
+  --color-info-border: var(--info-border);
+  --color-info-shadow: var(--info-shadow);
+  --color-info-start: var(--info-start);
+  --color-info-mid: var(--info-mid);
+  --color-info-end: var(--info-end);
+  --color-warning: var(--warning);
+  --color-warning-text: var(--warning-text);
+  --color-warning-border: var(--warning-border);
+  --color-warning-shadow: var(--warning-shadow);
+  --color-warning-start: var(--warning-start);
+  --color-warning-mid: var(--warning-mid);
+  --color-warning-end: var(--warning-end);
+  --color-error: var(--error);
+  --color-error-text: var(--error-text);
+  --color-error-border: var(--error-border);
+  --color-error-ring: var(--error-ring);
+  --color-error-shadow: var(--error-shadow);
+  --color-error-start: var(--error-start);
+  --color-error-mid: var(--error-mid);
+  --color-error-end: var(--error-end);
+  --color-default: var(--default);
+  --color-default-text: var(--default-text);
+  --color-default-border: var(--default-border);
+  --color-default-shadow: var(--default-shadow);
+  --color-default-start: var(--default-start);
+  --color-default-mid: var(--default-mid);
+  --color-default-end: var(--default-end);
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
@@ -307,7 +456,7 @@
       }
 
       .brand {
-        @apply hover:text-aurora-sky dark:hover:text-aurora-teal-400 inline-block flex-shrink-0 text-xl font-semibold tracking-tight text-slate-900 no-underline transition-all duration-200 hover:-translate-y-0.5 max-md:order-1 max-md:flex-1 max-md:text-lg dark:text-slate-100;
+        @apply hover:text-aurora-sky dark:hover:text-primary inline-block flex-shrink-0 text-xl font-semibold tracking-tight text-slate-900 no-underline transition-all duration-200 hover:-translate-y-0.5 max-md:order-1 max-md:flex-1 max-md:text-lg dark:text-slate-100;
       }
 
       .nav {
@@ -388,7 +537,7 @@
             @apply relative before:[mask:url('@assets/icons/setting.svg')_center/cover_no-repeat];
 
             &[data-count]:not([data-count="0"]) {
-              @apply after:absolute after:-top-0.5 after:-right-0.5 after:z-10 after:flex after:min-h-3 after:min-w-3 after:items-center after:justify-center after:rounded-full after:bg-red-500 after:px-0.5 after:text-[8px] after:leading-none after:font-bold after:text-white after:shadow-sm after:content-[attr(data-count)] dark:after:bg-red-600;
+              @apply after:bg-accent after:text-accent-text after:absolute after:-top-0.5 after:-right-0.5 after:z-10 after:flex after:min-h-3 after:min-w-3 after:items-center after:justify-center after:rounded-full after:px-0.5 after:text-[8px] after:leading-none after:font-bold after:shadow-sm after:content-[attr(data-count)];
             }
           }
         }
@@ -474,7 +623,7 @@
       @apply mt-2 flex min-h-16 flex-wrap items-center justify-between text-xs text-slate-500 dark:text-slate-400;
 
       & a {
-        @apply text-aurora-sky dark:text-aurora-teal-400;
+        @apply text-aurora-sky dark:text-primary;
       }
 
       & span {
@@ -583,7 +732,7 @@
 
     .cbi-button-positive,
     .cbi-button-apply {
-      @apply border-aurora-sky/40 bg-aurora-sky/8 text-aurora-sky hover:border-aurora-sky/60 hover:bg-aurora-sky/12 hover:text-aurora-sky-600 dark:border-aurora-teal-600/50 dark:bg-aurora-teal-600/15 dark:text-aurora-teal-400 dark:hover:border-aurora-teal-600/70 dark:hover:bg-aurora-teal-600/20 dark:hover:text-aurora-teal-300 border shadow-none;
+      @apply border-aurora-sky/40 bg-aurora-sky/8 text-aurora-sky hover:border-aurora-sky/60 hover:bg-aurora-sky/12 hover:text-aurora-sky-600 dark:border-aurora-teal-600/50 dark:bg-aurora-teal-600/15 dark:text-primary dark:hover:border-aurora-teal-600/70 dark:hover:bg-aurora-teal-600/20 dark:hover:text-aurora-teal-300 border shadow-none;
     }
 
     .btn-secondary,
@@ -607,7 +756,7 @@
     input[type="password"],
     .cbi-input-text,
     .cbi-input {
-      @apply focus:border-aurora-sky focus:ring-aurora-sky/20 dark:focus:border-aurora-teal-400 dark:focus:ring-aurora-teal-400/30 relative rounded-2xl border border-slate-300/70 bg-white px-3 py-1.5 text-sm font-normal text-slate-900 placeholder-slate-400 shadow-sm transition-all duration-200 focus:ring-2 focus:outline-none dark:border-slate-600/60 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-400;
+      @apply focus:border-aurora-sky focus:ring-aurora-sky/20 dark:focus:border-primary dark:focus:ring-primary/30 relative rounded-2xl border border-slate-300/70 bg-white px-3 py-1.5 text-sm font-normal text-slate-900 placeholder-slate-400 shadow-sm transition-all duration-200 focus:ring-2 focus:outline-none dark:border-slate-600/60 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-400;
 
       .table.cbi-section-table & {
         @apply w-full;
@@ -624,7 +773,7 @@
 
     input[type="radio"],
     input[type="checkbox"] {
-      @apply focus:before:border-aurora-sky focus:before:ring-aurora-sky/20 checked:before:border-aurora-sky checked:before:bg-aurora-sky dark:focus:before:border-aurora-teal-400 dark:focus:before:ring-aurora-teal-400/30 dark:checked:before:border-aurora-teal-600 dark:checked:before:bg-aurora-teal-600 relative mr-3 inline-block h-4 w-4 cursor-pointer appearance-none before:absolute before:top-0 before:left-0 before:h-4 before:w-4 before:border before:border-slate-300/70 before:bg-white before:transition-all before:duration-200 after:absolute after:top-0.5 after:left-0.5 after:h-3 after:w-3 after:bg-white after:opacity-0 after:transition-opacity after:duration-200 checked:after:opacity-100 hover:before:border-slate-400/60 focus:before:ring-2 focus:before:outline-none disabled:cursor-not-allowed dark:before:border-slate-600/60 dark:before:bg-slate-900 dark:hover:before:border-slate-500/60;
+      @apply focus:before:border-aurora-sky focus:before:ring-aurora-sky/20 checked:before:border-aurora-sky checked:before:bg-aurora-sky dark:focus:before:border-primary dark:focus:before:ring-primary/30 dark:checked:before:border-aurora-teal-600 dark:checked:before:bg-aurora-teal-600 relative mr-3 inline-block h-4 w-4 cursor-pointer appearance-none before:absolute before:top-0 before:left-0 before:h-4 before:w-4 before:border before:border-slate-300/70 before:bg-white before:transition-all before:duration-200 after:absolute after:top-0.5 after:left-0.5 after:h-3 after:w-3 after:bg-white after:opacity-0 after:transition-opacity after:duration-200 checked:after:opacity-100 hover:before:border-slate-400/60 focus:before:ring-2 focus:before:outline-none disabled:cursor-not-allowed dark:before:border-slate-600/60 dark:before:bg-slate-900 dark:hover:before:border-slate-500/60;
     }
 
     input[type="radio"] {
@@ -642,7 +791,7 @@
 
   @layer textarea {
     textarea {
-      @apply focus:border-aurora-sky focus:ring-aurora-sky/20 dark:focus:border-aurora-teal-400 dark:focus:ring-aurora-teal-400/30 min-h-24 w-full resize-y rounded-2xl border border-slate-300/70 bg-white px-3 py-2 text-sm font-normal text-slate-900 placeholder-slate-400 shadow-sm transition-all duration-200 focus:ring-2 focus:outline-none dark:border-slate-600/60 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-400;
+      @apply focus:border-aurora-sky focus:ring-aurora-sky/20 dark:focus:border-primary dark:focus:ring-primary/30 min-h-24 w-full resize-y rounded-2xl border border-slate-300/70 bg-white px-3 py-2 text-sm font-normal text-slate-900 placeholder-slate-400 shadow-sm transition-all duration-200 focus:ring-2 focus:outline-none dark:border-slate-600/60 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-400;
       &[disabled] {
         @apply cursor-not-allowed opacity-40 dark:opacity-30;
       }
@@ -651,7 +800,7 @@
 
   @layer select {
     select {
-      @apply focus:border-aurora-sky focus:ring-aurora-sky/20 dark:focus:border-aurora-teal-400 dark:focus:ring-aurora-teal-400/30 appearance-none rounded-2xl border border-slate-300/70 bg-white px-3 py-1.5 pr-10 text-sm font-normal text-slate-900 shadow-sm transition-all duration-200 focus:ring-2 focus:outline-none dark:border-slate-600/60 dark:bg-slate-900 dark:text-slate-100;
+      @apply focus:border-aurora-sky focus:ring-aurora-sky/20 dark:focus:border-primary dark:focus:ring-primary/30 appearance-none rounded-2xl border border-slate-300/70 bg-white px-3 py-1.5 pr-10 text-sm font-normal text-slate-900 shadow-sm transition-all duration-200 focus:ring-2 focus:outline-none dark:border-slate-600/60 dark:bg-slate-900 dark:text-slate-100;
       @apply bg-[url('@assets/icons/arrow-down.svg')] bg-[length:16px] bg-[right_0.75rem_center] bg-no-repeat dark:bg-[url('@assets/icons/arrow-down-dark.svg')];
       &[disabled] {
         @apply cursor-not-allowed opacity-40 dark:opacity-30;
@@ -661,7 +810,7 @@
 
   @layer dropdown {
     .cbi-dropdown {
-      @apply focus:border-aurora-sky focus:ring-aurora-sky/20 dark:focus:border-aurora-teal-400 dark:focus:ring-aurora-teal-400/30 inline-flex h-fit max-w-full min-w-fit flex-shrink-0 items-center p-0 whitespace-nowrap shadow-sm transition-all duration-200 focus:ring-2 focus:outline-none;
+      @apply focus:border-aurora-sky focus:ring-aurora-sky/20 dark:focus:border-primary dark:focus:ring-primary/30 inline-flex h-fit max-w-full min-w-fit flex-shrink-0 items-center p-0 whitespace-nowrap shadow-sm transition-all duration-200 focus:ring-2 focus:outline-none;
 
       &[disabled] {
         @apply pointer-events-none opacity-40 dark:opacity-30;
@@ -739,7 +888,7 @@
       }
 
       &[open] {
-        @apply border-aurora-sky ring-aurora-sky/20 dark:border-aurora-teal-400 dark:ring-aurora-teal-400/30 relative ring-2;
+        @apply border-aurora-sky ring-aurora-sky/20 dark:border-primary dark:ring-primary/30 relative ring-2;
 
         & > ul.dropdown {
           @apply block w-auto max-w-none;
@@ -800,18 +949,18 @@
 
   @layer tooltip {
     .cbi-tooltip {
-      @apply absolute z-110 max-w-xs scale-95 transform rounded-xl border border-slate-200/60 bg-white px-3 py-2 text-xs break-normal whitespace-normal text-slate-900 opacity-0 shadow-xl backdrop-blur-xl transition-all duration-300 ease-out dark:border-slate-700/60 dark:bg-slate-900 dark:text-slate-100 dark:shadow-black/40;
+      @apply border-default-border bg-default text-default-text shadow-default-shadow absolute z-110 max-w-xs scale-95 transform rounded-xl px-3 py-2 text-xs break-normal whitespace-normal opacity-0 backdrop-blur-xl transition-all duration-300 ease-out;
       &.error {
-        @apply border border-red-200/40 bg-gradient-to-br from-red-50 via-red-100 to-red-50 text-red-900 shadow-red-500/10 dark:border-red-500/30 dark:from-red-900/40 dark:via-red-800/30 dark:to-red-900/40 dark:text-red-200 dark:shadow-red-400/10;
+        @apply border-error-border from-error-start via-error-mid to-error-end text-error-text shadow-error-shadow bg-gradient-to-br;
       }
       &.success {
-        @apply border border-emerald-200/40 bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-50 text-emerald-900 shadow-emerald-500/10 dark:border-emerald-500/30 dark:from-emerald-900/40 dark:via-emerald-800/30 dark:to-emerald-900/40 dark:text-emerald-200 dark:shadow-emerald-400/10;
+        @apply border-success-border from-success-start via-success-mid to-success-end text-success-text shadow-success-shadow bg-gradient-to-br;
       }
       &.info {
-        @apply border border-blue-200/40 bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50 text-blue-900 shadow-blue-500/10 dark:border-blue-500/30 dark:from-blue-900/40 dark:via-blue-800/30 dark:to-blue-900/40 dark:text-blue-200 dark:shadow-blue-400/10;
+        @apply border-info-border from-info-start via-info-mid to-info-end text-info-text shadow-info-shadow bg-gradient-to-br;
       }
       &.notice {
-        @apply border border-amber-200/40 bg-gradient-to-br from-amber-50 via-amber-100 to-amber-50 text-amber-900 shadow-amber-500/10 dark:border-amber-500/30 dark:from-amber-900/40 dark:via-amber-800/30 dark:to-amber-900/40 dark:text-amber-200 dark:shadow-amber-400/10;
+        @apply border-warning-border from-warning-start via-warning-mid to-warning-end text-warning-text shadow-warning-shadow bg-gradient-to-br;
       }
     }
 
@@ -831,7 +980,7 @@
 
   @layer message {
     .alert-message {
-      @apply sticky top-14 z-40 mb-4 rounded-4xl border border-slate-200/30 bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 p-6 shadow-sm max-md:mx-0 max-md:mb-3 max-md:rounded-3xl max-md:p-4 dark:border-slate-600/20 dark:from-slate-800/80 dark:via-slate-800/60 dark:to-slate-800/80;
+      @apply border-default-border from-default-start via-default-mid to-default-end text-default-text shadow-default-shadow sticky top-14 z-40 mb-4 rounded-4xl bg-gradient-to-br p-6 max-md:mx-0 max-md:mb-3 max-md:rounded-3xl max-md:p-4;
 
       &.modal {
         @apply static top-auto;
@@ -846,21 +995,21 @@
       }
 
       &.success {
-        @apply border-emerald-200/40 bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-50 text-emerald-900 shadow-emerald-500/10 dark:border-emerald-500/30 dark:from-emerald-900/40 dark:via-emerald-800/30 dark:to-emerald-900/40 dark:text-emerald-200 dark:shadow-emerald-400/10;
+        @apply border-success-border from-success-start via-success-mid to-success-end text-success-text shadow-success-shadow bg-gradient-to-br;
       }
 
       &.info {
-        @apply border-blue-200/40 bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50 text-blue-900 shadow-blue-500/10 dark:border-blue-500/30 dark:from-blue-900/40 dark:via-blue-800/30 dark:to-blue-900/40 dark:text-blue-200 dark:shadow-blue-400/10;
+        @apply border-info-border from-info-start via-info-mid to-info-end text-info-text shadow-info-shadow bg-gradient-to-br;
       }
 
       &.warning,
       &.notice {
-        @apply border-amber-200/40 bg-gradient-to-br from-amber-50 via-amber-100 to-amber-50 text-amber-900 shadow-amber-500/10 dark:border-amber-500/30 dark:from-amber-900/40 dark:via-amber-800/30 dark:to-amber-900/40 dark:text-amber-200 dark:shadow-amber-400/10;
+        @apply border-warning-border from-warning-start via-warning-mid to-warning-end text-warning-text shadow-warning-shadow bg-gradient-to-br;
       }
 
       &.error,
       &.danger {
-        @apply border-red-200/40 bg-gradient-to-br from-red-50 via-red-100 to-red-50 text-red-900 shadow-red-500/10 dark:border-red-500/30 dark:from-red-900/40 dark:via-red-800/30 dark:to-red-900/40 dark:text-red-200 dark:shadow-red-400/10;
+        @apply border-error-border from-error-start via-error-mid to-error-end text-error-text shadow-error-shadow bg-gradient-to-br;
       }
 
       h4,
@@ -898,22 +1047,22 @@
 
   @layer badge {
     .label {
-      @apply rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 uppercase dark:bg-slate-700/80 dark:text-slate-200;
+      @apply bg-default text-default-text rounded-full px-3 py-1 text-xs font-bold uppercase;
 
       &.important {
-        @apply bg-blue-100 text-blue-900 dark:bg-blue-200 dark:text-blue-900;
+        @apply bg-info text-info-text;
       }
 
       &.warning {
-        @apply bg-red-100 text-red-900 dark:bg-red-200 dark:text-red-900;
+        @apply bg-error text-error-text;
       }
 
       &.success {
-        @apply bg-emerald-100 text-emerald-900 dark:bg-emerald-200 dark:text-emerald-900;
+        @apply bg-success text-success-text;
       }
 
       &.notice {
-        @apply bg-yellow-100 text-yellow-900 dark:bg-yellow-200 dark:text-yellow-900;
+        @apply bg-warning text-warning-text;
       }
     }
 
@@ -956,7 +1105,7 @@
       }
 
       &.ifacebadge-active {
-        @apply border-aurora-sky dark:border-aurora-teal-400 font-semibold;
+        @apply border-aurora-sky dark:border-primary font-semibold;
       }
 
       &.large {
@@ -1603,7 +1752,7 @@
   @layer form {
     .cbi-input-invalid,
     .cbi-value-error {
-      @apply !border-red-600/40 focus:!ring-red-600/20 dark:!border-red-400/80 dark:focus:!ring-red-400/40;
+      @apply !border-error-border focus:!ring-error-ring;
     }
 
     .cbi-value {
@@ -1652,7 +1801,7 @@
         }
 
         &.drag-over {
-          @apply border-aurora-sky/60 bg-aurora-sky/5 ring-aurora-sky/30 dark:border-aurora-teal-400/60 dark:bg-aurora-teal-600/10 dark:ring-aurora-teal-400/30 scale-105 shadow-lg ring-2;
+          @apply border-aurora-sky/60 bg-aurora-sky/5 ring-aurora-sky/30 dark:border-primary/60 dark:bg-aurora-teal-600/10 dark:ring-primary/30 scale-105 shadow-lg ring-2;
         }
 
         & > span,
@@ -1686,10 +1835,10 @@
       & li {
         @apply relative m-0 min-w-fit flex-shrink-0 list-none;
         &[data-errors] {
-          @apply after:absolute after:-top-0.5 after:-right-1.5 after:z-20 after:inline-flex after:min-h-4 after:min-w-4 after:items-center after:justify-center after:rounded-full after:bg-red-100 after:px-1.5 after:py-0.5 after:text-xs after:font-semibold after:text-red-900 after:content-[attr(data-errors)] dark:after:bg-red-900 dark:after:text-red-200;
+          @apply after:bg-accent after:text-accent-text after:absolute after:-top-0.5 after:-right-1.5 after:z-20 after:inline-flex after:min-h-4 after:min-w-4 after:items-center after:justify-center after:rounded-full after:px-1.5 after:py-0.5 after:text-xs after:font-semibold after:content-[attr(data-errors)];
 
           & > a {
-            @apply border border-red-300/80 dark:border-red-400/80;
+            @apply border-error-border border;
           }
         }
         & > a {
