@@ -8,6 +8,9 @@ include $(TOPDIR)/rules.mk
 LUCI_TITLE:=Design Theme
 LUCI_DEPENDS:=
 
+LUCI_MINIFY_CSS:=
+CONFIG_LUCI_CSSTIDY:=
+
 include $(TOPDIR)/feeds/luci/luci.mk
 
 # call BuildPackage - OpenWrt buildroot signature
