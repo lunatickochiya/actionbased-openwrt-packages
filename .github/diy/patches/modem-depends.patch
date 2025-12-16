@@ -10,15 +10,3 @@ index ed9530974..38d80b582 100644
  		+grep \
  
  include $(TOPDIR)/feeds/luci/luci.mk
-diff --git a/luci-app-modem/Makefile b/luci-app-modem/Makefile
-index 74f6c6742..b0858785b 100644
---- a/luci-app-modem/Makefile
-+++ b/luci-app-modem/Makefile
-@@ -22,7 +22,6 @@ LUCI_DEPENDS:=+luci-compat \
- 		+usbutils \
- 		+kmod-pcie_mhi \
- 		+pciutils \
--		+quectel-CM-5G \
- 		+sms-tool \
- 		+ndisc6 +rdisc6 \
- 		+bc +jq
