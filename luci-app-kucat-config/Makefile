@@ -14,14 +14,7 @@ LUCI_TITLE:=LuCI support for Kucat theme setting by sirpdboy
 LUCI_DEPENDS:=+curl +luci-theme-kucat
 LUCI_PKGARCH:=all
 
-
 define Build/Compile
-endef
-
-define Package/$(PKG_NAME)/postinst
-#!/bin/sh
-chmod +x /etc/init.d/kucat
-rm -f /tmp/luci-*
 endef
 
 define Package/$(PKG_NAME)/conffiles
