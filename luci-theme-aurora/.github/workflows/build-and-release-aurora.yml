@@ -88,10 +88,21 @@ jobs:
       - name: Build ${{ env.THEME }}
         run: |
           cd "$TMP"/${{ matrix.target.sdk_dir }}
-          sed -E 's|https?://git\.openwrt\.org/|https://github.com/|g' feeds.conf.default > feeds.conf
-          printf '=== %s ===\n%s\n=== %s ===\n%s\n' \
-            feeds.conf.default "$(cat feeds.conf.default)" \
-            feeds.conf "$(cat feeds.conf)"
+          cp feeds.conf.default feeds.conf
+          echo "=== feeds.conf ==="
+          cat feeds.conf
+          echo "---------- testing feed git URLs ----------"
+          grep -E '^[[:space:]]*src-git' feeds.conf | while read -r line; do
+            name=$(echo "$line" | awk '{print $(NF-1)}')
+            url_with_rev=$(echo "$line" | awk '{print $NF}')
+            url_base=${url_with_rev%%^*}
+            url=${url_base%%;*}
+            if git ls-remote "$url" HEAD >/dev/null 2>&1; then
+              echo "OK: $name $url_with_rev (remote: $url)"
+            else
+              echo "FAILED: $name $url_with_rev (remote: $url)"
+            fi
+          done
           ./scripts/feeds update -f base luci
           ./scripts/feeds install -p luci-base 
           make defconfig
