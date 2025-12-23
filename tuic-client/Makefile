@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=tuic-client
 PKG_VERSION:=1.6.5
-PKG_RELEASE:=32
+PKG_RELEASE:=33
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/Itsusinn/tuic/tar.gz/v$(PKG_VERSION)?
@@ -33,7 +33,7 @@ define Package/tuic-client
   SUBMENU:=Web Servers/Proxies
   TITLE:=TUIC proxy protocol client
   URL:=https://github.com/EAimTY/tuic
-  DEPENDS:=@(aarch64||armv7||x86_64||i686||loongarch64||riscv64)
+  DEPENDS:=@(aarch64||arm||mips||mipsel||x86_64||i386||i686||riscv64||loongarch64)
 endef
 
 define Package/tuic-client/description
@@ -42,22 +42,28 @@ endef
 
 define Select/Features
 $(strip \
-  $(if $(findstring x86_64,$(RUSTC_TARGET_ARCH)),--features jemallocator, \
-  $(if $(findstring i686,$(RUSTC_TARGET_ARCH)),--features jemallocator, \
-  $(if $(findstring aarch64,$(RUSTC_TARGET_ARCH)),--features jemallocator, \
-  $(if $(findstring armv7,$(RUSTC_TARGET_ARCH)),--no-default-features --features ring,jemallocator, \
-  $(if $(findstring loongarch64,$(RUSTC_TARGET_ARCH)),--no-default-features --features ring, \
-  $(if $(findstring riscv64,$(RUSTC_TARGET_ARCH)),--no-default-features --features ring,jemallocator, \
-  "" \
-  )))))))
+  $(if $(findstring x86_64,$(RUSTC_TARGET_ARCH)),--features jemallocator) \
+  $(if $(findstring aarch64,$(RUSTC_TARGET_ARCH)),--features jemallocator) \
+  $(if $(or \
+    $(findstring arm,$(RUSTC_TARGET_ARCH)), \
+    $(findstring mips,$(RUSTC_TARGET_ARCH)), \
+    $(findstring mipsel,$(RUSTC_TARGET_ARCH)), \
+    $(findstring i686,$(RUSTC_TARGET_ARCH)), \
+    $(findstring i386,$(RUSTC_TARGET_ARCH)), \
+    $(findstring riscv64,$(RUSTC_TARGET_ARCH)), \
+    $(findstring loongarch64,$(RUSTC_TARGET_ARCH)) \
+  ),--no-default-features --features ring) \
+)
 endef
 
 define Build/Compile
 	( \
 		pushd $(PKG_BUILD_DIR) ; \
 		$(CARGO_PKG_CONFIG_VARS) \
-		TARGET_CFLAGS="$(filter-out -O%,$(TARGET_CFLAGS)) $(RUSTC_CFLAGS)" \
-		cargo build --release -p tuic-client --target $(RUSTC_TARGET_ARCH) $(call Select/Features) ; \
+		cargo build --release \
+			-p tuic-client \
+			--target $(RUSTC_TARGET_ARCH) \
+			$(call Select/Features) ; \
 		popd ; \
 	)
 endef
