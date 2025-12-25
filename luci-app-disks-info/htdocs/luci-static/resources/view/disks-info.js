@@ -61,6 +61,49 @@ document.head.append(E('style', {'type': 'text/css'},
 .disks-info-err td {
 	color: var(--app-disks-info-dark-font-color) !important;
 }
+svg polyline.disks-info-temp-line {
+	fill: rgba(0 98 130 / 0.2) !important;
+	fill-opacity: 1;
+	stroke: rgba(0 98 130 / 1.0) !important;
+	stroke-width: 1;
+}
+svg line.disks-info-line-w {
+	stroke: orange !important;
+	stroke-opacity: 1;
+	stroke-width: 0.8;
+}
+svg line.disks-info-line-c {
+	stroke: red !important;
+	stroke-opacity: 1;
+	stroke-width: 0.7;
+}
+svg line.disks-info-time-grid {
+	stroke: rgba(122 122 122 / 0.2) !important;
+	stroke-width: 1;
+}
+svg text.disks-info-time-text {
+	fill: rgba(122 122 122 / 0.5) !important;
+	font-family: monospace;
+	font-size: 12px;
+	font-weight: bold;
+	writing-mode: vertical-rl;
+}
+svg line.disks-info-celsius-line {
+	stroke: rgba(122 122 122 / 0.2) !important;
+	stroke-width: 1;
+}
+svg text.disks-info-celsius-text {
+	fill: #eee !important;
+	font-family: monospace;
+	font-size: 14px;
+	text-shadow: 1px 1px 1px #000;
+}
+svg text.disks-info-summary-text {
+	fill: #eee !important;
+	font-family: monospace;
+	font-size: 12px;
+	text-shadow: 1px 1px 1px #000;
+}
 `));
 
 return view.extend({
@@ -505,7 +548,7 @@ return view.extend({
 
 		// temperature line
 		let tempLine   = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-			tempLine.setAttribute('style', 'fill:rgba(0 98 130 / 0.2); fill-opacity:1; stroke:rgba(0 98 130 / 1.0); stroke-width:1');
+			tempLine.setAttribute('class', 'disks-info-temp-line');
 		let tempPoints = [[0, svgHeight]];
 
 		for(let i = 0; i < dataSize; i++) {
@@ -526,7 +569,7 @@ return view.extend({
 			lineW.setAttribute('y1', svgHeight - (this.diskTempWarning - tempMinimalValue) * tempValueMul);
 			lineW.setAttribute('x2', '100%');
 			lineW.setAttribute('y2', svgHeight - (this.diskTempWarning - tempMinimalValue) * tempValueMul);
-			lineW.setAttribute('style', 'stroke:orange; stroke-width:0.8');
+			lineW.setAttribute('class', 'disks-info-line-w');
 		svg.appendChild(lineW);
 
 		// temperature critical
@@ -535,7 +578,7 @@ return view.extend({
 			lineC.setAttribute('y1', svgHeight - (this.diskTempCritical - tempMinimalValue) * tempValueMul);
 			lineC.setAttribute('x2', '100%');
 			lineC.setAttribute('y2', svgHeight - (this.diskTempCritical - tempMinimalValue) * tempValueMul);
-			lineC.setAttribute('style', 'stroke:red; stroke-width:0.7');
+			lineC.setAttribute('class', 'disks-info-line-c');
 		svg.appendChild(lineC);
 
 		// time labels
@@ -546,12 +589,12 @@ return view.extend({
 				line.setAttribute('y1', 0);
 				line.setAttribute('x2', i);
 				line.setAttribute('y2', '100%');
-				line.setAttribute('style', 'stroke:rgba(122,122,122,0.2); stroke-width:1');
+				line.setAttribute('class', 'disks-info-time-grid');
 			svg.appendChild(line);
 			let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 				text.setAttribute('x', i + 6);
 				text.setAttribute('y', 0);
-				text.setAttribute('style', 'fill:rgba(122,122,122,0.5); font-family:monospace; font-size:12px; font-weight:bold; writing-mode:vertical-rl');
+				text.setAttribute('class', 'disks-info-time-text');
 				if(i >= 2 * timeAxisStep * timeAxisInterval) {
 					text.appendChild(document.createTextNode('%02d.%02d %02d:%02d'.format(
 						dataUnits[j][2].getDate(),
@@ -575,12 +618,12 @@ return view.extend({
 				line.setAttribute('y1', i);
 				line.setAttribute('x2', '100%');
 				line.setAttribute('y2', i);
-				line.setAttribute('style', 'stroke:rgba(122,122,122,0.2); stroke-width:1');
+				line.setAttribute('class', 'disks-info-celsius-line');
 			svg.appendChild(line);
 			let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 				text.setAttribute('x', 0);
 				text.setAttribute('y', i - 3);
-				text.setAttribute('style', 'fill:#eee; font-family:monospace; font-size:14px; text-shadow:1px 1px 1px #000');
+				text.setAttribute('class', 'disks-info-celsius-text');
 				if(c % 2 == 0) {
 					text.appendChild(document.createTextNode(((svgHeight - i) / tempValueMul) + tempMinimalValue + ' °C'));
 				};
@@ -592,7 +635,7 @@ return view.extend({
 		let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 			text.setAttribute('x', svgWidth / 3);
 			text.setAttribute('y', svgHeight - 10);
-			text.setAttribute('style', 'fill:#eee; font-family:monospace; font-size:12px; text-shadow:1px 1px 1px #000');
+			text.setAttribute('class', 'disks-info-summary-text');
 			text.appendChild(document.createTextNode(`Interval:${intervalMin}m Tmin:${tempMin}°C Tmax:${tempMax}°C`));
 		svg.appendChild(text);
 
@@ -734,8 +777,7 @@ return view.extend({
 					])
 				);
 			};
-			statsArea.append(pageTableTitle);
-			statsArea.append(pageTable);
+			statsArea.append(pageTableTitle, pageTable);
 		};
 		return statsArea;
 	},
