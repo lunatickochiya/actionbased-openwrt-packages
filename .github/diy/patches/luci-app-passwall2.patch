@@ -1,3 +1,17 @@
+--- a/luci-app-passwall2/root/etc/uci-defaults/luci-passwall2
++++ b/luci-app-passwall2/root/etc/uci-defaults/luci-passwall2
+@@ -1,5 +1,10 @@
+ #!/bin/sh
+ 
++[ "`which nft`" ] && {
++uci -q set passwall2.@global_forwarding[0].use_nft=1
++uci -q commit passwall2
++}
++
+ if [ -e "/etc/config/ucitrack" ]; then
+     uci -q batch <<-EOF
+  		delete ucitrack.@passwall2[-1]
+
 --- a/luci-app-passwall2/luasrc/controller/passwall2.lua
 +++ b/luci-app-passwall2/luasrc/controller/passwall2.lua
 @@ -82,6 +82,7 @@ function index()
