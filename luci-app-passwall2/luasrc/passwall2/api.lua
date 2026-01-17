@@ -108,10 +108,10 @@ function sh_uci_commit(config)
 end
 
 function set_cache_var(key, val)
-	sys.call(string.format('/usr/share/passwall2/app.sh set_cache_var %s "%s"', key, val))
+	sys.call(string.format('. /usr/share/passwall2/utils.sh ; set_cache_var %s "%s"', key, val))
 end
 function get_cache_var(key)
-	local val = sys.exec(string.format('echo -n $(/usr/share/passwall2/app.sh get_cache_var %s)', key))
+	local val = sys.exec(string.format('. /usr/share/passwall2/utils.sh ; echo -n $(get_cache_var %s)', key))
 	if val == "" then val = nil end
 	return val
 end
@@ -1178,7 +1178,7 @@ function get_version()
 	if not version or #version == 0 then
 		version = sys.exec("apk list luci-app-passwall2 2>/dev/null | awk '/installed/ {print $1}' | cut -d'-' -f4-")
 	end
-	return (version or ""):gsub("\n", "")
+	return (version or ""):gsub("\n", ""):match("^([^-]+)")
 end
 
 function to_check_self()
