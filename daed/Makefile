@@ -6,11 +6,11 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=daed
 PKG_VERSION:=1.21.1
-PKG_RELEASE:=58
+PKG_RELEASE:=59
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/daeuniverse/daed.git
-PKG_SOURCE_VERSION:=7b4e3e87bb1d245dbb993d715bb66bbb67cf655d
+PKG_SOURCE_VERSION:=b14dae8246dda1211c75a78b3fa33a46e5aaaa3e
 PKG_MIRROR_HASH:=skip
 
 PKG_LICENSE:=AGPL-3.0-only MIT

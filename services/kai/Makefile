@@ -10,11 +10,11 @@ include $(TOPDIR)/rules.mk
 PKG_ARCH_kai:=$(ARCH)
 
 PKG_NAME:=kai
-PKG_VERSION:=0.0.1
+PKG_VERSION:=0.0.2
 PKG_RELEASE:=0
 PKG_SOURCE:=$(PKG_NAME)-binary-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://github.com/Carseason/openwrt-packages/releases/download/prebuilt/
-PKG_HASH:=ac0f198049f3a9c0483c88d5bd48531b3ca0d85a7320291e94d7054afd4ea412
+PKG_HASH:=6938d0cd9460cbb454f83000a83c79b46a1d2aab38e1a16aba6de71f5ce1a8ab
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-binary-$(PKG_VERSION)
 
 PKG_BUILD_PARALLEL:=1
@@ -38,16 +38,6 @@ define Package/$(PKG_NAME)/conffiles
 /etc/config/kai
 endef
 
-define Package/$(PKG_NAME)/postinst
-#!/bin/sh
-if [ -z "$${IPKG_INSTROOT}" ]; then
-	if [ -f /etc/uci-defaults/09-kai ]; then
-		chmod 755 /etc/uci-defaults/09-kai
-		/etc/uci-defaults/09-kai && rm -f /etc/uci-defaults/09-kai
-	fi
-fi
-endef
-
 define Build/Configure
 endef
 
@@ -55,11 +45,9 @@ define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/install
-	$(INSTALL_DIR) $(1)/usr/sbin $(1)/etc/init.d $(1)/etc/uci-defaults $(1)/etc/config
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/kai_bin.$(PKG_ARCH_kai) $(1)/usr/sbin/kai_bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/kai_session.$(PKG_ARCH_kai) $(1)/usr/sbin/kai_session
+	$(INSTALL_DIR) $(1)/usr/sbin $(1)/etc/init.d $(1)/etc/config
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/kai.$(PKG_ARCH_kai) $(1)/usr/sbin/kai_bin
 	$(INSTALL_BIN) ./files/kai.init $(1)/etc/init.d/kai
-	$(INSTALL_BIN) ./files/kai.uci-default $(1)/etc/uci-defaults/09-kai
 	$(INSTALL_CONF) ./files/kai.config $(1)/etc/config/kai
 endef
 

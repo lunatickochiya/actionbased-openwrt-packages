@@ -74,12 +74,20 @@ network_name = s:taboption("general", Value, "network_name", translate("Network 
         translate("The network name used to identify this VPN network (--network-name parameter)"))
 network_name.password = true
 network_name.placeholder = "easytier-name"
+network_name.maxlength = 64
+network_name.validate = function(self, value)
+    if value and value ~= "" and value:match("[^%w%-_]") then
+        return nil, translate("Only alphanumeric characters, hyphens and underscores allowed")
+    end
+    return value
+end
 network_name:depends("etcmd", "etcmd")
 
 network_secret = s:taboption("general", Value, "network_secret", translate("Network Secret"),
         translate("Network secret used to verify whether this node belongs to the VPN network (--network-secret parameter)"))
 network_secret.password = true
 network_secret.placeholder = "easytier-password"
+network_secret.maxlength = 128
 network_secret:depends("etcmd", "etcmd")
 
 ip_dhcp = s:taboption("general", Flag, "ip_dhcp", translate("Enable DHCP"),
@@ -192,14 +200,14 @@ local model = nixio.fs.readfile("/proc/device-tree/model") or ""
 local hostname = nixio.fs.readfile("/proc/sys/kernel/hostname") or ""
 model = model:gsub("\n", "")
 hostname = hostname:gsub("\n", "")
-local device_name = (model ~= "" and model) or (hostname ~= "" and hostname) or "OpenWrt"
-device_name = device_name:gsub(" ", "_")
-desvice_name = s:taboption("general", Value, "desvice_name", translate("Hostname"),
+local device_name_default = (model ~= "" and model) or (hostname ~= "" and hostname) or "OpenWrt"
+device_name_default = device_name_default:gsub(" ", "_")
+hostname_opt = s:taboption("general", Value, "desvice_name", translate("Hostname"),
         translate("The hostname used to identify this device (--hostname parameter)"))
-desvice_name.placeholder = device_name
-desvice_name.default = device_name
-desvice_name:depends("etcmd", "etcmd")
-desvice_name:depends("etcmd", "web")
+hostname_opt.placeholder = device_name_default
+hostname_opt.default = device_name_default
+hostname_opt:depends("etcmd", "etcmd")
+hostname_opt:depends("etcmd", "web")
 
 uuid = s:taboption("general", Value, "uuid", translate("UUID"),
         translate("Unique identifier used to recognize this device when connecting to the web console, for issuing configuration files"))
@@ -253,15 +261,15 @@ disable_encryption = s:taboption("privacy", Flag, "disable_encryption", translat
 disable_encryption:depends("etcmd", "etcmd")
 
 encryption_algorithm = s:taboption("privacy", ListValue, "encryption_algorithm", translate("Encryption Algorithm"),
-        translate("encryption algorithm to use, supported: xor, chacha20, aes-gcm, aes-gcm-256, openssl-aes128-gcm, openssl-aes256-gcm, openssl-chacha20. default (aes-gcm) (--encryption-algorithm parameter)"))
+        translate("encryption algorithm to use, supported: xor, chacha20, aes-gcm, aes-256-gcm, openssl-aes-gcm, openssl-chacha20, openssl-aes-256-gcm. default (aes-gcm) (--encryption-algorithm parameter)"))
 encryption_algorithm.default = "aes-gcm"
 encryption_algorithm:value("xor",translate("xor"))
 encryption_algorithm:value("chacha20",translate("chacha20"))
 encryption_algorithm:value("aes-gcm",translate("aes-gcm"))
-encryption_algorithm:value("aes-gcm-256",translate("aes-gcm-256"))
-encryption_algorithm:value("openssl-aes128-gcm",translate("openssl-aes128-gcm"))
-encryption_algorithm:value("openssl-aes256-gcm",translate("openssl-aes256-gcm"))
+encryption_algorithm:value("aes-256-gcm",translate("aes-256-gcm"))
+encryption_algorithm:value("openssl-aes-gcm",translate("openssl-aes-gcm"))
 encryption_algorithm:value("openssl-chacha20",translate("openssl-chacha20"))
+encryption_algorithm:value("openssl-aes-256-gcm",translate("openssl-aes-256-gcm"))
 encryption_algorithm:depends("etcmd", "etcmd")
 
 multi_thread = s:taboption("privacy", Flag, "multi_thread", translate("Enable Multithreading"),
@@ -441,6 +449,22 @@ log:value("info", translate("Info"))
 log:value("debug", translate("Debug"))
 log:value("trace", translate("Trace"))
 
+-- Network Configuration Options
+auto_config_interface = s:taboption("privacy", Flag, "auto_config_interface", translate("Auto Configure Interface"),
+        translate("Automatically create and configure the EasyTier network interface"))
+auto_config_interface.default = "1"
+
+interface_netmask = s:taboption("privacy", Value, "interface_netmask", translate("Interface Netmask"),
+        translate("Subnet mask for the EasyTier interface (default: 255.0.0.0)"))
+interface_netmask.placeholder = "255.0.0.0"
+interface_netmask.default = "255.0.0.0"
+interface_netmask.datatype = "ip4addr"
+interface_netmask:depends("auto_config_interface", "1")
+
+auto_config_firewall = s:taboption("privacy", Flag, "auto_config_firewall", translate("Auto Configure Firewall"),
+        translate("Automatically add and manage firewall rules"))
+auto_config_firewall.default = "1"
+
 et_forward = s:taboption("privacy", MultiValue, "et_forward", translate("Access Control"),
         translate("Set traffic permission rules between different network zones"))
 et_forward:value("etfwlan", translate("Allow traffic from EasyTier virtual network to LAN"))
@@ -495,6 +519,16 @@ webbin = s:taboption("upload", Value, "webbin", translate("easytier-web Binary P
                 .. "then upload the installer"))
 webbin.placeholder = "/usr/bin/easytier-web"
 webbin.default = "/usr/bin/easytier-web"
+
+github_proxys = s:taboption("upload", Value, "github_proxys", translate("GitHub Proxy URLs"),
+        translate("Space-separated list of GitHub proxy URLs for downloading binaries. "
+                .. "Leave empty to use default proxies."))
+github_proxys.placeholder = "https://ghproxy.net/ https://gh-proxy.com/"
+
+fallback_version = s:taboption("upload", Value, "fallback_version", translate("Fallback Version"),
+        translate("Fallback version to use when unable to fetch the latest version from GitHub."))
+fallback_version.placeholder = "v2.5.0"
+fallback_version.default = "v2.5.0"
 
 local upload = s:taboption("upload", FileUpload, "upload_file")
 upload.optional = true
