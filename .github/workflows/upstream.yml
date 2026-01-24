@@ -360,6 +360,9 @@ jobs:
         # git_clone https://github.com/vison-v/luci-app-nginx-proxy
         git_clone https://github.com/tty228/luci-app-wechatpush
         git_clone https://github.com/AngelaCooljx/luci-theme-material3
+        git_clone https://github.com/sbwml/luci-app-webdav
+        git_clone https://github.com/sbwml/package_kernel_tcp-brutal
+        git_clone https://github.com/hudra0/luci-app-qosmate
         ) &
         (
         # git_clone https://github.com/Ysurac/openmptcprouter-feeds; mv openmptcprouter-feeds/luci-app-iperf ./;rm -rf openmptcprouter-feeds
