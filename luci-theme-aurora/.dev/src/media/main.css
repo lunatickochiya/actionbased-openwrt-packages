@@ -499,6 +499,10 @@
       }
     }
 
+    .control-group {
+      @apply mt-1;
+    }
+
     .control-group,
     .cbi-page-actions > div,
     .cbi-section-actions > div {
@@ -1044,11 +1048,6 @@
   @layer card {
     .cbi-section {
       @apply mb-3 overflow-visible rounded-2xl p-5 max-md:p-3;
-
-      /**
-       * Fix tab switching layout issue where `h-0` + invisible still leaves box spacing.
-       * If you wonder why this exists, ask the stupid LuCI `channel_analysis.js`.
-       */
 
       &[data-tab-title] {
         @apply m-0 p-0;
@@ -1694,15 +1693,17 @@
       }
 
       & > .cbi-value-field {
-        @apply flex max-w-full flex-1 flex-col gap-3;
-        &:not(:has(.cbi-dynlist)) {
-          @apply flex-row flex-wrap;
-        }
+        @apply max-w-full flex-1;
+
         &:has(> .cbi-dropdown[disabled]) {
           @apply cursor-not-allowed;
         }
         & .cbi-value-description {
-          @apply ml-3 break-words text-slate-500 dark:text-slate-400;
+          @apply relative mt-1 pl-4 leading-none break-words text-slate-500 dark:text-slate-400;
+
+          &:not(:empty) {
+            @apply before:bg-info-text before:absolute before:-left-0.5 before:inline-block before:size-4 before:[mask:url('@assets/icons/info.svg')_center/cover_no-repeat];
+          }
         }
       }
 
@@ -1858,7 +1859,7 @@
   }
 
   .spinning {
-    @apply relative !pl-8;
+    @apply relative inline-block !pl-8;
     @apply before:absolute before:top-1/2 before:left-[6px] before:size-5 before:-translate-y-1/2 before:animate-spin before:bg-current before:[mask:url('@assets/icons/spinning.svg')_center/cover_no-repeat];
     #view > & {
       @apply first:mx-auto first:grid first:min-h-[15vh] first:w-fit first:place-items-center first:max-md:min-h-dvh;
