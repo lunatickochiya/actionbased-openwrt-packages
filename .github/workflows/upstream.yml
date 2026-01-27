@@ -587,6 +587,7 @@ jobs:
             echo "wait"
           sleep 1
         done
+        rm -rf mosdns/patches/{100*}
 
     - name: Apply
       run: |
