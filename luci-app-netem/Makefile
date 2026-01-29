@@ -8,7 +8,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-netem
-PKG_RELEASE:=9
+PKG_RELEASE:=10
 PKG_VERSION:=0.1
 
 PKG_BUILD_DEPENDS:=$(if $(STAGING_DIR_ROOT),lua/host)
