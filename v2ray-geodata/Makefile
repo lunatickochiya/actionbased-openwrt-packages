@@ -5,14 +5,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=v2ray-geodata
-PKG_RELEASE:=60
+PKG_RELEASE:=61
 
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 
 include $(INCLUDE_DIR)/package.mk
 
-GEOIP_VER:=202601150021
+GEOIP_VER:=202601290026
 GEOIP_FILE:=geoip.dat.$(GEOIP_VER)
 define Download/geoip
   URL:=https://github.com/Loyalsoldier/geoip/releases/download/$(GEOIP_VER)/
@@ -21,7 +21,7 @@ define Download/geoip
   HASH:=skip
 endef
 
-GEOSITE_VER:=202601172214
+GEOSITE_VER:=202602012218
 GEOSITE_FILE:=geosite.dat.$(GEOSITE_VER)
 define Download/geosite
   URL:=https://github.com/Loyalsoldier/v2ray-rules-dat/releases/download/$(GEOSITE_VER)/
