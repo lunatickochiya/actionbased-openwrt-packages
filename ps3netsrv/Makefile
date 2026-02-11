@@ -8,17 +8,18 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ps3netsrv
 PKG_VERSION:=20250803
-PKG_GIT_COMMIT:=cb0e765ad37d62cf68b5f0d7bdda4b477b96fba8
-PKG_RELEASE:=8
+PKG_GIT_COMMIT:=3107bba17870657c5bb3f7830657838d766a296c
+PKG_RELEASE:=9
 
-PKG_SOURCE:=$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://github.com/jhonathanc/ps3netsrv/archive/refs/tags
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_GIT_COMMIT).tar.gz
+PKG_SOURCE_URL:=https://github.com/jhonathanc/ps3netsrv/releases/download/$(PKG_VERSION)
 PKG_HASH:=skip
 PKG_INSTALL:=1
 
 PKG_MAINTAINER:=JCorrea
 PKG_LICENSE:=GPLv3
 PKG_LICENSE_FILES:=COPYING
+PKG_BUILD_DEPENDS:=mbedtls
 
 include $(INCLUDE_DIR)/package.mk
 
