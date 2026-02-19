@@ -3,8 +3,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=nezha-agent
-PKG_VERSION:=2.0.0
-PKG_RELEASE:=50
+PKG_VERSION:=2.0.1
+PKG_RELEASE:=51
 
 include $(INCLUDE_DIR)/package.mk
 
