@@ -443,9 +443,10 @@ function gen_outbound(flag, node, tag, proxy_table)
 				udp_relay_mode = node.tuic_udp_relay_mode or "native",
 				udp_over_stream = false,
 				zero_rtt_handshake = (node.tuic_zero_rtt_handshake == "1") and true or false,
-				heartbeat = node.tuic_heartbeat .. "s",
+				heartbeat = (tonumber(node.tuic_heartbeat) or 3) .. "s",
 				tls = {
 					enabled = true,
+					disable_sni = (node.tls_disable_sni == "1") and true or false,
 					server_name = node.tls_serverName,
 					insecure = (node.tls_allowInsecure == "1") and true or false,
 					fragment = fragment,
@@ -453,10 +454,10 @@ function gen_outbound(flag, node, tag, proxy_table)
 					alpn = (node.tuic_alpn and node.tuic_alpn ~= "") and {
 						node.tuic_alpn
 					} or nil,
-					ech = {
-						enabled = (node.ech == "1") and true or false,
+					ech = (node.ech == "1") and {
+						enabled = true,
 						config = node.ech_config and split(node.ech_config:gsub("\\n", "\n"), "\n") or {}
-					}
+					} or nil
 				}
 			}
 		end
@@ -1194,7 +1195,7 @@ function gen_config(var)
 			return outbound
 		end
 
-		function set_outbound_detour(node, outbound, outbounds_table, shunt_rule_name)
+		function set_outbound_detour(node, outbound, outbounds_table)
 			if not node or not outbound or not outbounds_table then return nil end
 			local default_outTag = outbound.tag
 			local last_insert_outbound
@@ -1229,7 +1230,7 @@ function gen_config(var)
 					if preproxy_node then
 						local preproxy_outbound, exist
 						if preproxy_node.protocol == "_urltest" then
-							if preproxy_node.urltest_node then
+							if preproxy_node.urltest_node or (preproxy_node.node_add_mode and preproxy_node.node_add_mode == "batch") then
 								preproxy_outbound, exist = gen_urltest_outbound(preproxy_node)
 							end
 						else
@@ -1284,12 +1285,7 @@ function gen_config(var)
 						to_outbound = gen_outbound(node[".name"], to_node)
 					end
 					if to_outbound then
-						if shunt_rule_name then
-							to_outbound.tag = outbound.tag
-							outbound.tag = node[".name"]
-						else
-							to_outbound.tag = outbound.tag .. " -> " .. to_outbound.tag
-						end
+						to_outbound.tag = outbound.tag .. " -> " .. to_outbound.tag
 						if to_node.type == "sing-box" then
 							to_outbound.detour = outbound.tag
 						end
@@ -1309,21 +1305,8 @@ function gen_config(var)
 			elseif type(node_id) == "table" then
 				node = node_id
 			end
+			if not tag then tag = node[".name"] end
 			if node then
-				if node.protocol == "_iface" then
-					if node.iface then
-						local outbound = {
-							tag = tag,
-							type = "direct",
-							bind_interface = node.iface,
-							routing_mark = 255,
-						}
-						table.insert(outbounds, outbound)
-						sys.call(string.format("mkdir -p %s && touch %s/%s", api.TMP_IFACE_PATH, api.TMP_IFACE_PATH, node.iface))
-						return outbound.tag
-					end
-					return nil
-				end
 				if proxy_table.chain_proxy == "1" or proxy_table.chain_proxy == "2" then
 					node.chain_proxy = proxy_table.chain_proxy
 					node.preproxy_node = proxy_table.chain_proxy == "1" and proxy_table.preproxy_node
@@ -1334,11 +1317,21 @@ function gen_config(var)
 				end
 				local outbound, exist
 				if node.protocol == "_urltest" then
-					if node.urltest_node then
+					if node.urltest_node or (node.node_add_mode and node.node_add_mode == "batch") then
 						outbound, exist = gen_urltest_outbound(node)
 						if exist then
 							return outbound.tag
 						end
+					end
+				elseif node.protocol == "_iface" then
+					if node.iface then
+						outbound = {
+							tag = tag,
+							type = "direct",
+							bind_interface = node.iface,
+							routing_mark = 255,
+						}
+						sys.call(string.format("mkdir -p %s && touch %s/%s", api.TMP_IFACE_PATH, api.TMP_IFACE_PATH, node.iface))
 					end
 				else
 					for _, _outbound in ipairs(outbounds) do
